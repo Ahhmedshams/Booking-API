@@ -1,0 +1,17 @@
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Infrastructure.deps.json
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Infrastructure.dll
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Infrastructure.pdb
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Application.dll
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Domain.dll
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Application.pdb
+D:\Projects\BookingAPI\Infrastructure\bin\Debug\net7.0\Domain.pdb
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.csproj.AssemblyReference.cache
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.AssemblyInfoInputs.cache
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.AssemblyInfo.cs
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.csproj.CoreCompileInputs.cache
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.csproj.CopyComplete
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.dll
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\refint\Infrastructure.dll
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\Infrastructure.pdb
+D:\Projects\BookingAPI\Infrastructure\obj\Debug\net7.0\ref\Infrastructure.dll

@@ -1,0 +1,12 @@
+D:\Projects\BookingAPI\Domain\bin\Debug\net7.0\Domain.deps.json
+D:\Projects\BookingAPI\Domain\bin\Debug\net7.0\Domain.dll
+D:\Projects\BookingAPI\Domain\bin\Debug\net7.0\Domain.pdb
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.csproj.AssemblyReference.cache
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.AssemblyInfoInputs.cache
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.AssemblyInfo.cs
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.csproj.CoreCompileInputs.cache
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.dll
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\refint\Domain.dll
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\Domain.pdb
+D:\Projects\BookingAPI\Domain\obj\Debug\net7.0\ref\Domain.dll

@@ -1,0 +1,15 @@
+D:\Projects\BookingAPI\Application\bin\Debug\net7.0\Application.deps.json
+D:\Projects\BookingAPI\Application\bin\Debug\net7.0\Application.dll
+D:\Projects\BookingAPI\Application\bin\Debug\net7.0\Application.pdb
+D:\Projects\BookingAPI\Application\bin\Debug\net7.0\Domain.dll
+D:\Projects\BookingAPI\Application\bin\Debug\net7.0\Domain.pdb
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.csproj.AssemblyReference.cache
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.AssemblyInfoInputs.cache
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.AssemblyInfo.cs
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.csproj.CoreCompileInputs.cache
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.csproj.CopyComplete
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.dll
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\refint\Application.dll
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\Application.pdb
+D:\Projects\BookingAPI\Application\obj\Debug\net7.0\ref\Application.dll
