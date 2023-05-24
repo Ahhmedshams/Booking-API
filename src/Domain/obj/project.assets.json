@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj",
+      "projectUniqueName": "C:\\Users\\ahmed\\Source\\Repos\\Booking-API\\src\\Domain\\Domain.csproj",
       "projectName": "Domain",
-      "projectPath": "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj",
+      "projectPath": "C:\\Users\\ahmed\\Source\\Repos\\Booking-API\\src\\Domain\\Domain.csproj",
       "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\BookingAPI\\Domain\\obj\\",
+      "outputPath": "C:\\Users\\ahmed\\Source\\Repos\\Booking-API\\src\\Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

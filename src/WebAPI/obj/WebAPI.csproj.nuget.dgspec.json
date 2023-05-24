@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\BookingAPI\\WebAPI\\WebAPI.csproj": {}
+    "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\WebAPI\\WebAPI.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\BookingAPI\\Application\\Application.csproj": {
+    "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\BookingAPI\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "D:\\Projects\\BookingAPI\\Application\\Application.csproj",
+        "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj",
         "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\BookingAPI\\Application\\obj\\",
+        "outputPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj": {
-                "projectPath": "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj"
+              "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Domain\\Domain.csproj"
               }
             }
           }
@@ -77,14 +77,14 @@
         }
       }
     },
-    "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj": {
+    "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "D:\\Projects\\BookingAPI\\Domain\\Domain.csproj",
+        "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Domain\\Domain.csproj",
         "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\BookingAPI\\Domain\\obj\\",
+        "outputPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -136,14 +136,14 @@
         }
       }
     },
-    "D:\\Projects\\BookingAPI\\Infrastructure\\Infrastructure.csproj": {
+    "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\BookingAPI\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "D:\\Projects\\BookingAPI\\Infrastructure\\Infrastructure.csproj",
+        "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj",
         "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\BookingAPI\\Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -164,8 +164,8 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Projects\\BookingAPI\\Application\\Application.csproj": {
-                "projectPath": "D:\\Projects\\BookingAPI\\Application\\Application.csproj"
+              "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj": {
+                "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj"
               }
             }
           }
@@ -180,10 +180,6 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
-            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
-              "target": "Package",
-              "version": "[12.0.1, )"
-            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[7.0.5, )"
@@ -213,14 +209,14 @@
         }
       }
     },
-    "D:\\Projects\\BookingAPI\\WebAPI\\WebAPI.csproj": {
+    "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\WebAPI\\WebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\BookingAPI\\WebAPI\\WebAPI.csproj",
+        "projectUniqueName": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\WebAPI\\WebAPI.csproj",
         "projectName": "WebAPI",
-        "projectPath": "D:\\Projects\\BookingAPI\\WebAPI\\WebAPI.csproj",
+        "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\WebAPI\\WebAPI.csproj",
         "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\BookingAPI\\WebAPI\\obj\\",
+        "outputPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\WebAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -242,11 +238,11 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Projects\\BookingAPI\\Application\\Application.csproj": {
-                "projectPath": "D:\\Projects\\BookingAPI\\Application\\Application.csproj"
+              "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj": {
+                "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Application\\Application.csproj"
               },
-              "D:\\Projects\\BookingAPI\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\Projects\\BookingAPI\\Infrastructure\\Infrastructure.csproj"
+              "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\ahmed\\source\\repos\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
