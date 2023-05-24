@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class ResourceSchedule
+    public class ResourceSchedule : BaseEntity
     {
         public int Id { get; set; }
+        public string ResourceId { get; set; }
         public string Days { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set;}
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set;}
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set;}
+
+        public ResourceData ResourceData { get; set; }
 
     }
 }

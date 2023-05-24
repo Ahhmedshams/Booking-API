@@ -10,6 +10,9 @@ namespace Infrastructure.Persistence
         public ApplicationDbContext() { }
         public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
+        DbSet<ResourceType>  ResourceTypes { get; set; }
+        DbSet<ResourceMetadata> ResourceMetadata { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

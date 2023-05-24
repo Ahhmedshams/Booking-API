@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Helpers\" />
-    <Folder Include="Common\Interfaces\Repositories\" />
     <Folder Include="Common\Models\" />
   </ItemGroup>
 
