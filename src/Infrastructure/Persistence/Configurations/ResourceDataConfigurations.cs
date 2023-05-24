@@ -17,6 +17,10 @@ namespace Infrastructure.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(e => e.AttributeId);
 
+            builder.HasOne(e => e.Resource)
+                .WithMany()
+                .HasForeignKey(e => e.ResourceId);
+
 
 
         }

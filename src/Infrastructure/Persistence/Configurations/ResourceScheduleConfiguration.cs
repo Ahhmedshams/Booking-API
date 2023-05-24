@@ -26,8 +26,8 @@ namespace Infrastructure.Persistence.Configurations
                 v => TimeOnly.FromTimeSpan(v));
 
             builder.HasOne(e => e.ResourceData)
-                .WithMany()
-                .HasForeignKey(e => e.ResourceId);
+                .WithMany();
+              
 
 
 

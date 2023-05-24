@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Configurations
 {
-    public class ResourcePriceConfigurations : IEntityTypeConfiguration<ResourcePrice>
+    public class ResourceConfigurations : IEntityTypeConfiguration<Resource>
     {
-        public void Configure(EntityTypeBuilder<ResourcePrice> builder)
+        public void Configure(EntityTypeBuilder<Resource> builder)
         {
             
             builder.HasKey(e => e.Id);
@@ -24,9 +24,7 @@ namespace Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            builder.HasOne(e => e.ResourceData)
-                .WithMany()
-                .HasForeignKey(e => e.ResourceId);
+           
 
             builder.Property(e => e.Price).HasColumnType("decimal(5,2)");
 
