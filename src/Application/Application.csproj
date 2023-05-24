@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\" />
-    <Folder Include="Common\Interfaces\" />
     <Folder Include="Common\Helpers\" />
+    <Folder Include="Common\Interfaces\Repositories\" />
     <Folder Include="Common\Models\" />
   </ItemGroup>
 

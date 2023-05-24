@@ -176,3 +176,4 @@ C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\refint\WebAP
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\WebAPI.pdb
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\WebAPI.genruntimeconfig.cache
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\ref\WebAPI.dll
+C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\CoreApiResponse.dll
