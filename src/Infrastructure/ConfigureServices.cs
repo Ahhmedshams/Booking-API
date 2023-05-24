@@ -12,6 +12,7 @@ namespace Infrastructure
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
+                
                 options.UseSqlServer(configuration.GetConnectionString("Connection1"),
                       b => b.MigrationsAssembly("Infrastructure"));
             });

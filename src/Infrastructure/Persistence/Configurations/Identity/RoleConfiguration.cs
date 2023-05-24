@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Persistence.Configurations
+namespace Infrastructure.Persistence.Configurations.Identity
 {
     public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
     {
@@ -18,6 +18,6 @@ namespace Infrastructure.Persistence.Configurations
             builder.ToTable("Roles", "security");
 
         }
-        
+
     }
 }
