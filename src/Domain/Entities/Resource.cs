@@ -14,5 +14,6 @@ namespace Domain.Entities
 
 
         public ResourceType ResourceType { get; set; }
+        //public IEnumerable<ResourceData> Data { get; set; }
     }
 }

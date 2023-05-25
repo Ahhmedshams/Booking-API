@@ -1,4 +1,6 @@
-﻿using Infrastructure.Persistence;
+﻿using Application.Common.Interfaces.Repositories;
+using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,14 @@ namespace Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("Connection1"),
                       b => b.MigrationsAssembly("Infrastructure"));
             });
+
+            services.AddScoped<IResourceTypeRepo, ResourceTypeRepository>();
+            services.AddScoped<IResourceMetadataRepo, ResourceMetadataRepository>();
+            services.AddScoped<IResourceRepo, ResourceRepository>();
+            services.AddScoped<IResourceDataRepo, ResourceDataRepository>();
+
+
+
             return services;
         }
     }

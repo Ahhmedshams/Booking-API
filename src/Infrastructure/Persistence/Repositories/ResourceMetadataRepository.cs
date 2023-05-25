@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class ResourceMetadataRepository : CRUDRepository<ResourceMetadata>, IResourceMetadataRepository
+    public class ResourceMetadataRepository : CRUDRepository<ResourceMetadata>, IResourceMetadataRepo
     {
 
         public ResourceMetadataRepository(ApplicationDbContext context) :base(context) { }
@@ -38,6 +38,12 @@ namespace Infrastructure.Persistence.Repositories
         {
             await _context.ResourceMetadata.Where(predicate).ExecuteDeleteAsync();
             await _context.SaveChangesAsync();
+        }
+
+        public IEnumerable<ResourceMetadata> Find(Expression<Func<ResourceMetadata, bool>> predicate)
+        {
+           var res= _context.ResourceMetadata.Where(predicate).ToList();
+            return res;
         }
     }
 }

@@ -9,10 +9,10 @@ namespace Infrastructure.Persistence
     {
         public ApplicationDbContext() { }
         public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-       public DbSet<ResourceType>  ResourceTypes { get; set; }
+        public DbSet<ResourceType>  ResourceTypes { get; set; }
         public DbSet<ResourceMetadata> ResourceMetadata { get; set; }
-
+        public DbSet<Resource> Resource { get; set; }
+        public DbSet<ResourceData> ResourceData { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

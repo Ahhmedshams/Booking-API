@@ -97,6 +97,7 @@ C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\AutoMapper.d
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\Azure.Core.dll
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\Azure.Identity.dll
+C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\CoreApiResponse.dll
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\Humanizer.dll
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Cryptography.Internal.dll
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
@@ -176,4 +177,3 @@ C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\refint\WebAP
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\WebAPI.pdb
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\WebAPI.genruntimeconfig.cache
 C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\obj\Debug\net7.0\ref\WebAPI.dll
-C:\Users\ahmed\source\repos\Booking-API\src\WebAPI\bin\Debug\net7.0\CoreApiResponse.dll

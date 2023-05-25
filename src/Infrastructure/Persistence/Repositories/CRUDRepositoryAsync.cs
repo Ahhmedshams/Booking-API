@@ -51,16 +51,17 @@ namespace Infrastructure.Persistence.Repositories
             return foundEntity;
         }
 
-        public async Task<T> EditAsync<IDType>(IDType id, T entity)
+        public async Task<T> EditAsync<O>(O id, T entity, Expression<Func<T, O>> keySelector)
         {
             var foundEntity = await _context.Set<T>().FindAsync(id);
             if (foundEntity == null) return null;
+            _context.Entry(entity).Property(keySelector).CurrentValue = id;
             _context.Entry(foundEntity).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
             return foundEntity;
         }
 
-        
+
 
         public async Task<T?> GetByIdAsync<IDType>(IDType id , params Expression<Func<T, object>>[] includes)
         {

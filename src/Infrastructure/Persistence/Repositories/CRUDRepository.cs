@@ -48,12 +48,13 @@ namespace Infrastructure.Persistence.Repositories
             return foundEntity;
         }
 
-        public  T Edit<IDType>(IDType id, T entity)
+        public  T Edit<O>(O id, T entity, Expression<Func<T, O>> keySelector)
         {
             var foundEntity =  _context.Set<T>().Find(id);
             if (foundEntity == null) return null;
+            _context.Entry(entity).Property(keySelector).CurrentValue = id;
             _context.Entry(foundEntity).CurrentValues.SetValues(entity);
-             _context.SaveChanges();
+           var res =  _context.SaveChanges();
             return foundEntity;
         }
 

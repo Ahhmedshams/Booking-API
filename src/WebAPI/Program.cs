@@ -1,5 +1,6 @@
 using Infrastructure;
 using Application;
+using System.Reflection;
 
 namespace WebAPI
 {
@@ -19,8 +20,10 @@ namespace WebAPI
 
 
             builder.Services.AddInfrastructureServices(builder.Configuration);
-            builder.Services.AddApplicationServices();
 
+
+            //builder.Services.AddApplicationServices();
+            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
