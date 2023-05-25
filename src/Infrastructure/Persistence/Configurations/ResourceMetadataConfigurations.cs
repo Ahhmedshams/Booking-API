@@ -12,7 +12,7 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(x => x.IsDeleted).HasDefaultValue(false);
 
             builder.HasOne(e => e.ResourceType)
-                .WithMany()
+                .WithMany(r=>r.Metadata)
                 .HasForeignKey(e => e.ResourceTypeId);
 
 

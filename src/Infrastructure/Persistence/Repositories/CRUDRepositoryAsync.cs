@@ -9,13 +9,16 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class CRUDRepository<T> : CRUDRepositoryAsync<T>,  IRepository<T> where T : class
+    public class CRUDRepositoryAsync<T> : IAsyncRepository<T> where T : class
     {
-        public CRUDRepository(ApplicationDbContext context) : base(context)
+        protected readonly ApplicationDbContext _context;
+
+        public CRUDRepositoryAsync(ApplicationDbContext context)
         {
+            _context = context;
         }
 
-        public  IEnumerable<T> GetAll(bool withNoTracking = true, params Expression<Func<T, object>>[] includes)
+        public async Task<IEnumerable<T>> GetAllAsync(bool withNoTracking = true, params Expression<Func<T, object>>[] includes)
         {
             var query = _context.Set<T>().AsQueryable();
             if (includes.Length > 0)
@@ -24,42 +27,42 @@ namespace Infrastructure.Persistence.Repositories
                     query = query.Include(include);
 
             }
-            if (withNoTracking == true)
+            if (withNoTracking == true) 
                 query.AsNoTracking();
 
-            return query.ToList();
+            return await query.ToListAsync();
         }
 
-        public T Add(T entity)
+        public async Task<T> AddAsync(T entity)
         {
-             _context.Set<T>().Add(entity);
-             _context.SaveChanges();
+            await _context.Set<T>().AddAsync(entity);
+            await _context.SaveChangesAsync();
             return entity;
         }
 
-        public  T Delete<IDType>(IDType id)
+        public async Task<T> DeleteAsync<IDType>(IDType id)
         {
-            var foundEntity =  _context.Set<T>().Find(id);
+            var foundEntity = await _context.Set<T>().FindAsync(id);
             if (foundEntity == null) return null;
 
             _context.Set<T>().Remove(foundEntity);
-             _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return foundEntity;
         }
 
-        public  T Edit<IDType>(IDType id, T entity)
+        public async Task<T> EditAsync<IDType>(IDType id, T entity)
         {
-            var foundEntity =  _context.Set<T>().Find(id);
+            var foundEntity = await _context.Set<T>().FindAsync(id);
             if (foundEntity == null) return null;
             _context.Entry(foundEntity).CurrentValues.SetValues(entity);
-             _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return foundEntity;
         }
 
+        
 
-
-        public  T GetById<IDType>(IDType id, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdAsync<IDType>(IDType id , params Expression<Func<T, object>>[] includes)
         {
             var query = _context.Set<T>().AsQueryable();
             if (includes.Length > 0)
@@ -69,8 +72,7 @@ namespace Infrastructure.Persistence.Repositories
                     query = query.Include(include);
                 }
             }
-            return  _context.Set<T>().Find(id);
+            return await _context.Set<T>().FindAsync(id);
         }
-
     }
 }
