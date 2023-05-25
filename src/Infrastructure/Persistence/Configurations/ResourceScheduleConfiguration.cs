@@ -25,8 +25,8 @@ namespace Infrastructure.Persistence.Configurations
                 v => v.ToTimeSpan(),
                 v => TimeOnly.FromTimeSpan(v));
 
-            builder.HasOne(e => e.ResourceData)
-                .WithMany();
+            //builder.HasOne(e => e.ResourceData)
+            //    .WithMany();
               
 
 

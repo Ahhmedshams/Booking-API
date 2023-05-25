@@ -8,6 +8,6 @@ namespace Application.Common.Interfaces.Repositories
         IEnumerable<T> GetAll(bool withNoTracking = true, params Expression<Func<T, object>>[] includes);
         T Add(T entity);
         T Delete<IDType>(IDType id);
-        T Edit<IDType>(IDType id, T entity);
+        T Edit<IDType>(IDType id, T entity, Expression<Func<T, IDType>> keySelector);
     }
 }
