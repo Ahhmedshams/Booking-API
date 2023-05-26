@@ -75,5 +75,21 @@ namespace Infrastructure.Persistence.Repositories
             }
             return await _context.Set<T>().FindAsync(id);
         }
+
+
+        public async Task<T?> GetByIdAsync<IDType1, IDType2>(IDType1 id1, IDType2 id2, params Expression<Func<T, object>>[] includes)
+        {
+            var query = _context.Set<T>().AsQueryable();
+            if (includes.Length > 0)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+            return await _context.Set<T>().FindAsync(id1, id2);
+        }
+
+
     }
 }
