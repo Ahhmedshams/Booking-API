@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ITI\\GraduationProj\\Booking-API\\src\\WebAPI\\WebAPI.csproj": {}
+    "D:\\Booking-API\\src\\WebAPI\\WebAPI.csproj": {}
   },
   "projects": {
-    "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj": {
+    "D:\\Booking-API\\src\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj",
+        "projectUniqueName": "D:\\Booking-API\\src\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj",
-        "packagesPath": "C:\\Users\\HD TECH\\.nuget\\packages\\",
-        "outputPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\obj\\",
+        "projectPath": "D:\\Booking-API\\src\\Application\\Application.csproj",
+        "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
+        "outputPath": "D:\\Booking-API\\src\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HD TECH\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ahmed\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,15 +26,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\ITI\\GraduationProj\\Booking-API\\src\\Domain\\Domain.csproj": {
-                "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Domain\\Domain.csproj"
+              "D:\\Booking-API\\src\\Domain\\Domain.csproj": {
+                "projectPath": "D:\\Booking-API\\src\\Domain\\Domain.csproj"
               }
             }
           }
@@ -74,24 +73,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\ITI\\GraduationProj\\Booking-API\\src\\Domain\\Domain.csproj": {
+    "D:\\Booking-API\\src\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Domain\\Domain.csproj",
+        "projectUniqueName": "D:\\Booking-API\\src\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\HD TECH\\.nuget\\packages\\",
-        "outputPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Domain\\obj\\",
+        "projectPath": "D:\\Booking-API\\src\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
+        "outputPath": "D:\\Booking-API\\src\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HD TECH\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ahmed\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -100,7 +99,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -134,24 +132,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\ITI\\GraduationProj\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj": {
+    "D:\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "D:\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\HD TECH\\.nuget\\packages\\",
-        "outputPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Infrastructure\\obj\\",
+        "projectPath": "D:\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
+        "outputPath": "D:\\Booking-API\\src\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HD TECH\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ahmed\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -160,15 +158,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj": {
-                "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj"
+              "D:\\Booking-API\\src\\Application\\Application.csproj": {
+                "projectPath": "D:\\Booking-API\\src\\Application\\Application.csproj"
               }
             }
           }
@@ -208,24 +205,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\ITI\\GraduationProj\\Booking-API\\src\\WebAPI\\WebAPI.csproj": {
+    "D:\\Booking-API\\src\\WebAPI\\WebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ITI\\GraduationProj\\Booking-API\\src\\WebAPI\\WebAPI.csproj",
+        "projectUniqueName": "D:\\Booking-API\\src\\WebAPI\\WebAPI.csproj",
         "projectName": "WebAPI",
-        "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\WebAPI\\WebAPI.csproj",
-        "packagesPath": "C:\\Users\\HD TECH\\.nuget\\packages\\",
-        "outputPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\WebAPI\\obj\\",
+        "projectPath": "D:\\Booking-API\\src\\WebAPI\\WebAPI.csproj",
+        "packagesPath": "C:\\Users\\ahmed\\.nuget\\packages\\",
+        "outputPath": "D:\\Booking-API\\src\\WebAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HD TECH\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ahmed\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -234,18 +231,17 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj": {
-                "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Application\\Application.csproj"
+              "D:\\Booking-API\\src\\Application\\Application.csproj": {
+                "projectPath": "D:\\Booking-API\\src\\Application\\Application.csproj"
               },
-              "D:\\ITI\\GraduationProj\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\ITI\\GraduationProj\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj"
+              "D:\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\Booking-API\\src\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -304,7 +300,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }
