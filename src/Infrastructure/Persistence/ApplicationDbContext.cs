@@ -14,6 +14,11 @@ namespace Infrastructure.Persistence
         public DbSet<Resource> Resource { get; set; }
         public DbSet<ResourceData> ResourceData { get; set; }
 
+        DbSet<Service> Services { get; set; }
+        DbSet<ServiceMetadata> ServiceMetadata { get; set; }
+        DbSet<BookingItem> BookingItems { get; set; }
+        DbSet<ClientBooking> ClientBookings { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
          
