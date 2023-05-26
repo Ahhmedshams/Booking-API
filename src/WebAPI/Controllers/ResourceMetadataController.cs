@@ -25,9 +25,12 @@ namespace WebAPI.Controllers
             _resourceTypeRepo = resourceTypeRepo;
         }
 
-        [HttpPost]
-        public IActionResult AddRange(ResourceMetaReqDTO[] resourceMetaDTO)
+        [HttpPost("AddRange/{ResTypeID:int}")]
+        public IActionResult AddRange(int ResTypeID, ResourceMetaReqDTO[] resourceMetaDTO)
         {
+            var IdResalt = CheckID(ResTypeID, resourceMetaDTO);
+            if (IdResalt != null)
+                return IdResalt;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
@@ -37,7 +40,7 @@ namespace WebAPI.Controllers
             return CustomResult(res);
         }
 
-        [HttpPost("ResTypeID:int")]
+        [HttpPost("AddOne/{ResTypeID:int}")]
         public IActionResult AddOne(int ResTypeID, ResourceMetaReqDTO resourceMetaDTO)
         {
             var IdResalt = CheckID(ResTypeID, resourceMetaDTO);
@@ -51,8 +54,9 @@ namespace WebAPI.Controllers
             var resourceType = _mapper.Map<ResourceMetadata>(resourceMetaDTO);
             var res =_resourceMetadataRepo.Add(resourceType);
 
-            return CustomResult(res);
+            return CreatedAtAction("GetById", new { id = res.AttributeId }, res);
         }
+
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -78,12 +82,12 @@ namespace WebAPI.Controllers
             return CustomResult(resourceDTO);
         }
 
-        [HttpGet("GetResourceAttribute")]
-        public IActionResult GetByResourceTypeId([FromQuery] int TypeId)
+        [HttpGet("/api/ResourceAttribute/{id:int}")]
+        public IActionResult GetByResourceTypeId(int id)
         {
-            var resource = _resourceMetadataRepo.Find(Re=> Re.ResourceTypeId == TypeId);
+            var resource = _resourceMetadataRepo.Find(Re=> Re.ResourceTypeId == id);
             if (resource.Count() ==0)
-                return CustomResult($"No Resource Metadata Available To Resource Type Id= {TypeId}", HttpStatusCode.NotFound);
+                return CustomResult($"No Resource Metadata Available To Resource Type Id= {id}", HttpStatusCode.NotFound);
 
             var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(resource);
 
@@ -93,14 +97,39 @@ namespace WebAPI.Controllers
 
         private IActionResult CheckID(int ResTypeID, ResourceMetaReqDTO resourceMetaDTO)
         {
+
+            var TypeCheck = CheckResourceType(ResTypeID);
+            if (TypeCheck != null)
+                return TypeCheck;
+
             if (ResTypeID == 0 || ResTypeID != resourceMetaDTO.ResourceTypeId)
                 return CustomResult($"Error In Resource Type {ResTypeID}", HttpStatusCode.BadRequest);
 
+            return null;
+        }
+
+        private IActionResult CheckID(int ResTypeID, ResourceMetaReqDTO[] ResourceMetaDTO)
+        {
+            var TypeCheck = CheckResourceType(ResTypeID);
+            if (TypeCheck != null)
+                return TypeCheck;
+
+            var CheckId = ResourceMetaDTO.Where(Res => Res.ResourceTypeId != ResTypeID);
+
+            if (CheckId.Count() != 0)
+                return CustomResult($"Not All ResourceType ID Are Same ", HttpStatusCode.BadRequest);
+
+          
+            return null;
+        }
+
+        private IActionResult CheckResourceType(int ResTypeID)
+        {
             var resourceType = _resourceTypeRepo.IsExist(ResTypeID);
             if (!resourceType)
                 return CustomResult($"No Resource Type Are Available With id {ResTypeID}", HttpStatusCode.NotFound);
-
-            return null;
+            else
+                return null;
         }
 
 

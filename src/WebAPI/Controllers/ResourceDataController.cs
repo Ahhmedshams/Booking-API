@@ -39,8 +39,11 @@ namespace WebAPI.Controllers
 
         [HttpGet("GetResourceData")]
         public IActionResult FindResourceData(int resourceId)
+        [HttpGet("GetResourceData/{id:int}")]
+        public IActionResult FindResourceData(int id)
         {
            var ResourceData =_resourceDataRepo.Find(res=> res.ResourceId == resourceId);
+           var ResourceData =_resourceDataRepo.Find(res=> res.ResourceId == id);
 
             if (ResourceData.Count() == 0)
                 return CustomResult("No Resource data Are Available ", HttpStatusCode.NotFound);
@@ -51,11 +54,11 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpPost("AddRange")]
+        [HttpPost("AddRange/{id:int}")]
         public IActionResult AddRange(int id, ResourceDataRespIDValueDTO[] resourceDTO)
         {
 
-            var IdResalt = CheckIDRange(id, resourceDTO);
+            var IdResalt = CheckID(id, resourceDTO);
             if (IdResalt != null)
                 return IdResalt;
 
@@ -69,7 +72,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpPost("AddOne")]
+        [HttpPost("AddOne/{id:int}")]
         public IActionResult AddOne(int id, ResourceDataRespIDValueDTO resourceDTO)
         {
 
@@ -87,31 +90,39 @@ namespace WebAPI.Controllers
         }
 
 
-        private IActionResult CheckIDRange(int ResID, ResourceDataRespIDValueDTO[] resourceDTO)
+        private IActionResult CheckID(int ResID, ResourceDataRespIDValueDTO[] resourceDTO)
         {
+            var ResourceCheck = CheckResource(ResID);
+            if (ResourceCheck != null)
+                return ResourceCheck;
+
             var CheckId = resourceDTO.Where(res => res.ResourceId != ResID);
 
             if(CheckId.Count() != 0)
                 return CustomResult($"Not All Resource ID Are Same ", HttpStatusCode.BadRequest);
-
-           var resourceType = _resourceRepo.IsExist(ResID);
-            if (!resourceType)
-                return CustomResult($"No Resource  Are Available With id {ResID}", HttpStatusCode.NotFound);
-
-            return null;
+            else
+                return null;
         }
 
         private IActionResult CheckID(int ResID, ResourceDataRespIDValueDTO resourceDTO)
         {
+            var ResourceCheck = CheckResource(ResID);
+            if (ResourceCheck != null)
+                return ResourceCheck;
 
             if (ResID != resourceDTO.ResourceId)
                 return CustomResult($"Not All Resource ID Are Same ", HttpStatusCode.BadRequest);
+            else
+                return null;
+        }
 
+        private IActionResult CheckResource(int ResID)
+        {
             var resourceType = _resourceRepo.IsExist(ResID);
             if (!resourceType)
                 return CustomResult($"No Resource  Are Available With id {ResID}", HttpStatusCode.NotFound);
-
-            return null;
+            else
+                return null;
         }
 
 

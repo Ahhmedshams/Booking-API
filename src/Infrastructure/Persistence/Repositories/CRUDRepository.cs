@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using Domain.Common;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class CRUDRepository<T> : CRUDRepositoryAsync<T>,  IRepository<T> where T : class
+    public class CRUDRepository<T> : CRUDRepositoryAsync<T>,  IRepository<T> where T : class , ISoftDeletable
     {
         public CRUDRepository(ApplicationDbContext context) : base(context)
         {
@@ -71,6 +71,19 @@ namespace Infrastructure.Persistence.Repositories
                 }
             }
             return  _context.Set<T>().Find(id);
+        }
+
+
+        public T SoftDelete<IDType>(IDType id) 
+        {
+            var foundEntity = _context.Set<T>().Find(id);
+            if (foundEntity == null)
+                return null;
+            else
+                foundEntity.IsDeleted = true;
+            _context.SaveChanges();
+
+            return foundEntity;
         }
 
     }

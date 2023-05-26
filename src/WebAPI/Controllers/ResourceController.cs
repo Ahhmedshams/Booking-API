@@ -83,5 +83,28 @@ namespace WebAPI.Controllers
 
             return CustomResult(result);
         }
+
+
+        [HttpDelete("{id:int}")]
+        public IActionResult DeleteById(int id)
+        {
+            if (id == 0)
+                return CustomResult($"No Resource Is Available With id {id}", HttpStatusCode.BadRequest);
+
+            _resourceRepo.Delete(id);
+
+            return CustomResult(HttpStatusCode.NoContent);
+        }
+
+        [HttpDelete("SoftDelete/{id:int}")]
+        public IActionResult SoftDelete(int id)
+        {
+            if (id == 0)
+                return CustomResult($"No Resource Is Available With id {id}", HttpStatusCode.BadRequest);
+
+            _resourceRepo.SoftDelete(id);
+
+            return CustomResult(HttpStatusCode.NoContent);
+        }
     }
 }

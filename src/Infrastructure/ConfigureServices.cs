@@ -28,6 +28,14 @@ namespace Infrastructure
             services.AddScoped<IBookingItemRepo, BookItemRepository>();
             services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
 
+
+            services.AddScoped<IResourceTypeRepo, ResourceTypeRepository>();
+            services.AddScoped<IResourceMetadataRepo, ResourceMetadataRepository>();
+            services.AddScoped<IResourceRepo, ResourceRepository>();
+            services.AddScoped<IResourceDataRepo, ResourceDataRepository>();
+
+
+
             return services;
         }
     }
