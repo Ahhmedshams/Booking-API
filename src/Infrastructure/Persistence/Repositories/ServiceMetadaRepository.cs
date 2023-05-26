@@ -32,15 +32,28 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<ServiceMetadata> EditServiceMDAsyn(int serviceId, int resId, ServiceMetadata entity)
         {
             var foundEntity = await _context.Set<ServiceMetadata>()
-                .FindAsync(serviceId, resId);
+                        .Include(sm => sm.Service)
+                        .FirstOrDefaultAsync(sm => sm.ServiceId == serviceId && sm.ResourceTypeId == resId);
+
 
             if (foundEntity == null)
                 return null;
 
-            _context.Entry(foundEntity).CurrentValues.SetValues(entity);
+            foundEntity.ServiceId = entity.ServiceId;
+            foundEntity.ResourceTypeId = entity.ResourceTypeId;
+            // Remove the existing association
+            foundEntity.Service = null;
+            await _context.SaveChangesAsync();
+            foundEntity.Service = entity.Service;
+
+            // Save the changes to establish the new association
             await _context.SaveChangesAsync();
 
             return foundEntity;
+            //_context.Entry(foundEntity).CurrentValues.SetValues(entity);
+            //await _context.SaveChangesAsync();
+
+            //return foundEntity;
         }
 
         public async Task<ServiceMetadata> GetServiceMDByIdAsync(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes)

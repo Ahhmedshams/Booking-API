@@ -17,7 +17,7 @@ namespace Infrastructure
                 
                 options.UseSqlServer(configuration.GetConnectionString("Connection1"),
                       b => b.MigrationsAssembly("Infrastructure"));
-            });
+            }, ServiceLifetime.Scoped);
 
             services.AddScoped<IResourceTypeRepo, ResourceTypeRepository>();
             services.AddScoped<IResourceMetadataRepo, ResourceMetadataRepository>();

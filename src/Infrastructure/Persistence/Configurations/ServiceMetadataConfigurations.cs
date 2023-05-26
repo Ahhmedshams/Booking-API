@@ -9,13 +9,7 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.HasKey(m => new { m.ServiceId, m.ResourceTypeId });
 
-            //builder.HasOne(m => m.Service)
-            //       .WithMany()
-            //       .HasForeignKey(m => m.ServiceId);
-
-            //builder.HasOne(m => m.ResourceType)
-            //    .WithMany()
-            //    .HasForeignKey(m => m.ResourceTypeId);
+            
 
             builder.Property(m => m.CreatedOn)
                   .HasDefaultValueSql("GETDATE()");

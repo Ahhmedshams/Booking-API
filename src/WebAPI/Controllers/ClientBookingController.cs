@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
+using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientBookingController : ControllerBase
+    public class ClientBookingController : BaseController
     {
         private readonly IAsyncRepository<ClientBooking> clientBookingRepo;
         private readonly IMapper mapper;
@@ -23,9 +25,9 @@ namespace WebAPI.Controllers
         {
             var clientBooks = await clientBookingRepo.GetAllAsync();
             if (clientBooks.Count() == 0)
-                return BadRequest("No Clint's Book found");
+                return CustomResult("No Clint's Book Found", HttpStatusCode.NotFound);
             var clientBooksDTO = mapper.Map<IEnumerable<ClientBooking>,IEnumerable<ClientBookingDTO>>(clientBooks);
-            return Ok(clientBooksDTO);
+            return CustomResult(clientBooksDTO);
         }
 
         [HttpGet("{id:int}")]
@@ -33,40 +35,40 @@ namespace WebAPI.Controllers
         {
             var clientBook = await clientBookingRepo.GetByIdAsync(id);
             if (clientBook == null)
-                return BadRequest($"No Clint's Book found for this Id {id}");
+                return CustomResult($"No Clint's Book Found for this Id {id}", HttpStatusCode.NotFound);
 
             var clientBookingDTO = mapper.Map<ClientBooking, ClientBookingDTO>(clientBook);
-            return Ok(clientBookingDTO);
+            return CustomResult(clientBookingDTO);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Add(ClientBookingReqDTO clientBookDTO)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            var clientBook = mapper.Map<ClientBookingReqDTO, ClientBooking>(clientBookDTO);
-            await clientBookingRepo.AddAsync(clientBook);
-            return Ok(clientBook);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> Add(ClientBookingDTO clientBookDTO)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return CustomResult(ModelState , HttpStatusCode.BadRequest);
+        //    var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
+        //    await clientBookingRepo.AddAsync(clientBook);
+        //    return CustomResult(clientBook);
+        //}
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id, ClientBookingReqDTO clientBookDTO)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            var clientBook = mapper.Map<ClientBookingReqDTO, ClientBooking>(clientBookDTO);
-            await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);
-            return Ok(clientBook);
-        }
+        //[HttpPut("{id:int}")]
+        //public async Task<IActionResult> Edit(int id, ClientBookingDTO clientBookDTO)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return CustomResult(ModelState , HttpStatusCode.BadRequest);
+        //    var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
+        //    await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);
+        //    return CustomResult(clientBook);
+        //}
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var service = GetById(id);
+            var service = await GetById(id);
             if (service == null)
-                return BadRequest($"No Client's Book found for this Id {id} to delete it.");
+                return CustomResult($"No Client's Book found for this Id {id}", HttpStatusCode.NotFound);
             await clientBookingRepo.DeleteAsync(id);
-            return NoContent();
+            return CustomResult(HttpStatusCode.NoContent);
         }
     }
 }
