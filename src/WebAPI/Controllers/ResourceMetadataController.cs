@@ -1,9 +1,11 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using AutoMapper;
 using CoreApiResponse;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using WebAPI.Utility;
 
 namespace WebAPI.Controllers
 {
@@ -56,6 +58,24 @@ namespace WebAPI.Controllers
 
             return CreatedAtAction("GetById", new { id = res.AttributeId }, res);
         }
+
+
+        [HttpPost("/api/Create/ResourceType/{Name:alpha}")]
+        public async Task<IActionResult> CreateFullResourceType(string Name, ResourceAttribute[] resourceAttribute)
+        {
+            var NewResourceType = new ResourceType() { Name = Name };
+            var type =  await _resourceTypeRepo.AddAsync(NewResourceType);
+
+            if (!ModelState.IsValid)
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+           var res= ConvertToResourceMetadata(type.Id, resourceAttribute);
+
+
+            return CustomResult(res);
+        }
+
+
 
         [HttpGet]
         public IActionResult GetAll()
@@ -130,6 +150,19 @@ namespace WebAPI.Controllers
                 return CustomResult($"No Resource Type Are Available With id {ResTypeID}", HttpStatusCode.NotFound);
             else
                 return null;
+        }
+
+        private List<ResourceMetadata> ConvertToResourceMetadata(int id, ResourceAttribute[] resourceAttribute)
+        {
+            var result = new List<ResourceMetadata>();
+            
+
+            foreach (ResourceAttribute item in resourceAttribute)
+            {
+              var ResourceMeta =  item.ToResourceMetadata(id);
+                result.Add(ResourceMeta);
+            }
+            return result;
         }
 
     }

@@ -12,6 +12,14 @@ namespace WebAPI.DTO
         public string AttributeType { get; set; }
     }
 
+    public class ResourceAttribute
+    {
+        [Required]
+        public string AttributeName { get; set; }
+        [Required]
+        public string AttributeType { get; set; }
+    }
+
 
     public class ResourceMetaRespDTO
     {
