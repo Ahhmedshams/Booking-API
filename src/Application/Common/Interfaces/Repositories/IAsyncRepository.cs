@@ -14,5 +14,6 @@ namespace Application.Common.Interfaces.Repositories
         Task<T> AddAsync(T entity);
         Task<T> DeleteAsync<IDType>(IDType id);
         Task<T> EditAsync<IDType>(IDType id, T entity, Expression<Func<T, IDType>> keySelector);
+        Task<T> SoftDeleteAsync<IDType>(IDType id);
     }
 }

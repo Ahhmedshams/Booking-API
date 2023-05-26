@@ -9,5 +9,6 @@ namespace Application.Common.Interfaces.Repositories
         T Add(T entity);
         T Delete<IDType>(IDType id);
         T Edit<IDType>(IDType id, T entity, Expression<Func<T, IDType>> keySelector);
+         T SoftDelete<IDType>(IDType id);
     }
 }

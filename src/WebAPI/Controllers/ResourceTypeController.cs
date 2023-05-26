@@ -42,6 +42,7 @@ namespace WebAPI.Controllers
             return CustomResult(resourceTypeDTO);
         }
 
+
         [HttpPost]
         public IActionResult Add(ResourceTypeDTO resourceTypeDTO)
         {
@@ -50,9 +51,8 @@ namespace WebAPI.Controllers
             
             ResourceType resourceType = _mapper.Map<ResourceType>(resourceTypeDTO);
             _resourceTypeRepo.Add(resourceType);
-            
 
-            return CustomResult(resourceTypeDTO);
+            return CreatedAtAction("GetById", new { id = resourceType.Id }, resourceType);
         }
 
 
@@ -72,11 +72,22 @@ namespace WebAPI.Controllers
         public IActionResult DeleteById(int id)
         {
             if (id == 0 ) 
-              return  CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.BadRequest);
+              return  CustomResult($"No Resource Type IS Available With id {id}", HttpStatusCode.BadRequest);
 
             _resourceTypeRepo.Delete(id);
 
             return CustomResult( HttpStatusCode.NoContent);
+        }
+
+        [HttpDelete("SoftDelete/{id:int}")]
+        public IActionResult SoftDelete(int id)
+        {
+            if (id == 0)
+                return CustomResult($"No Resource Type Is Available With id {id}", HttpStatusCode.BadRequest);
+
+            _resourceTypeRepo.SoftDelete(id);
+
+            return CustomResult(HttpStatusCode.NoContent);
         }
     }
 }

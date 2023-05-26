@@ -9,5 +9,6 @@ namespace Application.Common.Interfaces.Repositories
     public interface IResourceTypeRepo : IRepository<ResourceType> , IAsyncRepository<ResourceType>
     {
         bool IsExist(int id);
+
     }
 }
