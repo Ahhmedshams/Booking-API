@@ -37,9 +37,12 @@ namespace WebAPI.Controllers
              
         }
 
+        [HttpGet("GetResourceData")]
+        public IActionResult FindResourceData(int resourceId)
         [HttpGet("GetResourceData/{id:int}")]
         public IActionResult FindResourceData(int id)
         {
+           var ResourceData =_resourceDataRepo.Find(res=> res.ResourceId == resourceId);
            var ResourceData =_resourceDataRepo.Find(res=> res.ResourceId == id);
 
             if (ResourceData.Count() == 0)

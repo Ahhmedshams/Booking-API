@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230525231544_service")]
+    partial class service
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,7 +145,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource", (string)null);
+                    b.ToTable("Resource");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -174,7 +177,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData", (string)null);
+                    b.ToTable("ResourceData");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -213,7 +216,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata", (string)null);
+                    b.ToTable("ResourceMetadata");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceSchedule", b =>
@@ -267,7 +270,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceDataResourceId", "ResourceDataAttributeId");
 
-                    b.ToTable("ResourceSchedule", (string)null);
+                    b.ToTable("ResourceSchedule");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -297,7 +300,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes", (string)null);
+                    b.ToTable("ResourceTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
