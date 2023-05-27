@@ -3,20 +3,21 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.Configurations
 {
-    public class ResourceScheduleConfiguration : IEntityTypeConfiguration<ResourceSchedule>
+    public class ScheduleItemConfiguration : IEntityTypeConfiguration<ScheduleItem>
     {
-        public void Configure(EntityTypeBuilder<ResourceSchedule> builder)
+        public void Configure(EntityTypeBuilder<ScheduleItem> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.HasKey(i => new { i.ScheduleID, i.Day,i.StartTime,i.EndTime });
+
             builder.Property(e => e.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Property(x => x.IsDeleted)
             .HasDefaultValue(false);
 
+           
+
             builder.Property(x => x.StartTime).HasColumnType("time").IsRequired();
             builder.Property(x => x.EndTime).HasColumnType("time").IsRequired();
-            builder.Property(x => x.StartDate).HasColumnType("DATE").IsRequired();
-            builder.Property(x => x.EndDate).HasColumnType("DATE").IsRequired();
-
+           
             builder.Property(e => e.StartTime).HasConversion(
                 v => v.ToTimeSpan(),
                 v => TimeOnly.FromTimeSpan(v));
@@ -25,12 +26,10 @@ namespace Infrastructure.Persistence.Configurations
                 v => v.ToTimeSpan(),
                 v => TimeOnly.FromTimeSpan(v));
 
-            //builder.HasOne(e => e.ResourceData)
-            //    .WithMany();
-              
-
-
-
+            builder.Property(i => i.CreatedOn)
+                 .HasDefaultValueSql("GETDATE()");
+            builder.Property(i => i.IsDeleted)
+                   .HasDefaultValue(false);
         }
     }
 }
