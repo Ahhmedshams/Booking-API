@@ -17,10 +17,7 @@ namespace WebAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
-
             builder.Services.AddInfrastructureServices(builder.Configuration);
-
 
             //builder.Services.AddApplicationServices();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -36,7 +33,6 @@ namespace WebAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
