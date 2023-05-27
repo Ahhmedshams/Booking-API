@@ -2,6 +2,7 @@
 using AutoMapper;
 using CoreApiResponse;
 using Domain.Entities;
+using Infrastructure.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -38,8 +39,9 @@ namespace WebAPI.Controllers
 
            var resourceType = _mapper.Map<IEnumerable<ResourceMetadata>>(resourceMetaDTO);
            var res = _resourceMetadataRepo.AddRange(resourceType);
+           var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(res);
 
-            return CustomResult(res);
+            return CustomResult(resourceDTO);
         }
 
         [HttpPost("AddOne/{ResTypeID:int}")]
@@ -69,10 +71,11 @@ namespace WebAPI.Controllers
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-           var res= ConvertToResourceMetadata(type.Id, resourceAttribute);
+           var Convertres= ConvertToResourceMetadata(type.Id, resourceAttribute);
+            var res = _resourceMetadataRepo.AddRange(Convertres);
+            var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(res);
 
-
-            return CustomResult(res);
+            return CustomResult(resourceDTO);
         }
 
 
