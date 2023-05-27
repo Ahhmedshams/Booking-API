@@ -9,7 +9,7 @@ namespace Domain.Entities
 {
     public class ScheduleItem : BaseEntity
     {
-        public int ScheduleID { get; set; }  
+        public int ScheduleID { get; set; }
         public string Day { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set;}

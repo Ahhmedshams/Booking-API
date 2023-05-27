@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Schedule : Migration
+    public partial class schdule : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     ScheduleID = table.Column<int>(type: "int", nullable: false),
-                    ResourceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ResourceId = table.Column<int>(type: "int", nullable: false),
                     FromDate = table.Column<DateTime>(type: "DATE", nullable: false),
                     ToDate = table.Column<DateTime>(type: "DATE", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -28,17 +28,23 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Schedule", x => new { x.ScheduleID, x.ResourceId });
+                    table.PrimaryKey("PK_Schedule", x => x.ScheduleID);
+                    table.ForeignKey(
+                        name: "FK_Schedule_Resource_ScheduleID",
+                        column: x => x.ScheduleID,
+                        principalTable: "Resource",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ScheduleItem",
                 columns: table => new
                 {
-                    ScheduleID = table.Column<int>(type: "int", nullable: false),
                     Day = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
+                    ScheduleID = table.Column<int>(type: "int", nullable: false),
                     Available = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
@@ -46,18 +52,29 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ScheduleItem", x => new { x.ScheduleID, x.Day, x.StartTime, x.EndTime });
+                    table.PrimaryKey("PK_ScheduleItem", x => new { x.Day, x.StartTime, x.EndTime });
+                    table.ForeignKey(
+                        name: "FK_ScheduleItem_Schedule_ScheduleID",
+                        column: x => x.ScheduleID,
+                        principalTable: "Schedule",
+                        principalColumn: "ScheduleID",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduleItem_ScheduleID",
+                table: "ScheduleItem",
+                column: "ScheduleID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Schedule");
+                name: "ScheduleItem");
 
             migrationBuilder.DropTable(
-                name: "ScheduleItem");
+                name: "Schedule");
 
             migrationBuilder.CreateTable(
                 name: "ResourceSchedule",
