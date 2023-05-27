@@ -1,14 +1,9 @@
 ﻿namespace WebAPI.DTO
 {
-    public class ServiceMetadataResDTO
-    {
-        public string ServiceName { get; set; }
-        public string ResourceTypeName { get; set; }
-    }
-
-    public class ServiceMetadataReqDTO
+    public class ServiceMetadataDTO
     {
         public int ServiceId { get; set; }
         public int ResourceTypeId { get; set; }
     }
+
 }

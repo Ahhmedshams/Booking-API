@@ -17,7 +17,7 @@ namespace Infrastructure
                 
                 options.UseSqlServer(configuration.GetConnectionString("Connection1"),
                       b => b.MigrationsAssembly("Infrastructure"));
-            });
+            }, ServiceLifetime.Scoped);
 
             services.AddScoped<IResourceTypeRepo, ResourceTypeRepository>();
             services.AddScoped<IResourceMetadataRepo, ResourceMetadataRepository>();
@@ -35,6 +35,10 @@ namespace Infrastructure
             services.AddScoped<IResourceDataRepo, ResourceDataRepository>();
 
 
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(CRUDRepository<>));
+            services.AddScoped<IBookingItemRepo, BookItemRepository>();
+            services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
+            services.AddScoped<IClientBookingRepo, ClientBookingRepository>();
 
             return services;
         }

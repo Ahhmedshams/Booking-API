@@ -15,6 +15,27 @@ namespace Infrastructure.Persistence.Repositories
         {
         }
 
+        public async Task<bool> CheckDuplicateKey(int serviceId, int resTypeId)
+        {
+            var objectExist = await GetServiceMDByIdAsync(serviceId, resTypeId);
+            if (objectExist == null)
+                return false;
+            return true;
+        }
+
+        public async Task<int> CheckExistenceOfServiceIdAndResId(int serviceId, int resTypeId)
+        {
+            var serviceExist = await _context.Set<Service>().FindAsync(serviceId);
+            if (serviceExist == null)
+                return 1; //Service not exist
+
+            var resourceExist = await _context.Set<ResourceType>().FindAsync(resTypeId);
+            if (resourceExist == null)
+                return -1; //Resource not exist
+
+            return 0; //both are found
+        }
+
         public async Task<ServiceMetadata> DeleteServiceMDAsyn(int serviceId, int resId)
         {
             var foundEntity = await _context.Set<ServiceMetadata>()
@@ -31,14 +52,13 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<ServiceMetadata> EditServiceMDAsyn(int serviceId, int resId, ServiceMetadata entity)
         {
-            var foundEntity = await _context.Set<ServiceMetadata>()
-                .FindAsync(serviceId, resId);
+            var foundEntity = await GetServiceMDByIdAsync(serviceId, resId);
 
             if (foundEntity == null)
                 return null;
 
-            _context.Entry(foundEntity).CurrentValues.SetValues(entity);
-            await _context.SaveChangesAsync();
+            await DeleteServiceMDAsyn(serviceId, resId);
+            await AddAsync(entity);
 
             return foundEntity;
         }

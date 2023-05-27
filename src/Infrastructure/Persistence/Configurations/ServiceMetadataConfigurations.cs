@@ -12,7 +12,7 @@ namespace Infrastructure.Persistence.Configurations
             //builder.HasOne(m => m.Service)
             //       .WithMany()
             //       .HasForeignKey(m => m.ServiceId);
-
+            
             //builder.HasOne(m => m.ResourceType)
             //    .WithMany()
             //    .HasForeignKey(m => m.ResourceTypeId);

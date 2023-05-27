@@ -8,5 +8,8 @@ namespace Application.Common.Interfaces.Repositories
 
         Task<BookingItem> EditBookAsyn(int bookId, int resId, BookingItem entity);
         Task<BookingItem> DeleteBookAsyn(int bookId, int resId);
+
+        Task<int> CheckExistenceOfBookIdAndResId(int bookId, int resId);
+        Task<bool> CheckDuplicateKey(int bookId, int resId);
     }
 }

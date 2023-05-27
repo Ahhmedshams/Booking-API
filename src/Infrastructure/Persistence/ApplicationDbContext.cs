@@ -19,7 +19,6 @@ namespace Infrastructure.Persistence
         DbSet<BookingItem> BookingItems { get; set; }
         DbSet<ClientBooking> ClientBookings { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
          

@@ -8,5 +8,7 @@ namespace Application.Common.Interfaces.Repositories
 
         Task<ServiceMetadata> EditServiceMDAsyn(int serviceId, int resId, ServiceMetadata entity);
         Task<ServiceMetadata> DeleteServiceMDAsyn(int serviceId, int resId);
+        Task<int> CheckExistenceOfServiceIdAndResId(int serviceId, int resTypeId);
+        Task<bool> CheckDuplicateKey(int serviceId, int resTypeId);
     }
 }
