@@ -1,0 +1,97 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Infrastructure.Migrations
+{
+    /// <inheritdoc />
+    public partial class Schedule : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "ResourceSchedule");
+
+            migrationBuilder.CreateTable(
+                name: "Schedule",
+                columns: table => new
+                {
+                    ScheduleID = table.Column<int>(type: "int", nullable: false),
+                    ResourceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FromDate = table.Column<DateTime>(type: "DATE", nullable: false),
+                    ToDate = table.Column<DateTime>(type: "DATE", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schedule", x => new { x.ScheduleID, x.ResourceId });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScheduleItem",
+                columns: table => new
+                {
+                    ScheduleID = table.Column<int>(type: "int", nullable: false),
+                    Day = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScheduleItem", x => new { x.ScheduleID, x.Day, x.StartTime, x.EndTime });
+                });
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Schedule");
+
+            migrationBuilder.DropTable(
+                name: "ScheduleItem");
+
+            migrationBuilder.CreateTable(
+                name: "ResourceSchedule",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ResourceDataResourceId = table.Column<int>(type: "int", nullable: false),
+                    ResourceDataAttributeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    Days = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "DATE", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ResourceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "DATE", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceSchedule", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourceSchedule_ResourceData_ResourceDataResourceId_ResourceDataAttributeId",
+                        columns: x => new { x.ResourceDataResourceId, x.ResourceDataAttributeId },
+                        principalTable: "ResourceData",
+                        principalColumns: new[] { "ResourceId", "AttributeId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceSchedule_ResourceDataResourceId_ResourceDataAttributeId",
+                table: "ResourceSchedule",
+                columns: new[] { "ResourceDataResourceId", "ResourceDataAttributeId" });
+        }
+    }
+}
