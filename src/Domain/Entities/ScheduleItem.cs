@@ -13,6 +13,7 @@ namespace Domain.Entities
         public string Day { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set;}
+       // public Schedule schedule { get; set; }
         public bool Available { get; set; }
     }
 }

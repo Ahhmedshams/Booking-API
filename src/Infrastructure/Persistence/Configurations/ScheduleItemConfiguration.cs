@@ -24,6 +24,8 @@ namespace Infrastructure.Persistence.Configurations
                 v => v.ToTimeSpan(),
                 v => TimeOnly.FromTimeSpan(v));
 
+            builder.HasOne<Schedule>().WithMany().HasForeignKey(e=>e.ScheduleID);
+
             builder.Property(i => i.CreatedOn)
                  .HasDefaultValueSql("GETDATE()");
 
