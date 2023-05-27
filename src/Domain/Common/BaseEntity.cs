@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Common
 {
-    public class BaseEntity
+    public class BaseEntity : ISoftDeletable
     {
         public int Id { get; set; }
         public bool IsDeleted { get; set; }
