@@ -254,6 +254,8 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleID"));
 
+
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -281,9 +283,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.Property<int>("ScheduleID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Day")
                         .HasColumnType("nvarchar(450)");
 
@@ -309,7 +308,12 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ScheduleID", "Day", "StartTime", "EndTime");
+                    b.Property<int>("ScheduleID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Day", "StartTime", "EndTime");
+
+                    b.HasIndex("ScheduleID");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -683,24 +687,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ResourceType");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Schedule", b =>
-                {
-                    b.HasOne("Domain.Entities.Resource", null)
-                        .WithMany()
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
-                {
-                    b.HasOne("Domain.Entities.Schedule", null)
-                        .WithMany()
-                        .HasForeignKey("ScheduleID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>

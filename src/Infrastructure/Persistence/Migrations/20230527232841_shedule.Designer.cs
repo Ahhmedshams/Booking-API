@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
+<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.Designer.cs
     [Migration("20230527232841_shedule")]
     partial class shedule
+========
+    [Migration("20230527224331_schdule")]
+    partial class schdule
+>>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -255,8 +260,11 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.Designer.cs
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleID"));
 
+========
+>>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.Designer.cs
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -276,17 +284,17 @@ namespace Infrastructure.Migrations
                         .HasColumnType("DATE");
 
                     b.HasKey("ScheduleID");
+<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.Designer.cs
 
                     b.HasIndex("ResourceId");
+========
+>>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.Designer.cs
 
                     b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.Property<int>("ScheduleID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Day")
                         .HasColumnType("nvarchar(450)");
 
@@ -312,7 +320,12 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ScheduleID", "Day", "StartTime", "EndTime");
+                    b.Property<int>("ScheduleID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Day", "StartTime", "EndTime");
+
+                    b.HasIndex("ScheduleID");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -692,7 +705,11 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Resource", null)
                         .WithMany()
+<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.Designer.cs
                         .HasForeignKey("ResourceId")
+========
+                        .HasForeignKey("ScheduleID")
+>>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.Designer.cs
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

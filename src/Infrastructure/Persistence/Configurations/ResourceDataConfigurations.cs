@@ -12,7 +12,6 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(x => x.IsDeleted)
             .HasDefaultValue(false);
 
-
             builder.HasOne(e => e.ResourceMetadata)
                 .WithMany()
                 .HasForeignKey(e => e.AttributeId);
@@ -20,9 +19,6 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasOne(e => e.Resource)
                 .WithMany()
                 .HasForeignKey(e => e.ResourceId);
-
-
-
         }
     }
 }
