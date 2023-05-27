@@ -7,9 +7,9 @@ namespace WebAPI.Profiles
     {
         public BookingItemMapper()
         {
-            CreateMap<BookingItemReqDTO, BookingItem>();
-            CreateMap<BookingItem, BookingItemResDTO>()
-                .ForMember(dest => dest.ResourceName, opt => opt.MapFrom(src => src.Resource.ResourceType.Name));
+            CreateMap<BookingItemDTO, BookingItem>();
+            CreateMap<BookingItem, BookingItemDTO>();
+                
         }
     }
 }

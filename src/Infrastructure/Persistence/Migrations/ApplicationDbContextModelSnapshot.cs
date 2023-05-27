@@ -55,7 +55,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("BookingItems");
+                    b.ToTable("BookingItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
@@ -108,7 +108,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ClientBookings");
+                    b.ToTable("ClientBookings", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
@@ -142,7 +142,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource");
+                    b.ToTable("Resource", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -174,7 +174,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData");
+                    b.ToTable("ResourceData", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -213,7 +213,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata");
+                    b.ToTable("ResourceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceSchedule", b =>
@@ -267,7 +267,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceDataResourceId", "ResourceDataAttributeId");
 
-                    b.ToTable("ResourceSchedule");
+                    b.ToTable("ResourceSchedule", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -297,7 +297,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ResourceTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
@@ -337,7 +337,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -365,7 +365,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ServiceMetadata");
+                    b.ToTable("ServiceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Identity.ApplicationUser", b =>

@@ -27,6 +27,7 @@ namespace Infrastructure
             services.AddScoped(typeof(IAsyncRepository<>), typeof(CRUDRepository<>));
             services.AddScoped<IBookingItemRepo, BookItemRepository>();
             services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
+            services.AddScoped<IClientBookingRepo, ClientBookingRepository>();
 
             return services;
         }

@@ -10,10 +10,10 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ClientBookingController : BaseController
     {
-        private readonly IAsyncRepository<ClientBooking> clientBookingRepo;
+        private readonly IClientBookingRepo clientBookingRepo;
         private readonly IMapper mapper;
 
-        public ClientBookingController(IAsyncRepository<ClientBooking> _clientBookingRepo,
+        public ClientBookingController(IClientBookingRepo _clientBookingRepo,
                                         IMapper _mapper)
         {
             clientBookingRepo = _clientBookingRepo;
@@ -41,25 +41,35 @@ namespace WebAPI.Controllers
             return CustomResult(clientBookingDTO);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Add(ClientBookingDTO clientBookDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState , HttpStatusCode.BadRequest);
-        //    var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
-        //    await clientBookingRepo.AddAsync(clientBook);
-        //    return CustomResult(clientBook);
-        //}
+        [HttpPost] 
+        public async Task<IActionResult> Add(ClientBookingDTO clientBookDTO)
+        {
+            if (!ModelState.IsValid)
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-        //[HttpPut("{id:int}")]
-        //public async Task<IActionResult> Edit(int id, ClientBookingDTO clientBookDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState , HttpStatusCode.BadRequest);
-        //    var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
-        //    await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);
-        //    return CustomResult(clientBook);
-        //}
+            var serviceExisting = await clientBookingRepo.CheckServiceExistence(clientBookDTO.ServiceId);
+            if (!serviceExisting)
+                return CustomResult("Service Id is not exist");
+
+            var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
+            await clientBookingRepo.AddAsync(clientBook);
+            return CustomResult(clientBookDTO);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Edit(int id, ClientBookingDTO clientBookDTO)
+        {
+            if (!ModelState.IsValid)
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+            var serviceExisting = await clientBookingRepo.CheckServiceExistence(clientBookDTO.ServiceId);
+            if (!serviceExisting)
+                return CustomResult("Service Id is not exist");
+
+            var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
+            await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);
+            return CustomResult(clientBookDTO);
+        }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)

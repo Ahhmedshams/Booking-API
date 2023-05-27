@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Application.Common.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,14 +32,13 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<BookingItem> EditBookAsyn(int bookId, int resId, BookingItem entity)
         {
-            var foundEntity = await _context.Set<BookingItem>()
-                .FindAsync(bookId, resId);
+            var foundEntity = await GetBookByIdAsync(bookId, resId);
 
             if (foundEntity == null)
                 return null;
 
-            _context.Entry(foundEntity).CurrentValues.SetValues(entity);
-            await _context.SaveChangesAsync();
+            await DeleteBookAsyn(bookId, resId);
+            await AddAsync(entity);
 
             return foundEntity;
         }
@@ -56,6 +56,27 @@ namespace Infrastructure.Persistence.Repositories
 
             return foundEntity;
 
+        }
+
+        public async Task<int> CheckExistenceOfBookIdAndResId(int bookId, int resId)
+        {
+            var clientBookExist = await _context.Set<ClientBooking>().FindAsync(bookId);
+            if (clientBookExist == null)
+                return 1; //Client book not exist
+
+            var resourceExist = await _context.Set<Resource>().FindAsync(resId);
+            if (resourceExist == null)
+                return -1; //Resource not exist
+
+            return 0; //both are found
+        }
+
+        public async Task<bool> CheckDuplicateKey(int bookId, int resId)
+        {
+            var objectExist = await GetBookByIdAsync(bookId, resId);
+            if(objectExist == null)
+                return false;
+            return true; 
         }
     }
 }

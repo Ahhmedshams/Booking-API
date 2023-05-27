@@ -47,6 +47,10 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+            if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
+                return CustomResult("Invalid value for ServiceStatus");
+
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
             await serviceRepo.AddAsync(service);
             return CustomResult(service);
@@ -57,6 +61,10 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+            if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
+                return CustomResult("Invalid value for ServiceStatus");
+
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
             await serviceRepo.EditAsync(id, service , s=>s.Id);
             return CustomResult(service);

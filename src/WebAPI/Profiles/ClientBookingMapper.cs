@@ -9,7 +9,7 @@ namespace WebAPI.Profiles
         public ClientBookingMapper()
         {
             CreateMap<ClientBookingDTO, ClientBooking>();
-             
+            CreateMap<ClientBooking, ClientBookingDTO>();
 
         }
 

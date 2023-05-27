@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -13,6 +8,27 @@ namespace Infrastructure.Persistence.Repositories
     {
         public ServiceMetadaRepository(ApplicationDbContext context) : base(context)
         {
+        }
+
+        public async Task<bool> CheckDuplicateKey(int serviceId, int resTypeId)
+        {
+            var objectExist = await GetServiceMDByIdAsync(serviceId, resTypeId);
+            if (objectExist == null)
+                return false;
+            return true;
+        }
+
+        public async Task<int> CheckExistenceOfServiceIdAndResId(int serviceId, int resTypeId)
+        {
+            var serviceExist = await _context.Set<Service>().FindAsync(serviceId);
+            if (serviceExist == null)
+                return 1; //Service not exist
+
+            var resourceExist = await _context.Set<ResourceType>().FindAsync(resTypeId);
+            if (resourceExist == null)
+                return -1; //Resource not exist
+
+            return 0; //both are found
         }
 
         public async Task<ServiceMetadata> DeleteServiceMDAsyn(int serviceId, int resId)
@@ -31,29 +47,15 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<ServiceMetadata> EditServiceMDAsyn(int serviceId, int resId, ServiceMetadata entity)
         {
-            var foundEntity = await _context.Set<ServiceMetadata>()
-                        .Include(sm => sm.Service)
-                        .FirstOrDefaultAsync(sm => sm.ServiceId == serviceId && sm.ResourceTypeId == resId);
-
+            var foundEntity = await GetServiceMDByIdAsync(serviceId, resId);
 
             if (foundEntity == null)
                 return null;
 
-            foundEntity.ServiceId = entity.ServiceId;
-            foundEntity.ResourceTypeId = entity.ResourceTypeId;
-            // Remove the existing association
-            foundEntity.Service = null;
-            await _context.SaveChangesAsync();
-            foundEntity.Service = entity.Service;
-
-            // Save the changes to establish the new association
-            await _context.SaveChangesAsync();
+            await DeleteServiceMDAsyn(serviceId, resId);
+            await AddAsync(entity);
 
             return foundEntity;
-            //_context.Entry(foundEntity).CurrentValues.SetValues(entity);
-            //await _context.SaveChangesAsync();
-
-            //return foundEntity;
         }
 
         public async Task<ServiceMetadata> GetServiceMDByIdAsync(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
