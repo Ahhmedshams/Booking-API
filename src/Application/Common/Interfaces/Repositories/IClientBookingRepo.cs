@@ -2,6 +2,9 @@
 {
     public interface IClientBookingRepo: IAsyncRepository<ClientBooking>
     {
-        Task<bool> CheckServiceExistence(int serviceId);
+        Task<IEnumerable<ClientBooking>> GetAllBookings();
+        Task<ClientBooking> GetBookingById(int id);
+        Task<bool> IsServiceExist(int serviceId);
+        Task DeleteSoft(int id);
     }
 }

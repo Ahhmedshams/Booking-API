@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using CoreApiResponse;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -47,7 +46,7 @@ namespace WebAPI.Controllers
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-            var serviceExisting = await clientBookingRepo.CheckServiceExistence(clientBookDTO.ServiceId);
+            var serviceExisting = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
             if (!serviceExisting)
                 return CustomResult("Service Id is not exist");
 
@@ -62,7 +61,7 @@ namespace WebAPI.Controllers
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-            var serviceExisting = await clientBookingRepo.CheckServiceExistence(clientBookDTO.ServiceId);
+            var serviceExisting = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
             if (!serviceExisting)
                 return CustomResult("Service Id is not exist");
 

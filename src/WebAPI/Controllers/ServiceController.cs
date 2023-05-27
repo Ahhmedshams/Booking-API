@@ -10,10 +10,10 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ServiceController : BaseController
     {
-        private readonly IAsyncRepository<Service> serviceRepo;
+        private readonly IServiceRepo serviceRepo;
         private readonly IMapper mapper;
 
-        public ServiceController(IAsyncRepository<Service> _serviceRepo,
+        public ServiceController(IServiceRepo _serviceRepo,
                                 IMapper _mapper)
         {
             serviceRepo = _serviceRepo;
@@ -23,7 +23,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var services = await serviceRepo.GetAllAsync();
+            var services = await serviceRepo.GetAllServices();
             if (services.Count() == 0)
                 return CustomResult("No Services Found", HttpStatusCode.NotFound);
 
@@ -34,7 +34,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var service = await serviceRepo.GetByIdAsync(id);
+            var service = await serviceRepo.GetServiceById(id);
             if (service == null)
                 return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
 
@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
             var service = await GetById(id);
             if (service == null)
                 return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
-            await serviceRepo.DeleteAsync(id);
+            await serviceRepo.DeleteSoft(id);
             return CustomResult(HttpStatusCode.NoContent);
         }
 

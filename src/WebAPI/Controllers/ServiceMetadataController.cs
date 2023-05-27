@@ -33,32 +33,61 @@ namespace WebAPI.Controllers
             return CustomResult(metadataDTO);
         }
 
-        [HttpGet("{serviceId:int}/{resTypeId:int}")]
-        public async Task<IActionResult> GetById(int serviceId, int resTypeId)
-        {
-            var metadata = await metadataRepo.GetServiceMDByIdAsync(serviceId, resTypeId);
 
+        [HttpGet("GetByServiceId")]
+        public async Task<IActionResult> GetByServiceId([FromQuery] int serviceId)
+        {
+            var metadata = await metadataRepo.GetByServiceId(serviceId);
 
             if (metadata == null)
-                return CustomResult($"No Service Metadata Found For This service Id: {serviceId} with resource Id: {resTypeId})",
+                return CustomResult($"No Service Metadata Found For this Id: {serviceId})",
                     HttpStatusCode.NotFound);
 
-            var metadataDTO = mapper.Map<ServiceMetadata, ServiceMetadataDTO>(metadata);
+            var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, IEnumerable<ServiceMetadataDTO>>(metadata);
             return CustomResult(metadataDTO);
         }
 
+        [HttpGet("GetByResourceId")]
+        public async Task<IActionResult> GetByResTypeId([FromQuery] int resTypeId)
+        {
+            var metadata = await metadataRepo.GetByResourceId(resTypeId);
 
-        [HttpPost]
-        public async Task<IActionResult> Add(ServiceMetadataDTO serviceMetadataDTO)
+            if (metadata == null)
+                return CustomResult($"No Service Metadata Found For this Id: {resTypeId})",
+                    HttpStatusCode.NotFound);
+
+            var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, IEnumerable<ServiceMetadataDTO>>(metadata);
+            return CustomResult(metadataDTO);
+        }
+
+        [HttpPost("AddOne")]
+        public async Task<IActionResult> AddOne(ServiceMetadataDTO serviceMetadataDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return await ProcessAction(serviceMetadataDTO, async () =>
+            return await ProcessActionOne(serviceMetadataDTO, async () =>
             {
                 var metadata = mapper.Map<ServiceMetadataDTO, ServiceMetadata>(serviceMetadataDTO);
                 await metadataRepo.AddAsync(metadata);
                 return serviceMetadataDTO;
+            });
+        }
+
+        [HttpPost("AddBulk")]
+        public async Task<IActionResult> AddBulk(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return await ProcessActionBulk(serviceMetadataDTOs, async () =>
+            {
+                var addedItems = new List<ServiceMetadataDTO>();
+
+                var services = mapper.Map<IEnumerable<ServiceMetadataDTO>, IEnumerable<ServiceMetadata>>(serviceMetadataDTOs);
+                await metadataRepo.AddBulk(services);
+                return serviceMetadataDTOs;
+
             });
         }
 
@@ -68,7 +97,7 @@ namespace WebAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return await ProcessAction(serviceMetadata, async () =>
+            return await ProcessActionOne(serviceMetadata, async () =>
             {
                 var service = mapper.Map<ServiceMetadataDTO, ServiceMetadata>(serviceMetadata);
                 await metadataRepo.EditServiceMDAsyn(serviceId, resTypeId, service);
@@ -76,20 +105,43 @@ namespace WebAPI.Controllers
             });
         }
 
-        private async Task<IActionResult> ProcessAction(ServiceMetadataDTO serviceMetadata, Func<Task<ServiceMetadataDTO>> action)
-        {
-            int existenceofClientBookAndRes = await metadataRepo
-                                               .CheckExistenceOfServiceIdAndResId(serviceMetadata.ServiceId, 
-                                                                                  serviceMetadata.ResourceTypeId);
-            switch (existenceofClientBookAndRes)
-            {
-                case 1:
-                    return CustomResult($"No Service found for Id: {serviceMetadata.ServiceId}");
-                case -1:
-                    return CustomResult($"No Resource Type found for Id: {serviceMetadata.ResourceTypeId}");
-            }
 
-            bool checkDuplicate = await metadataRepo.CheckDuplicateKey(serviceMetadata.ServiceId, serviceMetadata.ResourceTypeId);
+
+        [HttpDelete("{serviceId:int}/{resTypeId:int}")]
+        public async Task<IActionResult> Delete(int serviceId, int resTypeId)
+        {
+            var servicesMetadata = await metadataRepo.GetServiceMDByIdAsync(serviceId, resTypeId);
+            if (servicesMetadata == null)
+                return CustomResult(HttpStatusCode.NotFound);
+
+            await metadataRepo.DeleteServiceMDAsyn(serviceId, resTypeId);
+            return CustomResult(HttpStatusCode.NoContent);
+        }
+
+        [HttpDelete("{serviceId:int}")]
+        public async Task<IActionResult> DeleteBulk(int serviceId)
+        {
+            var servicesMetadata = await metadataRepo.GetByServiceId(serviceId);
+            if (servicesMetadata == null)
+                return CustomResult(HttpStatusCode.NotFound);
+
+            await metadataRepo.DeleteBulk(serviceId);
+            return CustomResult(HttpStatusCode.NoContent);
+        }
+
+        private async Task<IActionResult> ProcessActionOne(ServiceMetadataDTO serviceMetadataDTO, Func<Task<ServiceMetadataDTO>> action)
+        {
+
+            bool existenceOfServiceId = await metadataRepo.IsServiceExis(serviceMetadataDTO.ServiceId);
+            if (!existenceOfServiceId)
+                return CustomResult($"No Service found for Id: {serviceMetadataDTO.ServiceId}");
+
+            bool existenceofResTypeId = await metadataRepo.IsResTypeExist(serviceMetadataDTO.ResourceTypeId);
+            if (!existenceofResTypeId)
+                return CustomResult($"No Resource Type found for Id: {serviceMetadataDTO.ResourceTypeId}");
+
+
+            bool checkDuplicate = await metadataRepo.CheckDuplicateKey(serviceMetadataDTO.ServiceId, serviceMetadataDTO.ResourceTypeId);
             if (checkDuplicate)
                 return CustomResult("Duplicate key violation. The specified key already exists in the system");
 
@@ -97,57 +149,67 @@ namespace WebAPI.Controllers
             return CustomResult(result);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //[HttpPost]
-        //public async Task<IActionResult> Add(ServiceMetadataDTO metadataDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState, HttpStatusCode.BadRequest);
-        //    var metadata = mapper.Map<ServiceMetadataDTO, ServiceMetadata>(metadataDTO);
-        //    await metadataRepo.AddAsync(metadata);
-        //    return CustomResult(metadataDTO);
-        //}
-
-        //[HttpPut("{serviceId:int}/{resourceId:int}")]
-        //public async Task<IActionResult> Edit(int serviceId, int resourceId, ServiceMetadataDTO metadataDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState, HttpStatusCode.BadRequest);
-
-        //    var metadata = mapper.Map<ServiceMetadataDTO, ServiceMetadata>(metadataDTO);
-
-        //    var existingMetadata = await metadataRepo.EditServiceMDAsyn(serviceId, resourceId, metadata);
-        //    if (existingMetadata == null)
-        //        return CustomResult(HttpStatusCode.NotFound);
-
-        //    metadata.Service = existingMetadata.Service;
-        //    metadata.ResourceType = existingMetadata.ResourceType;
-
-        //    return CustomResult(metadataDTO);
-        //}
-
-        [HttpDelete("{serviceId:int}/{resTypeId:int}")]
-        public async Task<IActionResult> Delete(int serviceId, int resTypeId)
+        private async Task<IActionResult> ProcessActionBulk(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs, Func<Task<IEnumerable<ServiceMetadataDTO>>> action)
         {
-            var bookingItem = await GetById(serviceId, resTypeId);
-            if (bookingItem == null)
-                return CustomResult(HttpStatusCode.NotFound);
+            var invalidServiceIds = await GetInvalidServiceIds(serviceMetadataDTOs);
+            if (invalidServiceIds.Count > 0)
+                return CustomResult($"No Service found for Ids: {string.Join(", ", invalidServiceIds)}");
 
-            await metadataRepo.DeleteServiceMDAsyn(serviceId, resTypeId);
-            return CustomResult(HttpStatusCode.NoContent);
+            var invalidResTypeIds = await GetInvalidResourceTypeIds(serviceMetadataDTOs);
+            if (invalidResTypeIds.Count > 0)
+                return CustomResult($"No Resource Type found for Ids: {string.Join(", ", invalidResTypeIds)}");
+
+            var duplicateItems = await GetDuplicateItems(serviceMetadataDTOs);
+            if (duplicateItems.Count > 0)
+                return CustomResult($"Duplicate key violation");
+
+            var result = await action.Invoke();
+            return CustomResult(result);
         }
+
+        private async Task<List<int>> GetInvalidServiceIds(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs)
+        {
+            var invalidServiceIds = new List<int>();
+
+            foreach (var serviceMetadataDTO in serviceMetadataDTOs)
+            {
+                bool existenceOfServiceId = await metadataRepo.IsServiceExis(serviceMetadataDTO.ServiceId);
+                if (!existenceOfServiceId)
+                    invalidServiceIds.Add(serviceMetadataDTO.ServiceId);
+            }
+
+            return invalidServiceIds;
+        }
+
+        private async Task<List<int>> GetInvalidResourceTypeIds(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs)
+        {
+            var invalidResTypeIds = new List<int>();
+
+            foreach (var serviceMetadataDTO in serviceMetadataDTOs)
+            {
+                bool existenceofResTypeId = await metadataRepo.IsResTypeExist(serviceMetadataDTO.ResourceTypeId);
+                if (!existenceofResTypeId)
+                    invalidResTypeIds.Add(serviceMetadataDTO.ResourceTypeId);
+            }
+
+            return invalidResTypeIds;
+        }
+
+        private async Task<List<ServiceMetadataDTO>> GetDuplicateItems(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs)
+        {
+            var duplicateItems = new List<ServiceMetadataDTO>();
+
+            foreach (var serviceMetadataDTO in serviceMetadataDTOs)
+            {
+                bool checkDuplicate = await metadataRepo.CheckDuplicateKey(serviceMetadataDTO.ServiceId, serviceMetadataDTO.ResourceTypeId);
+                if (checkDuplicate)
+                    duplicateItems.Add(serviceMetadataDTO);
+            }
+
+            return duplicateItems;
+        }
+
+
 
     }
 }
