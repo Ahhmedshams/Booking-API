@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class CRUDRepositoryAsync<T> : IAsyncRepository<T> where T : class
+    public class CRUDRepositoryAsync<T> : IAsyncRepository<T> where T : class ,ISoftDeletable
     {
         protected readonly ApplicationDbContext _context;
 
@@ -92,7 +93,6 @@ namespace Infrastructure.Persistence.Repositories
 
 
 
-        public async Task<T> SoftDeleteAsync<IDType>(IDType id)
 
         public async Task<T?> GetByIdAsync<IDType1, IDType2>(IDType1 id1, IDType2 id2, params Expression<Func<T, object>>[] includes)
         {
@@ -107,6 +107,17 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.Set<T>().FindAsync(id1, id2);
         }
 
+        public async Task<T> SoftDeleteAsync<IDType>(IDType id)
+        {
+            var foundEntity = _context.Set<T>().Find(id);
+            if (foundEntity == null)
+                return null;
+            else
+                foundEntity.IsDeleted = true;
+            await _context.SaveChangesAsync();
+
+            return foundEntity;
+        }
 
     }
 }
