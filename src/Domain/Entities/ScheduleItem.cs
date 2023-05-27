@@ -14,7 +14,6 @@ namespace Domain.Entities
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set;}
         public bool Available { get; set; }
-        public Schedule ScheduleData { get; set; }
-
+        public Schedule Schedule { get; set; }
     }
 }
