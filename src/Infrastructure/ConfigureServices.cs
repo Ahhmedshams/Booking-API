@@ -1,6 +1,8 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,18 +29,8 @@ namespace Infrastructure
             services.AddScoped(typeof(IAsyncRepository<>), typeof(CRUDRepository<>));
             services.AddScoped<IBookingItemRepo, BookItemRepository>();
             services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
-
-
-            services.AddScoped<IResourceTypeRepo, ResourceTypeRepository>();
-            services.AddScoped<IResourceMetadataRepo, ResourceMetadataRepository>();
-            services.AddScoped<IResourceRepo, ResourceRepository>();
-            services.AddScoped<IResourceDataRepo, ResourceDataRepository>();
-
-
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(CRUDRepository<>));
-            services.AddScoped<IBookingItemRepo, BookItemRepository>();
-            services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
             services.AddScoped<IClientBookingRepo, ClientBookingRepository>();
+            services.AddCors();
 
             return services;
         }

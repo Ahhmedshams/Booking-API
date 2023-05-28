@@ -1,6 +1,12 @@
 using Infrastructure;
 using Application;
 using System.Reflection;
+using Infrastructure.Identity;
+using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace WebAPI
 {
@@ -8,6 +14,7 @@ namespace WebAPI
     {
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -19,7 +26,29 @@ namespace WebAPI
 
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
-            //builder.Services.AddApplicationServices();
+
+            /*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                           .AddEntityFrameworkStores<ApplicationDbContext>();*/
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+              .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                //options.RequireHttpsMetadata = true; check if the request is https
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecurityKey"]))
+                };
+            });
+
+
+            /*            builder.Services.AddAuthentication();*/
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             var app = builder.Build();
 
@@ -30,8 +59,15 @@ namespace WebAPI
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()     // Allow requests from any origin
+                       .AllowAnyMethod()     // Allow all HTTP methods
+                       .AllowAnyHeader();    // Allow all headers
+            });
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
