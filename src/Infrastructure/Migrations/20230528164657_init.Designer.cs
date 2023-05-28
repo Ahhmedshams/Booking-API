@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230528164657_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,8 +257,6 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleID"));
 
-
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -308,12 +309,12 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ScheduleID")
+                    b.Property<int>("ScheduleId")
                         .HasColumnType("int");
 
                     b.HasKey("Day", "StartTime", "EndTime");
 
-                    b.HasIndex("ScheduleID");
+                    b.HasIndex("ScheduleId");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -689,6 +690,28 @@ namespace Infrastructure.Migrations
                     b.Navigation("ResourceType");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Schedule", b =>
+                {
+                    b.HasOne("Domain.Entities.Resource", "Resource")
+                        .WithMany("Schedules")
+                        .HasForeignKey("ResourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Resource");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
+                {
+                    b.HasOne("Domain.Entities.Schedule", "Schedule")
+                        .WithMany("ScheduleItems")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
                 {
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
@@ -764,9 +787,19 @@ namespace Infrastructure.Migrations
                     b.Navigation("BookingItems");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Resource", b =>
+                {
+                    b.Navigation("Schedules");
+                });
+
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
                 {
                     b.Navigation("Metadata");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Schedule", b =>
+                {
+                    b.Navigation("ScheduleItems");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
