@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Application.Common.Helpers;
+using Infrastructure.Persistence.Specification;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -24,11 +26,27 @@ namespace Infrastructure.Persistence.Repositories
             return service;
         }
 
+        public async Task<IEnumerable<Service>> GetAllServicesWithSpec(ISpecification<Service> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        public async Task<Service> GetServiceByIdWithSpec(ISpecification<Service> spec)
+        {
+            return await ApplySpecification(spec).FirstOrDefaultAsync();
+        }
+
+
         public async Task DeleteSoft(int id)
         {
             var service = await GetByIdAsync(id);
             service.IsDeleted = true;
             await _context.SaveChangesAsync();
+        }
+
+        private IQueryable<Service> ApplySpecification(ISpecification<Service> spec)
+        {
+            return SpecificationEvaluator<Service>.GetQuery(_context.Set<Service>(), spec);
         }
     }
 }

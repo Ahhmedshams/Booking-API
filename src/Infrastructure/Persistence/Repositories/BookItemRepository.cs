@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Application.Common.Helpers;
+using Infrastructure.Persistence.Specification;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Persistence.Repositories
@@ -8,6 +10,7 @@ namespace Infrastructure.Persistence.Repositories
         public BookItemRepository(ApplicationDbContext context) : base(context)
         {
         }
+
 
         public async Task<BookingItem> GetBookByComplexIdsAsync(int bookId, int resId, params Expression<Func<BookingItem, object>>[] includes)
         {
@@ -76,7 +79,7 @@ namespace Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<BookingItem>> AddBulk(IEnumerable<BookingItem> bookingItems)
+        public async Task<IEnumerable<BookingItem>> AddRange(IEnumerable<BookingItem> bookingItems)
         {
             await _context.Set<BookingItem>().AddRangeAsync(bookingItems);
             await _context.SaveChangesAsync();
@@ -99,5 +102,18 @@ namespace Infrastructure.Persistence.Repositories
                 return false;
             return true;
         }
+
+
+        public async Task<IEnumerable<BookingItem>> GetAllBooksWithSpec(ISpecification<BookingItem> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        private IQueryable<BookingItem> ApplySpecification(ISpecification<BookingItem> spec)
+        {
+            return SpecificationEvaluator<BookingItem>.GetQuery(_context.Set<BookingItem>(), spec);
+        }
+
+
     }
 }

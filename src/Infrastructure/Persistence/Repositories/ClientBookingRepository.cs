@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Application.Common.Helpers;
+using Infrastructure.Persistence.Specification;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -10,8 +12,11 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<bool> IsServiceExist(int serviceId)
         {
-            var serviceExisting = await _context.Set<ClientBooking>().FindAsync(serviceId);
-            if (serviceExisting == null)
+            var service = await _context.Set<Service>()
+                                    .Where(s => s.IsDeleted == false & s.Id == serviceId)
+                                    .FirstOrDefaultAsync();
+
+            if (service == null)
                 return false; //service isn't exist
             return true;
         }
@@ -31,12 +36,22 @@ namespace Infrastructure.Persistence.Repositories
             return clientBookings;
         }
 
+        public async Task<IEnumerable<ClientBooking>> GetAllBookingsWithSpec(ISpecification<ClientBooking> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
         public async Task<ClientBooking> GetBookingById(int id)
         {
             var clientBooking = await _context.Set<ClientBooking>()
                                     .Where(b => b.IsDeleted == false & b.Id == id)
                                     .FirstOrDefaultAsync();
             return clientBooking;
+        }
+
+        private IQueryable<ClientBooking> ApplySpecification(ISpecification<ClientBooking> spec)
+        {
+            return SpecificationEvaluator<ClientBooking>.GetQuery(_context.Set<ClientBooking>(), spec);
         }
     }
 }

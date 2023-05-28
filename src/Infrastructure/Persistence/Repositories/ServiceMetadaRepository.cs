@@ -1,4 +1,6 @@
 ﻿
+using Application.Common.Helpers;
+using Infrastructure.Persistence.Specification;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -10,7 +12,7 @@ namespace Infrastructure.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<ServiceMetadata>> AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
+        public async Task<IEnumerable<ServiceMetadata>> AddRange(IEnumerable<ServiceMetadata> serviceMetadata)
         {
             await _context.Set<ServiceMetadata>().AddRangeAsync(serviceMetadata);
             await _context.SaveChangesAsync();
@@ -104,6 +106,16 @@ namespace Infrastructure.Persistence.Repositories
             if (serviceExist == null)
                 return false;
             return true;
+        }
+
+        public async Task<IEnumerable<ServiceMetadata>> GetAllServiceMDWithSpec(ISpecification<ServiceMetadata> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        private IQueryable<ServiceMetadata> ApplySpecification(ISpecification<ServiceMetadata> spec)
+        {
+            return SpecificationEvaluator<ServiceMetadata>.GetQuery(_context.Set<ServiceMetadata>(), spec);
         }
     }
        

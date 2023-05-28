@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using AutoMapper;
 using CoreApiResponse;
+using Infrastructure.Persistence.Specification.ServiceMetadataSpec;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -23,38 +24,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ServiceMetadataSpecParams specParams)
         {
-            var metadata = await metadataRepo.GetAllAsync();
+            var spec = new ServiceMetadataSpecification(specParams);
+            var metadata = await metadataRepo.GetAllServiceMDWithSpec(spec);
             if (metadata.Count() == 0)
-                return CustomResult("No Service Metadata Found" , HttpStatusCode.NotFound);
-
-            var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, IEnumerable<ServiceMetadataDTO>>(metadata);
-            return CustomResult(metadataDTO);
-        }
-
-
-        [HttpGet("GetByServiceId")]
-        public async Task<IActionResult> GetByServiceId([FromQuery] int serviceId)
-        {
-            var metadata = await metadataRepo.GetByServiceId(serviceId);
-
-            if (metadata == null)
-                return CustomResult($"No Service Metadata Found For this Id: {serviceId})",
-                    HttpStatusCode.NotFound);
-
-            var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, IEnumerable<ServiceMetadataDTO>>(metadata);
-            return CustomResult(metadataDTO);
-        }
-
-        [HttpGet("GetByResourceId")]
-        public async Task<IActionResult> GetByResTypeId([FromQuery] int resTypeId)
-        {
-            var metadata = await metadataRepo.GetByResourceId(resTypeId);
-
-            if (metadata == null)
-                return CustomResult($"No Service Metadata Found For this Id: {resTypeId})",
-                    HttpStatusCode.NotFound);
+                return CustomResult("No Service Metadata Found", HttpStatusCode.NotFound);
 
             var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, IEnumerable<ServiceMetadataDTO>>(metadata);
             return CustomResult(metadataDTO);
@@ -75,7 +50,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("AddBulk")]
-        public async Task<IActionResult> AddBulk(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs)
+        public async Task<IActionResult> AddRange(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -85,14 +60,14 @@ namespace WebAPI.Controllers
                 var addedItems = new List<ServiceMetadataDTO>();
 
                 var services = mapper.Map<IEnumerable<ServiceMetadataDTO>, IEnumerable<ServiceMetadata>>(serviceMetadataDTOs);
-                await metadataRepo.AddBulk(services);
+                await metadataRepo.AddRange(services);
                 return serviceMetadataDTOs;
 
             });
         }
 
-        [HttpPut("{serviceId:int}/{resTypeId:int}")]
-        public async Task<IActionResult> Edit(int serviceId, int resTypeId, ServiceMetadataDTO serviceMetadata)
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromQuery] int serviceId, [FromQuery] int resTypeId, ServiceMetadataDTO serviceMetadata)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -107,8 +82,8 @@ namespace WebAPI.Controllers
 
 
 
-        [HttpDelete("{serviceId:int}/{resTypeId:int}")]
-        public async Task<IActionResult> Delete(int serviceId, int resTypeId)
+        [HttpDelete("DeleteOne")]
+        public async Task<IActionResult> Delete([FromQuery] int serviceId, [FromQuery] int resTypeId)
         {
             var servicesMetadata = await metadataRepo.GetServiceMDByIdAsync(serviceId, resTypeId);
             if (servicesMetadata == null)
@@ -118,8 +93,8 @@ namespace WebAPI.Controllers
             return CustomResult(HttpStatusCode.NoContent);
         }
 
-        [HttpDelete("{serviceId:int}")]
-        public async Task<IActionResult> DeleteBulk(int serviceId)
+        [HttpDelete("DeleteBulk")]
+        public async Task<IActionResult> DeleteBulk([FromQuery] int serviceId)
         {
             var servicesMetadata = await metadataRepo.GetByServiceId(serviceId);
             if (servicesMetadata == null)

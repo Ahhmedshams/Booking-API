@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CoreApiResponse;
+using Infrastructure.Persistence.Specification.BookingItemSpec;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -22,39 +23,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] BookingItemSpecParams specParams)
         {
-            var bookingItems = await bookingItemRepo.GetAllAsync(true, b => b.ClientBooking, r => r.Resource);
+            var spec = new BookingItemSpecification(specParams);
+            var bookingItems = await bookingItemRepo.GetAllBooksWithSpec(spec);
             if (bookingItems.Count() == 0)
                 return CustomResult("No Booking Items Found", HttpStatusCode.NotFound);
             var bookingItemsDTO = mapper.Map<IEnumerable<BookingItem>, IEnumerable<BookingItemDTO>>(bookingItems);
             return CustomResult(bookingItemsDTO);
         }
-
-        [HttpGet("{bookingId:int}/{resourceId:int}")]
-        public async Task<IActionResult> GetById( int bookingId, int resourceId)
-        {
-            var bookingItem = await bookingItemRepo.GetBookByComplexIdsAsync(bookingId, resourceId , b=>b.ClientBooking,r => r.Resource);
-            if (bookingItem == null)
-                return CustomResult($"No Booking Items Found For bookId: {bookingId} with resourceId: {resourceId} ",
-                    HttpStatusCode.NotFound);
-
-            var clientBookingDTO = mapper.Map<BookingItem, BookingItemDTO>(bookingItem);
-            return CustomResult(clientBookingDTO);
-        }
-
-        [HttpGet("{bookingId:int}")]
-        public async Task<IActionResult> GetByBookId(int bookingId)
-        {
-            var bookingItem = await bookingItemRepo.GetBookItemByIdAsync(bookingId, b => b.ClientBooking, r => r.Resource);
-            if (bookingItem == null)
-                return CustomResult($"No Booking Items Found For bookId: {bookingId} ",
-                    HttpStatusCode.NotFound);
-
-            var clientBookingDTO = mapper.Map<IEnumerable<BookingItem>, IEnumerable<BookingItemDTO>>(bookingItem);
-            return CustomResult(clientBookingDTO);
-        }
-
 
         [HttpPost("AddOne")]
         public async Task<IActionResult> AddOne(BookingItemDTO bookingItemDTO)
@@ -70,8 +47,8 @@ namespace WebAPI.Controllers
             });
         }
 
-        [HttpPost("AddBulk")]
-        public async Task<IActionResult> AddBulk(IEnumerable<BookingItemDTO> bookingItemsDTOs)
+        [HttpPost("AddRange")]
+        public async Task<IActionResult> AddRange(IEnumerable<BookingItemDTO> bookingItemsDTOs)
         {
             if (bookingItemsDTOs.Count() == 0)
                 return CustomResult("No booking items provided.");
@@ -80,19 +57,14 @@ namespace WebAPI.Controllers
             {
                 var addedItems = new List<BookingItemDTO>();
 
-                foreach (var bookingItemDTO in bookingItemsDTOs)
-                {
-                    var bookingItem = mapper.Map<BookingItemDTO, BookingItem>(bookingItemDTO);
-                    await bookingItemRepo.AddAsync(bookingItem);
-                    addedItems.Add(bookingItemDTO);
-                }
-
-                return addedItems;
+                var bookingItems = mapper.Map<IEnumerable<BookingItemDTO>, IEnumerable<BookingItem>>(bookingItemsDTOs);
+                await bookingItemRepo.AddRange(bookingItems);
+                return bookingItemsDTOs;
             });
         }
 
-        [HttpPut("{bookingId:int}/{resourceId:int}")]
-        public async Task<IActionResult> Edit(int bookingId, int resourceId, BookingItemDTO bookingItemDTO)
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromQuery] int bookingId,[FromQuery] int resourceId, BookingItemDTO bookingItemDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -105,10 +77,10 @@ namespace WebAPI.Controllers
             });
         }
 
-        [HttpDelete("{bookingId:int}/{resourceId:int}")]
-        public async Task<IActionResult> Delete(int bookingId, int resourceId)
+        [HttpDelete("DeleteOne")]
+        public async Task<IActionResult> Delete([FromQuery] int bookingId,[FromQuery] int resourceId)
         {
-            var service = await GetById(bookingId, resourceId);
+            var service = await bookingItemRepo.GetBookByComplexIdsAsync(bookingId, resourceId);
             if (service == null)
                 return CustomResult($"No Booking Items For bookId: {bookingId} with resourceId: {resourceId} ",
                     HttpStatusCode.NotFound);
@@ -116,8 +88,8 @@ namespace WebAPI.Controllers
             return CustomResult(HttpStatusCode.NoContent);
         }
 
-        [HttpDelete("{bookingId:int}")]
-        public async Task<IActionResult> DeleteBulk(int bookingId)
+        [HttpDelete("DeleteBulk")]
+        public async Task<IActionResult> DeleteBulk([FromQuery] int bookingId)
         {
             var bookingItems = await bookingItemRepo.GetBookItemByIdAsync(bookingId);
             if (bookingItems == null)

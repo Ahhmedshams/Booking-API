@@ -1,6 +1,8 @@
 ﻿
 using AutoMapper;
 using CoreApiResponse;
+using Infrastructure.Persistence.Specification;
+using Infrastructure.Persistence.Specification.ServiceSpec;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -20,10 +22,12 @@ namespace WebAPI.Controllers
             mapper = _mapper;
         }
 
+        
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ServiceSpecParams specParams)
         {
-            var services = await serviceRepo.GetAllServices();
+            var spec = new ServiceSpecification(specParams);
+            var services = await serviceRepo.GetAllServicesWithSpec(spec);
             if (services.Count() == 0)
                 return CustomResult("No Services Found", HttpStatusCode.NotFound);
 
@@ -31,20 +35,10 @@ namespace WebAPI.Controllers
             return CustomResult(servicesDTO);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var service = await serviceRepo.GetServiceById(id);
-            if (service == null)
-                return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
-
-            var serviceDTO = mapper.Map<Service , ServiceDTO>(service); 
-            return CustomResult(serviceDTO);
-        }
-
         [HttpPost]
         public async Task<IActionResult> Add(ServiceDTO serviceDTO)
         {
+            serviceDTO.Id = 0;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
@@ -53,7 +47,8 @@ namespace WebAPI.Controllers
 
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
             await serviceRepo.AddAsync(service);
-            return CustomResult(service);
+            serviceDTO.Id = service.Id;
+            return CustomResult(serviceDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -73,7 +68,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var service = await GetById(id);
+            var service = await serviceRepo.GetServiceById(id);
             if (service == null)
                 return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
             await serviceRepo.DeleteSoft(id);

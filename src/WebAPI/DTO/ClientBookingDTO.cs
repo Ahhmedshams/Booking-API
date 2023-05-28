@@ -2,7 +2,7 @@
 {
     public class ClientBookingDTO
     {
-        public int Id { get; set; }
+        public int Id { get; set;}
         public DateTime Date { get; set; }
         public TimeSpan Time { get; set; }
         public TimeSpan Duration { get; set; }
