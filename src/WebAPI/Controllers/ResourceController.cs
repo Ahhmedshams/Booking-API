@@ -12,20 +12,22 @@ namespace WebAPI.Controllers
     public class ResourceController : BaseController
     {
         private readonly IMapper _mapper;
-        private readonly ApplicationDbContext _context;
         private readonly IResourceRepo _resourceRepo;
+        private readonly IResourceTypeRepo _resourceTypeRepo;
+        
 
-        public ResourceController(IMapper mapper, ApplicationDbContext context, IResourceRepo resourceRepo)
+       
+        public ResourceController(IMapper mapper,  IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo)
         {
             _mapper = mapper;
-            _context = context;
             _resourceRepo = resourceRepo;
+            _resourceTypeRepo = resourceTypeRepo;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            IEnumerable<Resource> resource = _resourceRepo.GetAll();
+            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync();
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
@@ -35,9 +37,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            Resource resource = _resourceRepo.GetById(id);
+            Resource resource = await _resourceRepo.GetByIdAsync(id);
             if (resource == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
@@ -47,30 +49,24 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(ResourceReqDTO resourceDTO)
+        public async Task<IActionResult> Add(ResourceReqDTO resourceDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
+            var ResoureceType = await _resourceTypeRepo.IsExistAsync(resourceDTO.ResourceTypeId);
+            if (!ResoureceType)
+                return CustomResult($"No Resource Type Are Available With id {resourceDTO.ResourceTypeId}", HttpStatusCode.BadRequest);
+
+           
             var resource = _mapper.Map<Resource>(resourceDTO);
-            var result =  _resourceRepo.Add(resource);
-
-
+            var result = await _resourceRepo.AddAsync(resource);
             return CustomResult(result);
+            
         }
 
 
-        //[HttpPut("{id:int}")]
-        //public IActionResult Edit(int id, ResourceReqDTO resourceDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState, HttpStatusCode.BadRequest);
-
-        //    var resource = _mapper.Map<Resource>(resourceDTO);
-        //   var result = _resourceRepo.Edit(id, resource, Res => Res.Id);
-
-        //    return CustomResult(result);
-        //}
+       
 
 
         [HttpPut("{id:int}")]
@@ -86,23 +82,23 @@ namespace WebAPI.Controllers
 
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteById(int id)
+        public async Task<IActionResult> DeleteById(int id)
         {
             if (id == 0)
                 return CustomResult($"No Resource Is Available With id {id}", HttpStatusCode.BadRequest);
 
-            _resourceRepo.Delete(id);
+           await  _resourceRepo.DeleteAsync(id);
 
             return CustomResult(HttpStatusCode.NoContent);
         }
 
         [HttpDelete("SoftDelete/{id:int}")]
-        public IActionResult SoftDelete(int id)
+        public async Task<IActionResult> SoftDelete(int id)
         {
             if (id == 0)
                 return CustomResult($"No Resource Is Available With id {id}", HttpStatusCode.BadRequest);
 
-            _resourceRepo.SoftDelete(id);
+            await _resourceRepo.SoftDeleteAsync(id);
 
             return CustomResult(HttpStatusCode.NoContent);
         }

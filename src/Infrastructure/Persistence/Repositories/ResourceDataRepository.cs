@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -28,9 +29,17 @@ namespace Infrastructure.Persistence.Repositories
             return entities;
         }
 
-        public IEnumerable<ResourceData> Find(Expression<Func<ResourceData, bool>> predicate)
+
+        public async Task<IEnumerable<ResourceData>> FindAsync(Expression<Func<ResourceData, bool>> predicate)
         {
-            return _context.ResourceData.Where(predicate).ToList();
+            return await base.FindAsync(predicate);
         }
+
+
+        public async Task<ResourceData> FindAsync(int ResourceId, int AttributeId)
+        {
+            return await _context.ResourceData.FirstOrDefaultAsync(r => r.AttributeId == AttributeId && r.ResourceId == ResourceId);
+        }
+
     }
 }

@@ -10,6 +10,8 @@ namespace Application.Common.Interfaces.Repositories
     public interface IResourceDataRepo :IAsyncRepository<ResourceData> ,IRepository<ResourceData>
     {
         IEnumerable<ResourceData> Find(Expression<Func<ResourceData, bool>> predicate);
+       Task< IEnumerable<ResourceData>> FindAsync(Expression<Func<ResourceData, bool>> predicate);
+        Task<ResourceData> FindAsync(int ResourceId, int AttributeId);
         IEnumerable<ResourceData> AddRange(IEnumerable<ResourceData> entities);
         Task<IEnumerable<ResourceData>> AddRangeAsync(IEnumerable<ResourceData> entities);
 

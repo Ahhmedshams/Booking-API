@@ -26,9 +26,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var ResourceData = _resourceDataRepo.GetAll();
+            var ResourceData = await _resourceDataRepo.GetAllAsync();
             if (ResourceData.Count() == 0)
                 return CustomResult("No Resource Data Are Available ", HttpStatusCode.NotFound);
             var Result = _mapper.Map<List<ResourceDataRespIDValueDTO>>(ResourceData);
@@ -39,9 +39,9 @@ namespace WebAPI.Controllers
 
        
         [HttpGet("GetResourceData/{id:int}")]
-        public IActionResult FindResourceData(int id)
+        public async Task<IActionResult> FindResourceData(int id)
         {
-           var ResourceData =_resourceDataRepo.Find(res=> res.ResourceId == id);
+           var ResourceData = await _resourceDataRepo.FindAsync(res=> res.ResourceId == id);
 
             if (ResourceData.Count() == 0)
                 return CustomResult("No Resource data Are Available ", HttpStatusCode.NotFound);
@@ -53,7 +53,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPost("AddRange/{id:int}")]
-        public IActionResult AddRange(int id, ResourceDataRespIDValueDTO[] resourceDTO)
+        public async Task<IActionResult> AddRange(int id, ResourceDataRespIDValueDTO[] resourceDTO)
         {
 
             var IdResalt = CheckID(id, resourceDTO);
@@ -64,14 +64,14 @@ namespace WebAPI.Controllers
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             var resourceData = _mapper.Map<IEnumerable<ResourceData>>(resourceDTO);
-            var res = _resourceDataRepo.AddRange(resourceData);
+            var res = await _resourceDataRepo.AddRangeAsync(resourceData);
 
             return CustomResult(res);
         }
 
 
         [HttpPost("AddOne/{id:int}")]
-        public IActionResult AddOne(int id, ResourceDataRespIDValueDTO resourceDTO)
+        public async Task<IActionResult> AddOne(int id, ResourceDataRespIDValueDTO resourceDTO)
         {
 
             var IdResalt = CheckID(id, resourceDTO);
@@ -82,11 +82,31 @@ namespace WebAPI.Controllers
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             var resourceData = _mapper.Map<ResourceData>(resourceDTO);
-            var res = _resourceDataRepo.Add(resourceData);
+            var res = await _resourceDataRepo.AddAsync(resourceData);
 
             return CustomResult(res);
         }
 
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Edit(int id, ResourceDataRespIDValueDTO resourceAttribute)
+        {
+            var Data = await _resourceDataRepo.FindAsync( id, resourceAttribute.AttributeId);
+            if (Data == null)
+                return CustomResult($"No Resource Metadata Available With id {id}", HttpStatusCode.NotFound);
+
+            if(!ModelState.IsValid)
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+
+            Data.AttributeValue = resourceAttribute.AttributeValue;
+
+           await _resourceDataRepo.SaveChangesAsync();
+
+            var resourceDTO = _mapper.Map<ResourceMetaRespDTO>(Data);
+
+            return CustomResult(resourceDTO);
+        }
 
         private IActionResult CheckID(int ResID, ResourceDataRespIDValueDTO[] resourceDTO)
         {

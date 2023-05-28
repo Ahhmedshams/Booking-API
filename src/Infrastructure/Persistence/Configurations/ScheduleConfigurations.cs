@@ -15,7 +15,7 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.Property(x => x.FromDate).HasColumnType("DATE").IsRequired();
             builder.Property(x => x.ToDate).HasColumnType("DATE").IsRequired();
-            builder.HasMany<ScheduleItem>().WithOne().HasForeignKey(e => e.ScheduleID);
+           // builder.HasMany<ScheduleItem>().WithOne().HasForeignKey(e => e.ScheduleID);
         }
     }
 }

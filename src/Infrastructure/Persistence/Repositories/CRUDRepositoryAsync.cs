@@ -106,5 +106,28 @@ namespace Infrastructure.Persistence.Repositories
             return foundEntity;
         }
 
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        public ISoftDeletable SoftDelete(ISoftDeletable Entity)
+        {
+            Entity.IsDeleted = true;
+            return Entity;
+        }
+
+        public IEnumerable<ISoftDeletable> SoftDelete(IEnumerable<ISoftDeletable> Entities)
+        {
+            foreach(var Entity in Entities)
+                Entity.IsDeleted = true;
+
+            return Entities;
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
     }
 }

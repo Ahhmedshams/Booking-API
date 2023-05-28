@@ -45,5 +45,13 @@ namespace Infrastructure.Persistence.Repositories
            var res= _context.ResourceMetadata.Where(predicate).ToList();
             return res;
         }
+
+        public async Task<IEnumerable<ResourceMetadata>> FindAsync(Expression<Func<ResourceMetadata, bool>> predicate)
+        {
+            var res = await _context.ResourceMetadata.Where(predicate).ToListAsync();
+            return res;
+        }
+
+       
     }
 }

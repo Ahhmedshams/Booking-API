@@ -14,6 +14,9 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasOne(e => e.ResourceType)
                 .WithMany(r=>r.Metadata)
                 .HasForeignKey(e => e.ResourceTypeId);
+
+            builder.HasQueryFilter(r => r.IsDeleted == false);
+
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             return _context.Resource.Any(res => res.Id == id);
         }
+
         public Resource EditPrice(int id, decimal price)
         {
             var foundEntity = _context.Resource.Find(id);

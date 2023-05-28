@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230527224331_schdule")]
-    partial class schdule
+    [Migration("20230527225536_schedule")]
+    partial class schedule
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -252,7 +252,10 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.Property<int>("ScheduleID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleID"));
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -273,6 +276,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("DATE");
 
                     b.HasKey("ScheduleID");
+
+                    b.HasIndex("ResourceId");
 
                     b.ToTable("Schedule");
                 });
@@ -304,12 +309,12 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ScheduleID")
+                    b.Property<int>("ScheduleId")
                         .HasColumnType("int");
 
                     b.HasKey("Day", "StartTime", "EndTime");
 
-                    b.HasIndex("ScheduleID");
+                    b.HasIndex("ScheduleId");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -687,20 +692,24 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
-                    b.HasOne("Domain.Entities.Resource", null)
-                        .WithMany()
-                        .HasForeignKey("ScheduleID")
+                    b.HasOne("Domain.Entities.Resource", "Resource")
+                        .WithMany("Schedules")
+                        .HasForeignKey("ResourceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Resource");
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.HasOne("Domain.Entities.Schedule", null)
+                    b.HasOne("Domain.Entities.Schedule", "Schedule")
                         .WithMany()
-                        .HasForeignKey("ScheduleID")
+                        .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -776,6 +785,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
                 {
                     b.Navigation("BookingItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Resource", b =>
+                {
+                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>

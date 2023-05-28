@@ -9,5 +9,7 @@ namespace Application.Common.Interfaces.Repositories
         IEnumerable<ResourceMetadata> AddRange(IEnumerable<ResourceMetadata> entities);
         void DeleteBulk(Expression<Func<ResourceMetadata, bool>> predicate);
         IEnumerable<ResourceMetadata> Find(Expression<Func<ResourceMetadata, bool>> predicate);
+        Task<IEnumerable<ResourceMetadata>> FindAsync(Expression<Func<ResourceMetadata, bool>> predicate);
+
     }
 }

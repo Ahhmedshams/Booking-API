@@ -19,9 +19,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task< IActionResult> GetAll()
         {
-            IEnumerable<ResourceType> resourceTypes = _resourceTypeRepo.GetAll();
+            IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync();
             if (resourceTypes.Count() == 0 ) 
                 return CustomResult("No Resource Type Are Available", HttpStatusCode.NotFound);
             
@@ -31,9 +31,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            ResourceType resourceType = _resourceTypeRepo.GetById(id);
+            ResourceType resourceType = await _resourceTypeRepo.GetByIdAsync(id);
             if (resourceType == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
@@ -44,50 +44,41 @@ namespace WebAPI.Controllers
 
 
         [HttpPost]
-        public IActionResult Add(ResourceTypeDTO resourceTypeDTO)
+        public async Task<IActionResult> Add(ResourceTypeDTO resourceTypeDTO)
         {
             if (!ModelState.IsValid) 
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
             
             ResourceType resourceType = _mapper.Map<ResourceType>(resourceTypeDTO);
-            _resourceTypeRepo.Add(resourceType);
+             await _resourceTypeRepo.AddAsync(resourceType);
 
             return CreatedAtAction("GetById", new { id = resourceType.Id }, resourceType);
         }
 
 
         [HttpPut("{id:int}")]
-        public IActionResult Edit( int id , ResourceTypeDTO resourceTypeDTO)
+        public async Task<IActionResult> Edit( int id , ResourceTypeDTO resourceTypeDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             ResourceType resourceType = _mapper.Map<ResourceType>(resourceTypeDTO);
-            _resourceTypeRepo.Edit(id,resourceType,Res=>Res.Id);
+           var result = await _resourceTypeRepo.EditAsync(id, resourceType, Res => Res.Id);
 
-            return CustomResult(resourceTypeDTO);
+            return CustomResult(result);
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteById(int id)
+        public async Task<IActionResult> DeleteById(int id)
         {
             if (id == 0 ) 
               return  CustomResult($"No Resource Type IS Available With id {id}", HttpStatusCode.BadRequest);
 
-            _resourceTypeRepo.Delete(id);
+           await _resourceTypeRepo.DeleteAsync(id);
 
             return CustomResult( HttpStatusCode.NoContent);
         }
 
-        [HttpDelete("SoftDelete/{id:int}")]
-        public IActionResult SoftDelete(int id)
-        {
-            if (id == 0)
-                return CustomResult($"No Resource Type Is Available With id {id}", HttpStatusCode.BadRequest);
-
-            _resourceTypeRepo.SoftDelete(id);
-
-            return CustomResult(HttpStatusCode.NoContent);
-        }
+       
     }
 }

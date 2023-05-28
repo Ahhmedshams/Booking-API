@@ -74,16 +74,11 @@ namespace Infrastructure.Persistence.Repositories
             return  _context.Set<T>().Find(id);
         }
 
-        public T SoftDelete<IDType>(IDType id)
-        {
-            var foundEntity = _context.Set<T>().Find(id);
-            if (foundEntity == null)
-                return null;
-            else
-                foundEntity.IsDeleted = true;
-            _context.SaveChanges();
+      
 
-            return foundEntity;
+        public  IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+        {
+            return  _context.Set<T>().Where(predicate).ToList();
         }
 
     }

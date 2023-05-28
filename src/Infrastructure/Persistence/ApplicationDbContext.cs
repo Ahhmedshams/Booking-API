@@ -1,4 +1,5 @@
-﻿using Infrastructure.Identity;
+﻿using Domain.Common;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -25,6 +26,26 @@ namespace Infrastructure.Persistence
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             base.OnModelCreating(builder);
+        }
+
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var Now = DateTime.UtcNow;
+
+            foreach (var entry in base.ChangeTracker.Entries())
+            {
+                if(entry.Entity is IHasUpdatedOn UpdateEntity)
+                {
+                    switch(entry.State)
+                    {
+                        case EntityState.Modified:
+                            UpdateEntity.LastUpdatedOn = Now;
+                            break;
+                    }
+                }
+            }
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,12 @@ namespace Infrastructure.Persistence.Repositories
         public bool IsExist(int id)
         {
             return _context.ResourceTypes.Any(res => res.Id == id);
+        }
+
+        public async Task<bool> IsExistAsync(int id)
+        {
+            return await _context.ResourceTypes.AnyAsync(res => res.Id == id);
+
         }
     }
 }
