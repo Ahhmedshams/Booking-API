@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Infrastructure.Persistence.Specification.ClientBookingSpec;
 using Infrastructure.Persistence.Specification;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -38,6 +39,9 @@ namespace WebAPI.Controllers
             clientBookDTO.Id = 0;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+            if (!Enum.IsDefined(typeof(BookingStatus), clientBookDTO.Status))
+                return CustomResult("Invalid value for BookingStatus");
 
             var serviceExisting = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
             if (!serviceExisting)

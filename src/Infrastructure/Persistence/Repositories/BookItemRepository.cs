@@ -79,7 +79,7 @@ namespace Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<BookingItem>> AddRange(IEnumerable<BookingItem> bookingItems)
+        public async Task<IEnumerable<BookingItem>> AddBulk(IEnumerable<BookingItem> bookingItems)
         {
             await _context.Set<BookingItem>().AddRangeAsync(bookingItems);
             await _context.SaveChangesAsync();

@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
                 var addedItems = new List<ServiceMetadataDTO>();
 
                 var services = mapper.Map<IEnumerable<ServiceMetadataDTO>, IEnumerable<ServiceMetadata>>(serviceMetadataDTOs);
-                await metadataRepo.AddRange(services);
+                await metadataRepo.AddBulk(services);
                 return serviceMetadataDTOs;
 
             });

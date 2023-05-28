@@ -12,7 +12,7 @@ namespace Infrastructure.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<ServiceMetadata>> AddRange(IEnumerable<ServiceMetadata> serviceMetadata)
+        public async Task<IEnumerable<ServiceMetadata>> AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
         {
             await _context.Set<ServiceMetadata>().AddRangeAsync(serviceMetadata);
             await _context.SaveChangesAsync();

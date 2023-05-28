@@ -58,7 +58,7 @@ namespace WebAPI.Controllers
                 var addedItems = new List<BookingItemDTO>();
 
                 var bookingItems = mapper.Map<IEnumerable<BookingItemDTO>, IEnumerable<BookingItem>>(bookingItemsDTOs);
-                await bookingItemRepo.AddRange(bookingItems);
+                await bookingItemRepo.AddBulk(bookingItems);
                 return bookingItemsDTOs;
             });
         }

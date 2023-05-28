@@ -7,7 +7,7 @@ namespace Application.Common.Interfaces.Repositories
     {
         Task<IEnumerable<ServiceMetadata>> GetAllServiceMDWithSpec(ISpecification<ServiceMetadata> spec);
 
-        Task<IEnumerable<ServiceMetadata>> AddRange(IEnumerable<ServiceMetadata> serviceMetadata);
+        Task<IEnumerable<ServiceMetadata>> AddBulk(IEnumerable<ServiceMetadata> serviceMetadata);
         Task<ServiceMetadata> GetServiceMDByIdAsync(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes);
         Task<IEnumerable<ServiceMetadata>> GetByServiceId(int serviceId, params Expression<Func<ServiceMetadata, object>>[] includes);
         Task<IEnumerable<ServiceMetadata>> GetByResourceId(int resId, params Expression<Func<ServiceMetadata, object>>[] includes);

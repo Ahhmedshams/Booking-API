@@ -51,8 +51,8 @@ namespace WebAPI.Controllers
             return CustomResult(serviceDTO);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id ,ServiceDTO serviceDTO)
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromQuery] int id ,ServiceDTO serviceDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
@@ -65,8 +65,8 @@ namespace WebAPI.Controllers
             return CustomResult(service);
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int id)
         {
             var service = await serviceRepo.GetServiceById(id);
             if (service == null)
