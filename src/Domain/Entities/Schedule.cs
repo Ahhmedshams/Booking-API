@@ -13,7 +13,6 @@ namespace Domain.Entities
         public int ResourceId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
-
-        public Resource Resource { get; set; }
+       // public IEnumerable<ScheduleItem> ScheduleItems { get; set; }
     }
 }

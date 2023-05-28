@@ -254,6 +254,8 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleID"));
 
+
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -306,12 +308,12 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ScheduleId")
+                    b.Property<int>("ScheduleID")
                         .HasColumnType("int");
 
                     b.HasKey("Day", "StartTime", "EndTime");
 
-                    b.HasIndex("ScheduleId");
+                    b.HasIndex("ScheduleID");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -687,28 +689,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("ResourceType");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Schedule", b =>
-                {
-                    b.HasOne("Domain.Entities.Resource", "Resource")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Resource");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
-                {
-                    b.HasOne("Domain.Entities.Schedule", "Schedule")
-                        .WithMany()
-                        .HasForeignKey("ScheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Schedule");
-                });
-
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
                 {
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
@@ -782,11 +762,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
                 {
                     b.Navigation("BookingItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Resource", b =>
-                {
-                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
