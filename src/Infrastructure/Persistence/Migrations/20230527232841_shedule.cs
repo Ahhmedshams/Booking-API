@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.cs
     public partial class shedule : Migration
-========
-    public partial class schdule : Migration
->>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,12 +18,8 @@ namespace Infrastructure.Migrations
                 name: "Schedule",
                 columns: table => new
                 {
-<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.cs
                     ScheduleID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-========
-                    ScheduleID = table.Column<int>(type: "int", nullable: false),
->>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.cs
                     ResourceId = table.Column<int>(type: "int", nullable: false),
                     FromDate = table.Column<DateTime>(type: "DATE", nullable: false),
                     ToDate = table.Column<DateTime>(type: "DATE", nullable: false),
@@ -39,13 +31,8 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Schedule", x => x.ScheduleID);
                     table.ForeignKey(
-<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.cs
                         name: "FK_Schedule_Resource_ResourceId",
                         column: x => x.ResourceId,
-========
-                        name: "FK_Schedule_Resource_ScheduleID",
-                        column: x => x.ScheduleID,
->>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.cs
                         principalTable: "Resource",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -55,10 +42,10 @@ namespace Infrastructure.Migrations
                 name: "ScheduleItem",
                 columns: table => new
                 {
+                    ScheduleID = table.Column<int>(type: "int", nullable: false),
                     Day = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
-                    ScheduleID = table.Column<int>(type: "int", nullable: false),
                     Available = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
@@ -66,11 +53,7 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.cs
                     table.PrimaryKey("PK_ScheduleItem", x => new { x.ScheduleID, x.Day, x.StartTime, x.EndTime });
-========
-                    table.PrimaryKey("PK_ScheduleItem", x => new { x.Day, x.StartTime, x.EndTime });
->>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.cs
                     table.ForeignKey(
                         name: "FK_ScheduleItem_Schedule_ScheduleID",
                         column: x => x.ScheduleID,
@@ -80,15 +63,9 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-<<<<<<<< HEAD:src/Infrastructure/Persistence/Migrations/20230527232841_shedule.cs
                 name: "IX_Schedule_ResourceId",
                 table: "Schedule",
                 column: "ResourceId");
-========
-                name: "IX_ScheduleItem_ScheduleID",
-                table: "ScheduleItem",
-                column: "ScheduleID");
->>>>>>>> dbe789f279eaeec8e1d7f99c2d55fe924ab83e2f:src/Infrastructure/Persistence/Migrations/20230527224331_schdule.cs
         }
 
         /// <inheritdoc />
