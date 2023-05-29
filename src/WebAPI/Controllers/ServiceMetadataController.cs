@@ -31,7 +31,8 @@ namespace WebAPI.Controllers
             if (metadata.Count() == 0)
                 return CustomResult("No Service Metadata Found", HttpStatusCode.NotFound);
 
-            var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, IEnumerable<ServiceMetadataDTO>>(metadata);
+            var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, 
+                                         IEnumerable<ServiceMetadataDTO>>(metadata);
             return CustomResult(metadataDTO);
         }
 
@@ -59,7 +60,8 @@ namespace WebAPI.Controllers
             {
                 var addedItems = new List<ServiceMetadataDTO>();
 
-                var services = mapper.Map<IEnumerable<ServiceMetadataDTO>, IEnumerable<ServiceMetadata>>(serviceMetadataDTOs);
+                var services = mapper.Map<IEnumerable<ServiceMetadataDTO>, 
+                                          IEnumerable<ServiceMetadata>>(serviceMetadataDTOs);
                 await metadataRepo.AddBulk(services);
                 return serviceMetadataDTOs;
 
@@ -67,10 +69,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Edit([FromQuery] int serviceId, [FromQuery] int resTypeId, ServiceMetadataDTO serviceMetadata)
+        public async Task<IActionResult> Edit([FromQuery] int serviceId, 
+                                              [FromQuery] int resTypeId, 
+                                              ServiceMetadataDTO serviceMetadata)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             return await ProcessActionOne(serviceMetadata, async () =>
             {
@@ -79,8 +83,6 @@ namespace WebAPI.Controllers
                 return serviceMetadata;
             });
         }
-
-
 
         [HttpDelete("DeleteOne")]
         public async Task<IActionResult> Delete([FromQuery] int serviceId, [FromQuery] int resTypeId)
@@ -104,39 +106,41 @@ namespace WebAPI.Controllers
             return CustomResult(HttpStatusCode.NoContent);
         }
 
-        private async Task<IActionResult> ProcessActionOne(ServiceMetadataDTO serviceMetadataDTO, Func<Task<ServiceMetadataDTO>> action)
+        private async Task<IActionResult> ProcessActionOne(ServiceMetadataDTO serviceMetadataDTO, 
+                                                           Func<Task<ServiceMetadataDTO>> action)
         {
 
             bool existenceOfServiceId = await metadataRepo.IsServiceExis(serviceMetadataDTO.ServiceId);
             if (!existenceOfServiceId)
-                return CustomResult($"No Service found for Id: {serviceMetadataDTO.ServiceId}");
+                return CustomResult($"No Service found for Id: {serviceMetadataDTO.ServiceId}", HttpStatusCode.BadRequest);
 
             bool existenceofResTypeId = await metadataRepo.IsResTypeExist(serviceMetadataDTO.ResourceTypeId);
             if (!existenceofResTypeId)
-                return CustomResult($"No Resource Type found for Id: {serviceMetadataDTO.ResourceTypeId}");
+                return CustomResult($"No Resource Type found for Id: {serviceMetadataDTO.ResourceTypeId}", HttpStatusCode.BadRequest);
 
 
             bool checkDuplicate = await metadataRepo.CheckDuplicateKey(serviceMetadataDTO.ServiceId, serviceMetadataDTO.ResourceTypeId);
             if (checkDuplicate)
-                return CustomResult("Duplicate key violation. The specified key already exists in the system");
+                return CustomResult("Duplicate key violation.", HttpStatusCode.BadRequest);
 
             var result = await action.Invoke();
             return CustomResult(result);
         }
 
-        private async Task<IActionResult> ProcessActionBulk(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs, Func<Task<IEnumerable<ServiceMetadataDTO>>> action)
+        private async Task<IActionResult> ProcessActionBulk(IEnumerable<ServiceMetadataDTO> serviceMetadataDTOs,
+                                                            Func<Task<IEnumerable<ServiceMetadataDTO>>> action)
         {
             var invalidServiceIds = await GetInvalidServiceIds(serviceMetadataDTOs);
             if (invalidServiceIds.Count > 0)
-                return CustomResult($"No Service found for Ids: {string.Join(", ", invalidServiceIds)}");
+                return CustomResult($"No Service found for Ids: {string.Join(", ", invalidServiceIds)}", HttpStatusCode.BadRequest);
 
             var invalidResTypeIds = await GetInvalidResourceTypeIds(serviceMetadataDTOs);
             if (invalidResTypeIds.Count > 0)
-                return CustomResult($"No Resource Type found for Ids: {string.Join(", ", invalidResTypeIds)}");
+                return CustomResult($"No Resource Type found for Ids: {string.Join(", ", invalidResTypeIds)}", HttpStatusCode.BadRequest);
 
             var duplicateItems = await GetDuplicateItems(serviceMetadataDTOs);
             if (duplicateItems.Count > 0)
-                return CustomResult($"Duplicate key violation");
+                return CustomResult($"Duplicate key violation", HttpStatusCode.BadRequest);
 
             var result = await action.Invoke();
             return CustomResult(result);
@@ -176,7 +180,8 @@ namespace WebAPI.Controllers
 
             foreach (var serviceMetadataDTO in serviceMetadataDTOs)
             {
-                bool checkDuplicate = await metadataRepo.CheckDuplicateKey(serviceMetadataDTO.ServiceId, serviceMetadataDTO.ResourceTypeId);
+                bool checkDuplicate = await metadataRepo.CheckDuplicateKey(serviceMetadataDTO.ServiceId, 
+                                                                           serviceMetadataDTO.ResourceTypeId);
                 if (checkDuplicate)
                     duplicateItems.Add(serviceMetadataDTO);
             }

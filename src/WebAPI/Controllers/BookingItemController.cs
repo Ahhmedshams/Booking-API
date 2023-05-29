@@ -51,7 +51,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> AddRange(IEnumerable<BookingItemDTO> bookingItemsDTOs)
         {
             if (bookingItemsDTOs.Count() == 0)
-                return CustomResult("No booking items provided.");
+                return CustomResult("No booking items provided.", HttpStatusCode.BadRequest);
 
             return await ProcessActionBulk(bookingItemsDTOs, async () =>
             {
@@ -105,16 +105,16 @@ namespace WebAPI.Controllers
         {
             bool existenceOfClientBook = await bookingItemRepo.IsClientBookExis(bookingItemDTO.BookingId);
             if(! existenceOfClientBook)
-                return CustomResult($"No Client Book found for Id: {bookingItemDTO.BookingId}");
+                return CustomResult($"No Client Book found for Id: {bookingItemDTO.BookingId}", HttpStatusCode.BadRequest);
 
             bool existenceofResource = await bookingItemRepo.IsResourecExist(bookingItemDTO.ResourceId);
             if (!existenceofResource)
-                return CustomResult($"No Resource found for Id: {bookingItemDTO.ResourceId}");
+                return CustomResult($"No Resource found for Id: {bookingItemDTO.ResourceId}", HttpStatusCode.BadRequest);
 
 
             bool checkDuplicate = await bookingItemRepo.CheckDuplicateKey(bookingItemDTO.BookingId, bookingItemDTO.ResourceId);
             if (checkDuplicate)
-                return CustomResult("Duplicate key violation.");
+                return CustomResult("Duplicate key violation.", HttpStatusCode.BadRequest);
 
             var result = await action.Invoke();
             return CustomResult(result);
@@ -124,15 +124,15 @@ namespace WebAPI.Controllers
         {
             var invalidBookIds = await GetInvalidBookIds(bookingItemsDTOs);
             if (invalidBookIds.Count > 0)
-                return CustomResult($"No Client Book found for Ids: {string.Join(", ", invalidBookIds)}");
+                return CustomResult($"No Client Book found for Ids: {string.Join(", ", invalidBookIds)}", HttpStatusCode.BadRequest);
 
             var invalidResourceIds = await GetInvalidResourceIds(bookingItemsDTOs);
             if (invalidResourceIds.Count > 0)
-                return CustomResult($"No Resource found for Ids: {string.Join(", ", invalidResourceIds)}");
+                return CustomResult($"No Resource found for Ids: {string.Join(", ", invalidResourceIds)}", HttpStatusCode.BadRequest);
 
             var duplicateItems = await GetDuplicateItems(bookingItemsDTOs);
             if (duplicateItems.Count > 0)
-                return CustomResult($"Duplicate key violation.");
+                return CustomResult($"Duplicate key violation.", HttpStatusCode.BadRequest);
 
             var result = await action.Invoke();
             return CustomResult(result);

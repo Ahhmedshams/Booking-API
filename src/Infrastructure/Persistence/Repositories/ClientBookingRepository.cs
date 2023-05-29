@@ -17,7 +17,17 @@ namespace Infrastructure.Persistence.Repositories
                                     .FirstOrDefaultAsync();
 
             if (service == null)
-                return false; //service isn't exist
+                return false;
+            return true;
+        }
+
+        public async Task<bool> IsUserExist(string UserId)
+        {
+            var user = await _context.Set<ApplicationUser>()
+                                    .Where(s => s.Id == UserId)
+                                    .FirstOrDefaultAsync();
+            if (user == null) 
+                return false;
             return true;
         }
 
@@ -53,5 +63,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             return SpecificationEvaluator<ClientBooking>.GetQuery(_context.Set<ClientBooking>(), spec);
         }
+
+       
     }
 }

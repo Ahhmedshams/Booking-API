@@ -8,7 +8,7 @@
         public TimeSpan Duration { get; set; }
         public string Location { get; set; }
         public BookingStatus Status { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int ServiceId { get; set; }
     }
 

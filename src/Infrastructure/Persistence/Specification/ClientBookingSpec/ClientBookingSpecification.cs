@@ -50,10 +50,10 @@
                 AddSearchBy(b => b.ServiceId == specParams.ServiceId.Value);
             }
 
-            if(specParams.UserId.HasValue)
-            {
-                AddSearchBy(b => b.UserId == specParams.UserId.Value);
-            }
+            //if(specParams.UserId != null)
+            //{
+            //    AddSearchBy(b => b.UserId == specParams.UserId);
+            //}
             
         }
     }

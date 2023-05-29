@@ -41,11 +41,15 @@ namespace WebAPI.Controllers
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             if (!Enum.IsDefined(typeof(BookingStatus), clientBookDTO.Status))
-                return CustomResult("Invalid value for BookingStatus");
+                return CustomResult("Invalid value for BookingStatus", HttpStatusCode.BadRequest);
 
-            var serviceExisting = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
-            if (!serviceExisting)
-                return CustomResult("Service Id is not exist");
+            var isServiceExist = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
+            if (!isServiceExist)
+                return CustomResult("Service Id is not exist", HttpStatusCode.BadRequest);
+
+            var isUserExist = await clientBookingRepo.IsUserExist(clientBookDTO.UserId);
+            if (!isUserExist)
+                return CustomResult("User Id is not exist", HttpStatusCode.BadRequest);
 
             var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
             await clientBookingRepo.AddAsync(clientBook);
@@ -64,7 +68,7 @@ namespace WebAPI.Controllers
 
             var serviceExisting = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
             if (!serviceExisting)
-                return CustomResult("Service Id is not exist");
+                return CustomResult("Service Id is not exist", HttpStatusCode.BadRequest);
 
             var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
             await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);

@@ -8,6 +8,7 @@ namespace Application.Common.Interfaces.Repositories
         Task<IEnumerable<ClientBooking>> GetAllBookings();
         Task<ClientBooking> GetBookingById(int id);
         Task<bool> IsServiceExist(int serviceId);
+        Task<bool> IsUserExist(string UserId);
         Task DeleteSoft(int id);
     }
 }
