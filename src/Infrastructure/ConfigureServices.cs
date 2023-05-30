@@ -31,6 +31,7 @@ namespace Infrastructure
             services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
             services.AddScoped<IClientBookingRepo, ClientBookingRepository>();
             services.AddCors();
+            services.AddScoped<IServiceRepo, ServiceRepository>();
 
             return services;
         }

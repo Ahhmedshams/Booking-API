@@ -10,14 +10,6 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasKey(i => new { i.BookingId, i.ResourceId });
             builder.Property(i => i.Price).HasColumnType("decimal(18,2)");
 
-            builder.HasOne(i => i.ClientBooking)
-                .WithMany()
-                .HasForeignKey(i => i.BookingId);
-
-            builder.HasOne(i => i.Resource)
-                .WithMany()
-                .HasForeignKey(i => i.ResourceId);
-
             builder.Property(i => i.CreatedOn)
                   .HasDefaultValueSql("GETDATE()");
             builder.Property(i => i.IsDeleted)

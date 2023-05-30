@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Application.Common.Helpers;
+using Infrastructure.Persistence.Specification;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -13,6 +13,13 @@ namespace Infrastructure.Persistence.Repositories
     {
         public ServiceMetadaRepository(ApplicationDbContext context) : base(context)
         {
+        }
+
+        public async Task<IEnumerable<ServiceMetadata>> AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
+        {
+            await _context.Set<ServiceMetadata>().AddRangeAsync(serviceMetadata);
+            await _context.SaveChangesAsync();
+            return serviceMetadata;
         }
 
         public async Task<bool> CheckDuplicateKey(int serviceId, int resTypeId)
@@ -23,17 +30,10 @@ namespace Infrastructure.Persistence.Repositories
             return true;
         }
 
-        public async Task<int> CheckExistenceOfServiceIdAndResId(int serviceId, int resTypeId)
+        public async Task DeleteBulk(int serviceId)
         {
-            var serviceExist = await _context.Set<Service>().FindAsync(serviceId);
-            if (serviceExist == null)
-                return 1; //Service not exist
-
-            var resourceExist = await _context.Set<ResourceType>().FindAsync(resTypeId);
-            if (resourceExist == null)
-                return -1; //Resource not exist
-
-            return 0; //both are found
+            await _context.Set<ServiceMetadata>().Where(s => s.ServiceId == serviceId).ExecuteDeleteAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task<ServiceMetadata> DeleteServiceMDAsyn(int serviceId, int resId)
@@ -63,6 +63,26 @@ namespace Infrastructure.Persistence.Repositories
             return foundEntity;
         }
 
+        public async Task<IEnumerable<ServiceMetadata>> GetByResourceId(int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
+        {
+            var servicesMetadata = await _context.Set<ServiceMetadata>()
+                                    .Where(s => s.ResourceTypeId == resId)
+                                    .ToListAsync();
+            if (servicesMetadata.Count() == 0)
+                return null;
+            return servicesMetadata;
+        }
+
+        public async Task<IEnumerable<ServiceMetadata>> GetByServiceId(int serviceId, params Expression<Func<ServiceMetadata, object>>[] includes)
+        {
+            var servicesMetadata  = await _context.Set<ServiceMetadata>()
+                                    .Where(s => s.ServiceId == serviceId)
+                                    .ToListAsync();
+            if (servicesMetadata.Count() == 0)
+                return null;
+            return servicesMetadata;
+        }
+
         public async Task<ServiceMetadata> GetServiceMDByIdAsync(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
         {
             var query = _context.Set<ServiceMetadata>().AsQueryable();
@@ -73,6 +93,32 @@ namespace Infrastructure.Persistence.Repositories
 
             }
             return await _context.Set<ServiceMetadata>().FindAsync(serviceId, resId);
+        }
+
+        public async Task<bool> IsResTypeExist(int resTypeId)
+        {
+            var resourceExist = await _context.Set<ResourceType>().FindAsync(resTypeId);
+            if (resourceExist == null)
+                return false;
+            return true;
+        }
+
+        public async Task<bool> IsServiceExis(int serviceId)
+        {
+            var serviceExist = await _context.Set<Service>().FindAsync(serviceId);
+            if (serviceExist == null)
+                return false;
+            return true;
+        }
+
+        public async Task<IEnumerable<ServiceMetadata>> GetAllServiceMDWithSpec(ISpecification<ServiceMetadata> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        private IQueryable<ServiceMetadata> ApplySpecification(ISpecification<ServiceMetadata> spec)
+        {
+            return SpecificationEvaluator<ServiceMetadata>.GetQuery(_context.Set<ServiceMetadata>(), spec);
         }
     }
        

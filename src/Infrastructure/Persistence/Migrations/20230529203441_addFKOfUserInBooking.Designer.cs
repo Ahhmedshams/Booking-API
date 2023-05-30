@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230529203441_addFKOfUserInBooking")]
+    partial class addFKOfUserInBooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,6 +217,60 @@ namespace Infrastructure.Migrations
                     b.ToTable("ResourceMetadata");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Days")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("DATE");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ResourceDataAttributeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResourceDataResourceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResourceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("DATE");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResourceDataResourceId", "ResourceDataAttributeId");
+
+                    b.ToTable("ResourceSchedule");
+                });
+
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
                 {
                     b.Property<int>("Id")
@@ -240,76 +297,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.ToTable("ResourceTypes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Schedule", b =>
-                {
-                    b.Property<int>("ScheduleID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleID"));
-
-
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FromDate")
-                        .HasColumnType("DATE");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ResourceId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ToDate")
-                        .HasColumnType("DATE");
-
-                    b.HasKey("ScheduleID");
-
-                    b.ToTable("ResourceSchedule");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
-                {
-                    b.Property<string>("Day")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("TIME");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("TIME");
-
-                    b.Property<bool>("Available")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ScheduleID")
-                        .HasColumnType("int");
-
-                    b.HasKey("Day", "StartTime", "EndTime");
-
-                    b.HasIndex("ScheduleID");
 
                     b.ToTable("ResourceTypes");
                 });
@@ -687,6 +674,17 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ResourceType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResourceSchedule", b =>
+                {
+                    b.HasOne("Domain.Entities.ResourceData", "ResourceData")
+                        .WithMany()
+                        .HasForeignKey("ResourceDataResourceId", "ResourceDataAttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ResourceData");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>

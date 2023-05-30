@@ -1,6 +1,8 @@
 ﻿
 using AutoMapper;
 using CoreApiResponse;
+using Infrastructure.Persistence.Specification;
+using Infrastructure.Persistence.Specification.ServiceSpec;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -10,20 +12,22 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ServiceController : BaseController
     {
-        private readonly IAsyncRepository<Service> serviceRepo;
+        private readonly IServiceRepo serviceRepo;
         private readonly IMapper mapper;
 
-        public ServiceController(IAsyncRepository<Service> _serviceRepo,
+        public ServiceController(IServiceRepo _serviceRepo,
                                 IMapper _mapper)
         {
             serviceRepo = _serviceRepo;
             mapper = _mapper;
         }
 
+        
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ServiceSpecParams specParams)
         {
-            var services = await serviceRepo.GetAllAsync();
+            var spec = new ServiceSpecification(specParams);
+            var services = await serviceRepo.GetAllServicesWithSpec(spec);
             if (services.Count() == 0)
                 return CustomResult("No Services Found", HttpStatusCode.NotFound);
 
@@ -31,52 +35,43 @@ namespace WebAPI.Controllers
             return CustomResult(servicesDTO);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var service = await serviceRepo.GetByIdAsync(id);
-            if (service == null)
-                return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
-
-            var serviceDTO = mapper.Map<Service , ServiceDTO>(service); 
-            return CustomResult(serviceDTO);
-        }
-
         [HttpPost]
         public async Task<IActionResult> Add(ServiceDTO serviceDTO)
         {
+            serviceDTO.Id = 0;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
-                return CustomResult("Invalid value for ServiceStatus");
+                return CustomResult("Invalid value for ServiceStatus", HttpStatusCode.BadRequest);
 
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
             await serviceRepo.AddAsync(service);
-            return CustomResult(service);
+            serviceDTO.Id = service.Id;
+            return CustomResult(serviceDTO);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id ,ServiceDTO serviceDTO)
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromQuery] int id ,ServiceDTO serviceDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
-                return CustomResult("Invalid value for ServiceStatus");
+                return CustomResult("Invalid value for ServiceStatus", HttpStatusCode.BadRequest);
 
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
             await serviceRepo.EditAsync(id, service , s=>s.Id);
             return CustomResult(service);
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int id)
         {
-            var service = await GetById(id);
+            var service = await serviceRepo.GetServiceById(id);
             if (service == null)
                 return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
-            await serviceRepo.DeleteAsync(id);
+            await serviceRepo.DeleteSoft(id);
             return CustomResult(HttpStatusCode.NoContent);
         }
 

@@ -1,12 +1,7 @@
-﻿using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Helpers;
+using Infrastructure.Persistence.Specification;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -16,7 +11,8 @@ namespace Infrastructure.Persistence.Repositories
         {
         }
 
-        public async Task<BookingItem> GetBookByIdAsync(int bookId, int resId, params Expression<Func<BookingItem, object>>[] includes)
+
+        public async Task<BookingItem> GetBookByComplexIdsAsync(int bookId, int resId, params Expression<Func<BookingItem, object>>[] includes)
         {
             var query = _context.Set<BookingItem>().AsQueryable();
             if (includes.Length > 0)
@@ -32,51 +28,92 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<BookingItem> EditBookAsyn(int bookId, int resId, BookingItem entity)
         {
-            var foundEntity = await GetBookByIdAsync(bookId, resId);
+            var bookingItem = await GetBookByComplexIdsAsync(bookId, resId);
 
-            if (foundEntity == null)
+            if (bookingItem == null)
                 return null;
 
             await DeleteBookAsyn(bookId, resId);
             await AddAsync(entity);
 
-            return foundEntity;
+            return bookingItem;
         }
 
         public async Task<BookingItem> DeleteBookAsyn(int bookId, int resId)
         {
-            var foundEntity = await _context.Set<BookingItem>()
+            var bookingItem = await _context.Set<BookingItem>()
                    .FindAsync(bookId, resId);
 
-            if (foundEntity == null)
+            if (bookingItem == null)
                 return null;
 
-            _context.Set<BookingItem>().Remove(foundEntity);
+            _context.Set<BookingItem>().Remove(bookingItem);
             await _context.SaveChangesAsync();
 
-            return foundEntity;
+            return bookingItem;
 
-        }
-
-        public async Task<int> CheckExistenceOfBookIdAndResId(int bookId, int resId)
-        {
-            var clientBookExist = await _context.Set<ClientBooking>().FindAsync(bookId);
-            if (clientBookExist == null)
-                return 1; //Client book not exist
-
-            var resourceExist = await _context.Set<Resource>().FindAsync(resId);
-            if (resourceExist == null)
-                return -1; //Resource not exist
-
-            return 0; //both are found
         }
 
         public async Task<bool> CheckDuplicateKey(int bookId, int resId)
         {
-            var objectExist = await GetBookByIdAsync(bookId, resId);
-            if(objectExist == null)
+            var bookingItem = await GetBookByComplexIdsAsync(bookId, resId);
+            if(bookingItem == null)
                 return false;
             return true; 
         }
+
+        public async Task<IEnumerable<BookingItem>> GetBookItemByIdAsync(int bookId, params Expression<Func<BookingItem, object>>[] includes)
+        {
+            var bookingItems = await _context.Set<BookingItem>()
+                                    .Where(b => b.BookingId == bookId)
+                                    .ToListAsync();
+            if (bookingItems.Count() == 0)
+                return null;
+
+            return bookingItems;
+        }
+
+        public async Task DeleteBulk(int bookId)
+        {
+            await _context.Set<BookingItem>().Where(b => b.BookingId == bookId).ExecuteDeleteAsync();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<BookingItem>> AddBulk(IEnumerable<BookingItem> bookingItems)
+        {
+            await _context.Set<BookingItem>().AddRangeAsync(bookingItems);
+            await _context.SaveChangesAsync();
+            return bookingItems;
+
+        }
+
+        public async Task<bool> IsClientBookExis(int bookId)
+        {
+            var clientBookExist = await _context.Set<ClientBooking>().FindAsync(bookId);
+            if (clientBookExist == null)
+                return false;
+            return true;
+        }
+
+        public async Task<bool> IsResourecExist(int resId)
+        {
+            var resourceExist = await _context.Set<Resource>().FindAsync(resId);
+            if (resourceExist == null)
+                return false;
+            return true;
+        }
+
+
+        public async Task<IEnumerable<BookingItem>> GetAllBooksWithSpec(ISpecification<BookingItem> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        private IQueryable<BookingItem> ApplySpecification(ISpecification<BookingItem> spec)
+        {
+            return SpecificationEvaluator<BookingItem>.GetQuery(_context.Set<BookingItem>(), spec);
+        }
+
+
     }
 }

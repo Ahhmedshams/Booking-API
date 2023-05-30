@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using CoreApiResponse;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Infrastructure.Persistence.Specification.ClientBookingSpec;
+using Infrastructure.Persistence.Specification;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -21,60 +23,62 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ClientBookingSpecParam specParams)
         {
-            var clientBooks = await clientBookingRepo.GetAllAsync();
+            var spec = new ClientBookingSpecification(specParams);
+            var clientBooks = await clientBookingRepo.GetAllBookingsWithSpec(spec);
             if (clientBooks.Count() == 0)
                 return CustomResult("No Clint's Book Found", HttpStatusCode.NotFound);
-            var clientBooksDTO = mapper.Map<IEnumerable<ClientBooking>,IEnumerable<ClientBookingDTO>>(clientBooks);
+            var clientBooksDTO = mapper.Map<IEnumerable<ClientBooking>, IEnumerable<ClientBookingDTO>>(clientBooks);
             return CustomResult(clientBooksDTO);
-        }
-
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var clientBook = await clientBookingRepo.GetByIdAsync(id);
-            if (clientBook == null)
-                return CustomResult($"No Clint's Book Found for this Id {id}", HttpStatusCode.NotFound);
-
-            var clientBookingDTO = mapper.Map<ClientBooking, ClientBookingDTO>(clientBook);
-            return CustomResult(clientBookingDTO);
         }
 
         [HttpPost] 
         public async Task<IActionResult> Add(ClientBookingDTO clientBookDTO)
         {
+            clientBookDTO.Id = 0;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-            var serviceExisting = await clientBookingRepo.CheckServiceExistence(clientBookDTO.ServiceId);
-            if (!serviceExisting)
-                return CustomResult("Service Id is not exist");
+            if (!Enum.IsDefined(typeof(BookingStatus), clientBookDTO.Status))
+                return CustomResult("Invalid value for BookingStatus", HttpStatusCode.BadRequest);
+
+            var isServiceExist = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
+            if (!isServiceExist)
+                return CustomResult("Service Id is not exist", HttpStatusCode.BadRequest);
+
+            var isUserExist = await clientBookingRepo.IsUserExist(clientBookDTO.UserId);
+            if (!isUserExist)
+                return CustomResult("User Id is not exist", HttpStatusCode.BadRequest);
 
             var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
             await clientBookingRepo.AddAsync(clientBook);
+
+            clientBookDTO.Id = clientBook.Id;
             return CustomResult(clientBookDTO);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id, ClientBookingDTO clientBookDTO)
+
+
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromQuery] int id, ClientBookingDTO clientBookDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-            var serviceExisting = await clientBookingRepo.CheckServiceExistence(clientBookDTO.ServiceId);
+            var serviceExisting = await clientBookingRepo.IsServiceExist(clientBookDTO.ServiceId);
             if (!serviceExisting)
-                return CustomResult("Service Id is not exist");
+                return CustomResult("Service Id is not exist", HttpStatusCode.BadRequest);
 
             var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
             await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);
             return CustomResult(clientBookDTO);
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int id)
         {
-            var service = await GetById(id);
+            var service = await clientBookingRepo.GetBookingById(id);
             if (service == null)
                 return CustomResult($"No Client's Book found for this Id {id}", HttpStatusCode.NotFound);
             await clientBookingRepo.DeleteAsync(id);
