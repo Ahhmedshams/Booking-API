@@ -272,7 +272,9 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("ScheduleID");
 
-                    b.ToTable("ResourceSchedule");
+                    b.HasIndex("ResourceId");
+
+                    b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
@@ -309,7 +311,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ScheduleItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>

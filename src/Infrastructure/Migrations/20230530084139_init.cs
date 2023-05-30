@@ -253,8 +253,8 @@ namespace Infrastructure.Migrations
                     Duration = table.Column<TimeSpan>(type: "Time", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Pending"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
                     ServiceId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -262,6 +262,12 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClientBookings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClientBookings_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ClientBookings_Services_ServiceId",
                         column: x => x.ServiceId,
@@ -356,7 +362,6 @@ namespace Infrastructure.Migrations
                     BookingId = table.Column<int>(type: "int", nullable: false),
                     ResourceId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ClientBookingId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -370,11 +375,6 @@ namespace Infrastructure.Migrations
                         principalTable: "ClientBookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BookingItems_ClientBookings_ClientBookingId",
-                        column: x => x.ClientBookingId,
-                        principalTable: "ClientBookings",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_BookingItems_Resource_ResourceId",
                         column: x => x.ResourceId,
@@ -461,11 +461,6 @@ namespace Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingItems_ClientBookingId",
-                table: "BookingItems",
-                column: "ClientBookingId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BookingItems_ResourceId",
                 table: "BookingItems",
                 column: "ResourceId");
@@ -474,6 +469,11 @@ namespace Infrastructure.Migrations
                 name: "IX_ClientBookings_ServiceId",
                 table: "ClientBookings",
                 column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientBookings_UserId",
+                table: "ClientBookings",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Resource_ResourceTypeId",
@@ -540,9 +540,6 @@ namespace Infrastructure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "ClientBookings");
 
             migrationBuilder.DropTable(
@@ -550,6 +547,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Schedule");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Services");

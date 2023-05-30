@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Infrastructure.Identity;
+using Domain.Identity;
 
 namespace Domain.Common
 {

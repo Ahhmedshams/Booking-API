@@ -1,12 +1,7 @@
-﻿using Application.Common.Interfaces.Repositories;
-using AutoMapper;
+﻿using AutoMapper;
 using CoreApiResponse;
-using Domain.Entities;
-using Infrastructure.Migrations;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using WebAPI.DTO;
 using WebAPI.Utility;
 
 namespace WebAPI.Controllers

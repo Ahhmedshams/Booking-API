@@ -1,6 +1,6 @@
 ﻿using Application.DTO;
 using AutoMapper;
-using Infrastructure.Identity;
+using Domain.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

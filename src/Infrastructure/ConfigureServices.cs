@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
-using Infrastructure.Identity;
+using Domain.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Identity;

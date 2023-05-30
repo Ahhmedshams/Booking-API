@@ -1,7 +1,7 @@
 using Infrastructure;
 using Application;
 using System.Reflection;
-using Infrastructure.Identity;
+using Domain.Identity;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
