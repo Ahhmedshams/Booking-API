@@ -11,8 +11,9 @@ namespace Domain.Entities
     {
         public int ScheduleID { get; set; }
         public int ResourceId { get; set; }
+        public Resource Resource { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
-       // public IEnumerable<ScheduleItem> ScheduleItems { get; set; }
+        public IEnumerable<ScheduleItem> ScheduleItems { get; set; }
     }
 }

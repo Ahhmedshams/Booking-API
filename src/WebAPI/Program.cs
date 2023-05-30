@@ -27,6 +27,7 @@ namespace WebAPI
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
 
+
             /*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                            .AddEntityFrameworkStores<ApplicationDbContext>();*/
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -46,6 +47,7 @@ namespace WebAPI
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecurityKey"]))
                 };
             });
+
 
 
             /*            builder.Services.AddAuthentication();*/
