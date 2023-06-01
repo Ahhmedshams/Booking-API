@@ -7,7 +7,7 @@ namespace Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ScheduleItem> builder)
         {
-            builder.HasKey(i => new { i.Day,i.StartTime,i.EndTime });
+            builder.HasKey(i => new { i.Day,i.StartTime,i.EndTime,i.ScheduleId });
 
             builder.Property(e => e.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Property(x => x.IsDeleted)
@@ -15,7 +15,8 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.StartTime).HasColumnType("TIME").IsRequired();
             builder.Property(x => x.EndTime).HasColumnType("TIME").IsRequired();
-           
+            builder.Property(x => x.Day).HasColumnType("DATE").IsRequired();
+
             builder.Property(e => e.StartTime).HasConversion(
                 v => v.ToTimeSpan(),
                 v => TimeOnly.FromTimeSpan(v));

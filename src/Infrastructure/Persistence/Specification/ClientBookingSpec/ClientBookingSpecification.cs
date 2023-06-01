@@ -13,10 +13,10 @@
                 switch (specParams.Sort)
                 {
                     case "time":
-                        AddOrderBy(b => b.Time);
+                        AddOrderBy(b => b.StartTime);
                         break;
                     case "duration":
-                        AddOrderBy(b => b.Duration);
+                        AddOrderBy(b => b.EndTime);
                         break;
                     default:
                         AddOrderBy(b => b.Date);
@@ -42,7 +42,7 @@
 
             if(specParams.Time.HasValue)
             {
-                AddSearchBy(b => b.Time == specParams.Time.Value);
+                AddSearchBy(b => b.StartTime == specParams.Time.Value);
             }
 
             if(specParams.ServiceId.HasValue)
