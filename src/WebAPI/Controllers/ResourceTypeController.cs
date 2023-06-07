@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Common.Interfaces.Repositories;
+using AutoMapper;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -44,12 +45,16 @@ namespace WebAPI.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Add(ResourceTypeDTO resourceTypeDTO)
+        public async Task<IActionResult> Add(string Name)
         {
             if (!ModelState.IsValid) 
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
-            
-            ResourceType resourceType = _mapper.Map<ResourceType>(resourceTypeDTO);
+
+           var Result = await _resourceTypeRepo.IsExistAsync(Name);
+            if (Result)
+                return CustomResult("This Name already Exist", HttpStatusCode.BadRequest);
+
+            ResourceType resourceType = new() { Name = Name };
              await _resourceTypeRepo.AddAsync(resourceType);
 
             return CreatedAtAction("GetById", new { id = resourceType.Id }, resourceType);
@@ -74,7 +79,10 @@ namespace WebAPI.Controllers
             if (id == 0 ) 
               return  CustomResult($"No Resource Type IS Available With id {id}", HttpStatusCode.BadRequest);
 
-           await _resourceTypeRepo.DeleteAsync(id);
+           bool result =  await _resourceTypeRepo.SoftDeleteAsync(id);
+            if(!result)
+                return CustomResult($"No ResourceType is available with id {id}", HttpStatusCode.BadRequest);
+
 
             return CustomResult( HttpStatusCode.NoContent);
         }

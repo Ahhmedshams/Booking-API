@@ -11,5 +11,7 @@ namespace Application.Common.Interfaces.Repositories
         bool IsExist(int id);
         Task<bool> IsExistAsync(int id);
 
+        Task<bool> IsExistAsync(string name);
+
     }
 }

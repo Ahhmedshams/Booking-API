@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using CoreApiResponse;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using WebAPI.DTO;
 using WebAPI.Utility;
 
 namespace WebAPI.Controllers
@@ -15,8 +17,8 @@ namespace WebAPI.Controllers
         private readonly IResourceTypeRepo _resourceTypeRepo;
 
 
-        public ResourceMetadataController(IMapper mapper, 
-                                        IResourceMetadataRepo resourceMetadataRepo, 
+        public ResourceMetadataController(IMapper mapper,
+                                        IResourceMetadataRepo resourceMetadataRepo,
                                         IResourceTypeRepo resourceTypeRepo)
         {
             _mapper = mapper;
@@ -27,15 +29,17 @@ namespace WebAPI.Controllers
         [HttpPost("AddRange/{ResTypeID:int}")]
         public async Task<IActionResult> AddRange(int ResTypeID, ResourceMetaReqDTO[] resourceMetaDTO)
         {
-            var IdResalt = CheckID(ResTypeID, resourceMetaDTO);
+            var IdResalt = Check(ResTypeID, resourceMetaDTO);
             if (IdResalt != null)
                 return IdResalt;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-           var resourceType = _mapper.Map<IEnumerable<ResourceMetadata>>(resourceMetaDTO);
-           var res = await _resourceMetadataRepo.AddRangeAsync(resourceType);
-           var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(res);
+            var ValidResourceMetaData = await ValidAttribute(resourceMetaDTO, ResTypeID);
+
+            var resourceType = _mapper.Map<IEnumerable<ResourceMetadata>>(ValidResourceMetaData);
+            var res = await _resourceMetadataRepo.AddRangeAsync(resourceType);
+            var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(res);
 
             return CustomResult(resourceDTO);
         }
@@ -43,7 +47,7 @@ namespace WebAPI.Controllers
         [HttpPost("AddOne/{ResTypeID:int}")]
         public async Task<IActionResult> AddOne(int ResTypeID, ResourceMetaReqDTO resourceMetaDTO)
         {
-            var IdResult = CheckID(ResTypeID, resourceMetaDTO);
+            var IdResult = await Check(ResTypeID, resourceMetaDTO);
             if (IdResult != null)
                 return IdResult;
 
@@ -61,14 +65,18 @@ namespace WebAPI.Controllers
         [HttpPost("/api/Create/ResourceType/{Name:alpha}")]
         public async Task<IActionResult> CreateFullResourceType(string Name, ResourceAttribute[] resourceAttribute)
         {
+            var Result = await _resourceTypeRepo.IsExistAsync(Name);
+            if (Result)
+                return CustomResult("This Name already Exist", HttpStatusCode.BadRequest);
+
             var NewResourceType = new ResourceType() { Name = Name };
-            var type =  await _resourceTypeRepo.AddAsync(NewResourceType);
+            var type = await _resourceTypeRepo.AddAsync(NewResourceType);
 
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-           var Convertres= ConvertToResourceMetadata(type.Id, resourceAttribute);
-            var res = await _resourceMetadataRepo.AddRangeAsync(Convertres);
+            List<ResourceMetadata> ResourcesMetaData = ConvertToResourceMetadata(type.Id, resourceAttribute);
+            var res = await _resourceMetadataRepo.AddRangeAsync(ResourcesMetaData);
             var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(res);
 
             return CustomResult(resourceDTO);
@@ -77,7 +85,7 @@ namespace WebAPI.Controllers
 
 
         [HttpGet]
-        public  async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             IEnumerable<ResourceMetadata> resource = await _resourceMetadataRepo.GetAllAsync();
             if (resource.Count() == 0)
@@ -102,7 +110,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id , ResourceAttribute resourceAttribute)
+        public async Task<IActionResult> Edit(int id, ResourceAttribute resourceAttribute)
         {
             ResourceMetadata resource = await _resourceMetadataRepo.GetByIdAsync(id);
             if (resource == null)
@@ -120,8 +128,8 @@ namespace WebAPI.Controllers
         [HttpGet("/api/ResourceAttribute/{id:int}")]
         public async Task<IActionResult> GetByResourceTypeId(int id)
         {
-            var resource = await _resourceMetadataRepo.FindAsync(Re=> Re.ResourceTypeId == id);
-            if (resource.Count() ==0)
+            var resource = await _resourceMetadataRepo.FindAsync(Re => Re.ResourceTypeId == id);
+            if (resource.Count() == 0)
                 return CustomResult($"No Resource Metadata Available To Resource Type Id= {id}", HttpStatusCode.NotFound);
 
             var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(resource);
@@ -130,7 +138,17 @@ namespace WebAPI.Controllers
         }
 
 
-        private IActionResult CheckID(int ResTypeID, ResourceMetaReqDTO resourceMetaDTO)
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var Result = await _resourceTypeRepo.SoftDeleteAsync(id);
+            if (!Result)
+                return CustomResult($"No Resource Metadata Available With id {id}", HttpStatusCode.NotFound);
+            else
+                return CustomResult(HttpStatusCode.NoContent);
+        }
+
+        private async Task<IActionResult> Check(int ResTypeID, ResourceMetaReqDTO resourceMetaDTO)
         {
 
             var TypeCheck = CheckResourceType(ResTypeID);
@@ -140,10 +158,14 @@ namespace WebAPI.Controllers
             if (ResTypeID == 0 || ResTypeID != resourceMetaDTO.ResourceTypeId)
                 return CustomResult($"Error In Resource Type {ResTypeID}", HttpStatusCode.BadRequest);
 
+            var CheckAttribute = await CheckAttributeName(resourceMetaDTO);
+            if (CheckAttribute != null)
+                return CheckAttribute;
+
             return null;
         }
 
-        private IActionResult CheckID(int ResTypeID, ResourceMetaReqDTO[] ResourceMetaDTO)
+        private IActionResult Check(int ResTypeID, ResourceMetaReqDTO[] ResourceMetaDTO)
         {
             var TypeCheck = CheckResourceType(ResTypeID);
             if (TypeCheck != null)
@@ -154,7 +176,7 @@ namespace WebAPI.Controllers
             if (CheckId.Count() != 0)
                 return CustomResult($"Not All ResourceType ID Are Same ", HttpStatusCode.BadRequest);
 
-          
+
             return null;
         }
 
@@ -170,14 +192,42 @@ namespace WebAPI.Controllers
         private List<ResourceMetadata> ConvertToResourceMetadata(int id, ResourceAttribute[] resourceAttribute)
         {
             var result = new List<ResourceMetadata>();
-            
+            var ValidAttributes = resourceAttribute.CheckIsValidAttribute();
 
-            foreach (ResourceAttribute item in resourceAttribute)
+            foreach (ResourceAttribute item in ValidAttributes)
             {
-              var ResourceMeta =  item.ToResourceMetadata(id);
+                var ResourceMeta = item.ToResourceMetadata(id);
                 result.Add(ResourceMeta);
             }
             return result;
+        }
+
+        private async Task<IActionResult> CheckAttributeName(ResourceMetaReqDTO resourceMetaReqDTO)
+        {
+            var Result = await _resourceMetadataRepo.FindAsync(res => res.AttributeName == resourceMetaReqDTO.AttributeName
+                                              && res.ResourceTypeId == resourceMetaReqDTO.ResourceTypeId
+                                              );
+
+            if (Result.Count() != 0)
+                return CustomResult("This Attribute Name Is Dublicated", HttpStatusCode.BadRequest);
+            else
+                return null;
+        }
+        private async Task<List<ResourceMetaReqDTO>> ValidAttribute(ResourceMetaReqDTO[] resourceMetaReqDTO,int ResTypeID)
+        {
+            List<ResourceMetaReqDTO> ValidResMetadata = new();
+            var ExistedMetaData = await _resourceMetadataRepo.FindAsync( res=> res.ResourceTypeId == ResTypeID);
+
+            foreach (var item in resourceMetaReqDTO)
+            {
+               var Result =  ExistedMetaData.Any(res=> res.AttributeName ==  item.AttributeName);
+
+                if(!Result)
+                    ValidResMetadata.Add(item);
+            }
+
+            return ValidResMetadata;
+            
         }
 
     }

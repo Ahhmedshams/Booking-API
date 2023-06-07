@@ -94,16 +94,16 @@ namespace Infrastructure.Persistence.Repositories
 
 
 
-        public async Task<T> SoftDeleteAsync<IDType>(IDType id)
+        public virtual async Task<bool> SoftDeleteAsync(int id)
         {
             var foundEntity = _context.Set<T>().Find(id);
             if (foundEntity == null)
-                return null;
+                return false;
             else
                 foundEntity.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return foundEntity;
+            return true;
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
@@ -111,19 +111,9 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.Set<T>().Where(predicate).ToListAsync();
         }
 
-        public ISoftDeletable SoftDelete(ISoftDeletable Entity)
-        {
-            Entity.IsDeleted = true;
-            return Entity;
-        }
 
-        public IEnumerable<ISoftDeletable> SoftDelete(IEnumerable<ISoftDeletable> Entities)
-        {
-            foreach(var Entity in Entities)
-                Entity.IsDeleted = true;
 
-            return Entities;
-        }
+ 
 
         public async Task<int> SaveChangesAsync()
         {

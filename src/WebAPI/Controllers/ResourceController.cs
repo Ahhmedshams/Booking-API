@@ -81,16 +81,6 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteById(int id)
-        {
-            if (id == 0)
-                return CustomResult($"No Resource Is Available With id {id}", HttpStatusCode.BadRequest);
-
-           await  _resourceRepo.DeleteAsync(id);
-
-            return CustomResult(HttpStatusCode.NoContent);
-        }
 
         [HttpDelete("SoftDelete/{id:int}")]
         public async Task<IActionResult> SoftDelete(int id)

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -28,17 +29,9 @@ namespace Infrastructure.Persistence.Repositories
             return entities;
         }
 
-        public void DeleteBulk(Expression<Func<ResourceMetadata, bool>> predicate)
-        {
-             _context.ResourceMetadata.Where(predicate).ExecuteDelete();
-             _context.SaveChanges();
-        }
 
-        public async Task DeleteBulkAsync(Expression<Func<ResourceMetadata, bool>> predicate)
-        {
-            await _context.ResourceMetadata.Where(predicate).ExecuteDeleteAsync();
-            await _context.SaveChangesAsync();
-        }
+
+
 
         public IEnumerable<ResourceMetadata> Find(Expression<Func<ResourceMetadata, bool>> predicate)
         {
@@ -52,6 +45,24 @@ namespace Infrastructure.Persistence.Repositories
             return res;
         }
 
-       
+
+        public async Task<bool> SoftDeleteAsync(int id)
+        {
+            var ResoureMetaData = _context.ResourceMetadata.FirstOrDefault(ResMeta => ResMeta.AttributeId == id);
+
+            if (ResoureMetaData == null)
+                return false;
+
+            ResoureMetaData.IsDeleted = true;
+
+            _context.ResourceData.Where(res => res.AttributeId ==id).ToList().ForEach(resData =>
+               resData.IsDeleted = true
+               );
+
+           await _context.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }

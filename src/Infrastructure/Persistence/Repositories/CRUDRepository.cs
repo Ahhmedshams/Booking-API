@@ -81,5 +81,8 @@ namespace Infrastructure.Persistence.Repositories
             return  _context.Set<T>().Where(predicate).ToList();
         }
 
+
+
+
     }
 }
