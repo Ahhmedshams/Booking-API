@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Application.Common.Model;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Common.Interfaces.Repositories
 {
@@ -15,5 +11,9 @@ namespace Application.Common.Interfaces.Repositories
         IEnumerable<ResourceData> AddRange(IEnumerable<ResourceData> entities);
         Task<IEnumerable<ResourceData>> AddRangeAsync(IEnumerable<ResourceData> entities);
 
+        Task<AllResourceData> GetAllReourceData(int id);
+
+        Task<List<AllResourceData>> GetAllData();
+        Task<List<AllResourceData>> GetAllDataByType(int id);
     }
 }

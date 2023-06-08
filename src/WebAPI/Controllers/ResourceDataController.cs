@@ -1,8 +1,10 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Model;
 using AutoMapper;
 using CoreApiResponse;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Net;
@@ -16,41 +18,52 @@ namespace WebAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IResourceDataRepo _resourceDataRepo;
         private readonly IResourceRepo _resourceRepo;
+        private readonly IResourceMetadataRepo _resourceMetadataRepo;
 
-
-        public ResourceDataController(IMapper mapper, IResourceDataRepo resourceDataRepo, IResourceRepo resourceRepo)
+        public ResourceDataController(IMapper mapper, IResourceDataRepo resourceDataRepo, IResourceRepo resourceRepo, IResourceMetadataRepo resourceMetadataRepo)
         {
             _mapper = mapper;
             _resourceDataRepo = resourceDataRepo;
             _resourceRepo = resourceRepo;
+            _resourceMetadataRepo = resourceMetadataRepo;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var ResourceData = await _resourceDataRepo.GetAllAsync();
-            if (ResourceData.Count() == 0)
+            var Result = await _resourceDataRepo.GetAllData();
+            if (Result.Count() == 0)
                 return CustomResult("No Resource Data Are Available ", HttpStatusCode.NotFound);
-            var Result = _mapper.Map<List<ResourceDataRespIDValueDTO>>(ResourceData);
 
             return CustomResult(Result);
-             
-        }
 
+        }
        
-        [HttpGet("GetResourceData/{id:int}")]
+
+        [HttpGet("Resource/{id:int}")]
         public async Task<IActionResult> FindResourceData(int id)
         {
-           var ResourceData = await _resourceDataRepo.FindAsync(res=> res.ResourceId == id);
+            AllResourceData Result = await _resourceDataRepo.GetAllReourceData(id);
+            if (Result == null)
+                return CustomResult($"No Resource Are Available With ID {id} ", HttpStatusCode.NotFound);
 
-            if (ResourceData.Count() == 0)
-                return CustomResult("No Resource data Are Available ", HttpStatusCode.NotFound);
-
-            var Result = _mapper.Map<List<ResourceDataRespIDValueDTO>>(ResourceData);
 
             return CustomResult(Result);
         }
 
+        [HttpGet("Type/{id:int}")]
+        public async Task<IActionResult> AllDataByResourecTypeId(int id)
+        {
+            var Result = await _resourceDataRepo.GetAllDataByType(id);
+            if (Result == null)
+                return CustomResult($"No Resource Are Available ResourceType ID {id} ", HttpStatusCode.NotFound);
+
+
+            return CustomResult(Result);
+        }
+
+
+        
 
         [HttpPost("AddRange/{id:int}")]
         public async Task<IActionResult> AddRange(int id, ResourceDataRespIDValueDTO[] resourceDTO)
@@ -77,6 +90,11 @@ namespace WebAPI.Controllers
             var IdResalt = CheckID(id, resourceDTO);
             if (IdResalt != null)
                 return IdResalt;
+
+            var ResourceDataValidation = await CheckResourceData(id, resourceDTO);
+            if (ResourceDataValidation != null)
+                return ResourceDataValidation;
+
 
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
@@ -139,11 +157,44 @@ namespace WebAPI.Controllers
         {
             var resourceType = _resourceRepo.IsExist(ResID);
             if (!resourceType)
-                return CustomResult($"No Resource  Are Available With id {ResID}", HttpStatusCode.NotFound);
+                return CustomResult($"No Resource Are Available With id {ResID}", HttpStatusCode.NotFound);
             else
                 return null;
         }
 
+        private async Task<IActionResult> CheckResourceData(int ResID, ResourceDataRespIDValueDTO resourceDTO)
+        {
+
+            var  resource = await _resourceRepo.GetByIdAsync(ResID);
+
+            var resourceMetaData = await _resourceMetadataRepo.FindAsync(Re => Re.ResourceTypeId == resource.ResourceTypeId);
+            if(resourceMetaData.Count()==0)
+                return  CustomResult($"No Resource Metadata Available for ResourceType ID {ResID}", HttpStatusCode.NotFound);
+
+           
+               List<ResourceMetadata> Attribute = resourceMetaData.Where(res => res.AttributeId == resourceDTO.AttributeId).ToList();
+               if (Attribute.Count() == 0)
+                        return CustomResult(message: $"No AttributeId Available With ID{resourceDTO.AttributeId}", HttpStatusCode.NotFound);
+                
+                switch (Attribute[0].AttributeType) 
+                {
+                    case "Number":
+
+                        if (Int32.TryParse(resourceDTO.AttributeValue, out int value))
+                            break;
+                        else
+                            return CustomResult(message: $"Not a Valid Value for Attribute Value ID{resourceDTO.AttributeId}", HttpStatusCode.BadRequest);
+                        break;
+                }
+
+            return null;
+            
+        }
+
+            
+
+
+        
 
     }
 }

@@ -10,6 +10,7 @@ namespace Domain.Entities
     {
         public int Id { get; set; } 
         public int ResourceTypeId { get; set; }
+        public string Name { get; set; }
         public Decimal Price { get; set; }
         public ResourceType ResourceType { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }

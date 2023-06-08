@@ -13,6 +13,8 @@ namespace Infrastructure.Persistence.Configurations
             .HasDefaultValue(false);
 
             builder.HasQueryFilter(r => r.IsDeleted == false);
+
+            builder.Property(e => e.Name).IsUnicode(true);
         }
     }
 }

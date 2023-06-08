@@ -16,7 +16,7 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(e => e.CreatedOn).HasDefaultValueSql("GETDATE()");
             builder.Property(x => x.IsDeleted)
             .HasDefaultValue(false);
-
+            
             builder.HasOne(e => e.ResourceType)
                 .WithMany()
                 .HasForeignKey(e => e.ResourceTypeId)

@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Application.Common.Model;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -41,5 +37,137 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.ResourceData.FirstOrDefaultAsync(r => r.AttributeId == AttributeId && r.ResourceId == ResourceId);
         }
 
+        public async Task< AllResourceData> GetAllReourceData(int id )
+        {
+            var Resource = await _context.Resource.Include(res=> res.ResourceType) .FirstOrDefaultAsync(res => res.Id == id) ;
+
+            if (Resource == null)
+                return null ;
+            AllResourceData Result = new() { Id= id ,
+                Name= Resource.Name ,
+                Price = Resource.Price ,
+                ResourceTypeId = Resource.ResourceTypeId ,
+                ResourceTypeName = Resource.ResourceType.Name 
+            };
+
+
+            var Attributes = await (from RData in _context.ResourceData
+                                    join attr in _context.ResourceMetadata on RData.AttributeId equals attr.AttributeId
+                                    select new Application.Common.Model.Attribute
+                                    {
+                                          Name = attr.AttributeName,
+                                          Value = RData.AttributeValue
+                                      }).ToListAsync();
+
+            Result.Attributes = Attributes;
+
+            return Result;
+
+
+        }
+
+        public async Task< List<AllResourceData> > GetAllData()
+        {
+           var Resources =  await _context.Resource.Include(res => res.ResourceType).ToListAsync();
+
+            if (Resources == null)
+                return null;
+
+            var Query = from R in _context.Resource
+                         join RData in _context.ResourceData on R.Id equals RData.ResourceId
+                         join Mdata in _context.ResourceMetadata on RData.AttributeId equals Mdata.AttributeId
+                         select new
+                         {
+                             Id = R.Id,
+                             AttributeName = Mdata.AttributeName,
+                             AttributeValue = RData.AttributeValue
+                         };
+
+
+            List< AllResourceData> Result = new List< AllResourceData >();
+            foreach (var Resource in Resources)
+            {
+                AllResourceData Record = new()
+                {
+                    Id = Resource.Id,
+                    Name = Resource.Name,
+                    Price = Resource.Price,
+                    ResourceTypeId = Resource.ResourceTypeId,
+                    ResourceTypeName = Resource.ResourceType.Name
+                };
+
+                var attrbutes =  Query.Where(r => r.Id == Record.Id);
+                foreach(var attrbute in attrbutes)
+                {
+                    Application.Common.Model.Attribute attribute = new();
+
+                    attribute.Name = attrbute.AttributeName;
+                    attribute.Value = attrbute.AttributeValue;
+
+                    Record.Attributes.Add(attribute);
+                }
+
+                Result.Add(Record);
+            }
+
+            return Result;
+
+
+            
+        }
+
+        public async Task<List<AllResourceData>> GetAllDataByType(int id)
+        {
+            var Resources = await _context.Resource.Include(res => res.ResourceType).Where(res=> res.ResourceTypeId == id).ToListAsync();
+
+            if (Resources == null)
+                return null;
+
+            var Query = from R in _context.Resource
+                        join RData in _context.ResourceData on R.Id equals RData.ResourceId
+                        join Mdata in _context.ResourceMetadata on RData.AttributeId equals Mdata.AttributeId
+                        where R.ResourceTypeId == id
+                        select new
+                        {
+                            Id = R.Id,
+                            AttributeName = Mdata.AttributeName,
+                            AttributeValue = RData.AttributeValue
+                        };
+
+
+            List<AllResourceData> Result = new List<AllResourceData>();
+            foreach (var Resource in Resources)
+            {
+                AllResourceData Record = new()
+                {
+                    Id = Resource.Id,
+                    Name = Resource.Name,
+                    Price = Resource.Price,
+                    ResourceTypeId = Resource.ResourceTypeId,
+                    ResourceTypeName = Resource.ResourceType.Name
+                };
+
+                var attrbutes = Query.Where(r => r.Id == Record.Id);
+                foreach (var attrbute in attrbutes)
+                {
+                    Application.Common.Model.Attribute attribute = new();
+
+                    attribute.Name = attrbute.AttributeName;
+                    attribute.Value = attrbute.AttributeValue;
+
+                    Record.Attributes.Add(attribute);
+                }
+
+                Result.Add(Record);
+            }
+
+            return Result;
+
+
+
+        }
+
     }
+
+
 }
