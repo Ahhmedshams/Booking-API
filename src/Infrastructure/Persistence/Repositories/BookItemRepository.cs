@@ -120,7 +120,7 @@ namespace Infrastructure.Persistence.Repositories
                             .Where(b => b.ClientBooking.Date.Date >= startDate.Date &&
                                         b.ClientBooking.Date.Date <= endDate.Date &&
                                         b.IsDeleted == false)
-                            .GroupBy(b => new { b.Resource.ResourceType.Name })
+                            .GroupBy(b => new { b.Resource.Name })
                             .Select(g => new
                             {
                                 ResourceName = g.Key.Name,
@@ -133,8 +133,21 @@ namespace Infrastructure.Persistence.Repositories
             return top5Resources;
         }
 
-        
-
-
+        public async Task<IEnumerable<dynamic>> ResourceTypeBookingsReport(DateTime startDate, DateTime endDate)
+        {
+            var report = await _context.Set<BookingItem>()
+                            .Where(b => b.ClientBooking.Date.Date >= startDate.Date &&
+                                        b.ClientBooking.Date.Date <= endDate.Date &&
+                                        b.IsDeleted == false)
+                            .GroupBy(b => b.Resource.ResourceType.Name)
+                            .Select(g => new
+                            {
+                                ResourceTypeName = g.FirstOrDefault().Resource.ResourceType.Name,
+                                UsageCount = g.Count()
+                            })
+                            .OrderByDescending(r => r.UsageCount)
+                            .ToListAsync();
+            return report;
+        }
     }
 }

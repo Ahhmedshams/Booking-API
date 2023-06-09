@@ -51,8 +51,15 @@ namespace WebAPI.Controllers
         [HttpGet("Top5Resources")]
         public async Task<IActionResult> Top5ResourcesReport(DateTime startDate, DateTime endDate)
         {
-            var mostUsedResourceReport = await _bookingItemRepo.Top5ResourcesReport(startDate, endDate);
-            return CustomResult(mostUsedResourceReport);
+            var top5Resources = await _bookingItemRepo.Top5ResourcesReport(startDate, endDate);
+            return CustomResult(new {Top5Resources = top5Resources});
+        }
+
+        [HttpGet("ResTypeBookingsNo")]
+        public async Task<IActionResult> ResourceTypeBookingsReport(DateTime startDate, DateTime endDate)
+        {
+            var resTypeBookingsNo = await _bookingItemRepo.ResourceTypeBookingsReport(startDate, endDate);
+            return CustomResult(new { ResTypeBookingsNo = resTypeBookingsNo });
         }
 
         [HttpGet("NewCustomerNo")]
