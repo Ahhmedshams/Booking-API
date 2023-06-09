@@ -11,9 +11,10 @@ namespace Domain.Entities
     {
         public int ScheduleId { get; set; }
         public Schedule Schedule { get; set; }
-        public string Day { get; set; }
+        public DateTime Day { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set;}
+        public bool Shift { get; set;}
         public bool Available { get; set; }
     }
 }

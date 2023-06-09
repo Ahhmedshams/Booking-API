@@ -114,6 +114,27 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<BookingItem>.GetQuery(_context.Set<BookingItem>(), spec);
         }
 
+        public async Task<IEnumerable<dynamic>> Top5ResourcesReport(DateTime startDate, DateTime endDate)
+        {
+            var top5Resources = await _context.Set<BookingItem>()
+                            .Where(b => b.ClientBooking.Date.Date >= startDate.Date &&
+                                        b.ClientBooking.Date.Date <= endDate.Date &&
+                                        b.IsDeleted == false)
+                            .GroupBy(b => new { b.Resource.ResourceType.Name })
+                            .Select(g => new
+                            {
+                                ResourceName = g.Key.Name,
+                                TotalPrice = g.Sum(b => b.Price)
+                            })
+                            .OrderByDescending(r => r.TotalPrice)
+                            .Take(5)
+                            .ToListAsync();
+
+            return top5Resources;
+        }
+
+        
+
 
     }
 }

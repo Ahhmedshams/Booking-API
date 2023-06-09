@@ -9,9 +9,9 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.Property(c => c.Date)
                    .HasColumnType("Date");
-            builder.Property(c => c.Time)
+            builder.Property(c => c.StartTime)
                    .HasColumnType("Time");
-            builder.Property(c => c.Duration)
+            builder.Property(c => c.EndTime)
                    .HasColumnType("Time");
             builder.Property(c => c.Status)
                     .HasConversion<string>()
