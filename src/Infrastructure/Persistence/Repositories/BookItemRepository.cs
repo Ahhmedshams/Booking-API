@@ -114,20 +114,27 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<BookingItem>.GetQuery(_context.Set<BookingItem>(), spec);
         }
 
-        public async Task<IEnumerable<dynamic>> GetMostUsedResourcesReport(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<dynamic>> Top5ResourcesReport(DateTime startDate, DateTime endDate)
         {
-            var report = await _context.Set<BookingItem>()
-                            .Where(b => b.ClientBooking.Date >= startDate && b.ClientBooking.Date <= endDate)
-                            .GroupBy(b => b.ResourceId)
-                            .Select(r => new
+            var top5Resources = await _context.Set<BookingItem>()
+                            .Where(b => b.ClientBooking.Date.Date >= startDate.Date &&
+                                        b.ClientBooking.Date.Date <= endDate.Date &&
+                                        b.IsDeleted == false)
+                            .GroupBy(b => new { b.Resource.ResourceType.Name })
+                            .Select(g => new
                             {
-                                ResourceId = r.Key,
-                                ResourceName = r.FirstOrDefault().Resource.ResourceType.Name,
-                                UsageCount = r.Count()
-                            }).
-                            OrderByDescending(r => r.UsageCount)
+                                ResourceName = g.Key.Name,
+                                TotalPrice = g.Sum(b => b.Price)
+                            })
+                            .OrderByDescending(r => r.TotalPrice)
+                            .Take(5)
                             .ToListAsync();
-            return report;
+
+            return top5Resources;
         }
+
+        
+
+
     }
 }

@@ -64,20 +64,28 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<ClientBooking>.GetQuery(_context.Set<ClientBooking>(), spec);
         }
 
-        public async Task<IEnumerable<ClientBooking>> GetPriceReport(DateTime? startDate, DateTime? endDate)
+        public async Task<decimal> PriceReport(DateTime? startDate, DateTime? endDate)
         {
             var report = await _context.Set<ClientBooking>()
-                                .Where(b => b.Date >= startDate && b.Date <= endDate && b.IsDeleted == false)
-                                .OrderByDescending(b => b.TotalCost)
-                                .ToListAsync();
+                                .Where(b => b.Date.Date >= startDate && b.Date.Date <= endDate && b.IsDeleted == false)
+                                .SumAsync(b => b.TotalCost);
             return report;
         }
 
-        public async Task<IEnumerable<ClientBooking>> GetBookingReport(DateTime? startDate, DateTime? endDate)
+        public async Task<int> BookingsNoReport(DateTime? startDate, DateTime? endDate)
         {
             var report = await _context.Set<ClientBooking>()
-                                .Where(b => b.Date >= startDate && b.Date <= endDate && b.IsDeleted == false)
-                                .ToListAsync();
+                                .Where(b => b.Date.Date >= startDate && b.Date.Date <= endDate && b.IsDeleted == false)
+                                .CountAsync();
+            return report;
+        }
+
+        public async Task<int> CancelledBookingsReport(DateTime? startDate, DateTime? endDate)
+        {
+            var report = await _context.Set<ClientBooking>()
+                                .Where(b => b.Date.Date >= startDate && b.Date.Date <= endDate &&
+                                       b.Status == BookingStatus.Cancelled && b.IsDeleted == false)
+                                .CountAsync();
             return report;
         }
     }

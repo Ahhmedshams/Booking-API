@@ -16,11 +16,11 @@ namespace Infrastructure.Persistence.Repositories
         {
             _userManager = userManager;
         }
-        public async Task<IEnumerable<ApplicationUser>> UserReport(DateTime startDate, DateTime endDate)
+        public async Task<int> UserReport(DateTime startDate, DateTime endDate)
         {
             var users = await _userManager.Users
-                            .Where(u => u.CreatedOn>= startDate && u.CreatedOn<= endDate)
-                            .ToListAsync();
+                            .Where(u => u.CreatedOn.Date >= startDate && u.CreatedOn.Date <= endDate)
+                            .CountAsync();
             return users;
         }
     }

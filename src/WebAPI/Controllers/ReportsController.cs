@@ -26,50 +26,40 @@ namespace WebAPI.Controllers
             _bookingItemRepo = bookingItemRepo;
             _mapper = mapper;
         }
-        [HttpGet("HighestPrice")]
+        [HttpGet("TotalPrice")]
         public async Task<IActionResult> TopPricesReport(DateTime startDate , DateTime endDate)
         {
-            var pricingReport = await _clientBookingRepo.GetPriceReport(startDate, endDate); 
-            if(pricingReport.Count() == 0)
-                return CustomResult("No Clint's Book Found in this range of date", HttpStatusCode.NotFound);
-
-            var pricingReportDTO = _mapper.Map<IEnumerable<ClientBooking>, 
-                                            IEnumerable<PricesBookingReportDTO>>(pricingReport);
-            return CustomResult(pricingReportDTO);
+            var totalPrice = await _clientBookingRepo.PriceReport(startDate, endDate); 
+            return CustomResult(new {TotalPrice = totalPrice });
         }
 
-        [HttpGet("Booking")]
-        public async Task<IActionResult> BookingReport(DateTime startDate, DateTime endDate)
+        [HttpGet("CancelledBookings")]
+        public async Task<IActionResult> CancelledBookingsReport(DateTime startDate, DateTime endDate)
         {
-            var bookingReport =  await _clientBookingRepo.GetBookingReport(startDate,endDate);
-            if(bookingReport.Count() == 0)
-                return CustomResult("No Clint's Book Found in this range of date", HttpStatusCode.NotFound);
+            var canceledBookingsNo = await _clientBookingRepo.CancelledBookingsReport(startDate, endDate);
+            return CustomResult(new {CanceledBookingsNo = canceledBookingsNo});
+        }
 
-            var bookingReportDTO = _mapper.Map<IEnumerable<ClientBooking>,
-                                    IEnumerable<ClientBookingDTO>>(bookingReport);
-            return CustomResult(bookingReportDTO);
+        [HttpGet("BookingsNo")]
+        public async Task<IActionResult> BookingsNoReport(DateTime startDate, DateTime endDate)
+        {
+            var bookingsNo =  await _clientBookingRepo.BookingsNoReport(startDate,endDate);
+            return CustomResult(new {BookingsNo = bookingsNo});
 
         }
 
-        [HttpGet("Resource")]
-        public async Task<IActionResult> MostUsedResource(DateTime startDate, DateTime endDate)
+        [HttpGet("Top5Resources")]
+        public async Task<IActionResult> Top5ResourcesReport(DateTime startDate, DateTime endDate)
         {
-            var mostUsedResourceReport = await _bookingItemRepo.GetMostUsedResourcesReport(startDate, endDate);
-            if(mostUsedResourceReport.Count() == 0)
-                return CustomResult("No resources used in this range of date", HttpStatusCode.NotFound);
+            var mostUsedResourceReport = await _bookingItemRepo.Top5ResourcesReport(startDate, endDate);
             return CustomResult(mostUsedResourceReport);
         }
 
-        [HttpGet("NewCustomer")]
+        [HttpGet("NewCustomerNo")]
         public async Task<IActionResult> NewCustomerReport(DateTime startDate, DateTime endDate)
         {
-            var newCustomerReport = await _userRepo.UserReport(startDate, endDate);
-            if (newCustomerReport.Count() == 0)
-                return CustomResult("No Customer registerd in this range of date" , HttpStatusCode.NotFound);
-
-            var newCustomerReportDTO = _mapper.Map<IEnumerable<ApplicationUser>,
-                                    IEnumerable<RegisterUserDto>>(newCustomerReport);
-            return CustomResult(newCustomerReportDTO);
+            var newCustomerNo = await _userRepo.UserReport(startDate, endDate);
+            return CustomResult(new {NewCustomerNo = newCustomerNo});
         }
 
     }
