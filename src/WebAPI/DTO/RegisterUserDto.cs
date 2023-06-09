@@ -14,5 +14,7 @@ namespace WebAPI.DTO
         [Required]
         public string Password { get; set; }
 
+        public DateTime CreatedOn { get; set; }
+
     }
 }

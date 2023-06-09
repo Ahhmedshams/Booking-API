@@ -114,6 +114,20 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<BookingItem>.GetQuery(_context.Set<BookingItem>(), spec);
         }
 
-
+        public async Task<IEnumerable<dynamic>> GetMostUsedResourcesReport(DateTime startDate, DateTime endDate)
+        {
+            var report = await _context.Set<BookingItem>()
+                            .Where(b => b.ClientBooking.Date >= startDate && b.ClientBooking.Date <= endDate)
+                            .GroupBy(b => b.ResourceId)
+                            .Select(r => new
+                            {
+                                ResourceId = r.Key,
+                                ResourceName = r.FirstOrDefault().Resource.ResourceType.Name,
+                                UsageCount = r.Count()
+                            }).
+                            OrderByDescending(r => r.UsageCount)
+                            .ToListAsync();
+            return report;
+        }
     }
 }
