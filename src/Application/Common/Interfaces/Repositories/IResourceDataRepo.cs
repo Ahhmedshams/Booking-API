@@ -15,5 +15,9 @@ namespace Application.Common.Interfaces.Repositories
 
         Task<List<AllResourceData>> GetAllData();
         Task<List<AllResourceData>> GetAllDataByType(int id);
+
+
+        Task<bool> IsExistAsync(Expression<Func<ResourceData, bool>> predicate);
+
     }
 }

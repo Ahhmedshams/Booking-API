@@ -53,6 +53,7 @@ namespace Infrastructure.Persistence.Repositories
 
             var Attributes = await (from RData in _context.ResourceData
                                     join attr in _context.ResourceMetadata on RData.AttributeId equals attr.AttributeId
+                                    where RData.ResourceId == id
                                     select new Application.Common.Model.Attribute
                                     {
                                           Name = attr.AttributeName,
@@ -167,6 +168,10 @@ namespace Infrastructure.Persistence.Repositories
 
         }
 
+        public async Task<bool> IsExistAsync(Expression<Func<ResourceData, bool>> predicate)
+        {
+            return await _context.ResourceData.AnyAsync(predicate);
+        }
     }
 
 
