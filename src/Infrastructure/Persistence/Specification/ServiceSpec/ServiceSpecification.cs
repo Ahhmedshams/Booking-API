@@ -27,6 +27,11 @@
                 AddSearchBy(s => s.Id ==  specParams.Id.Value);
             }
 
+            if(specParams.Status != null)
+            {
+               AddSearchBy(s => s.Status == specParams.Status); 
+            }
+
         }
 
 
