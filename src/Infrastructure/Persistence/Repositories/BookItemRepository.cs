@@ -159,15 +159,16 @@ namespace Infrastructure.Persistence.Repositories
                             .GroupBy(b => new
                             {
                                 ResourcTypeName = b.Resource.ResourceType.Name,
-                                Month = new DateTime(b.ClientBooking.Date.Year, b.ClientBooking.Date.Month,1)
+                                Month = b.ClientBooking.Date.Month
                             })
                             .Select(g => new
                             {
-                                ResourceTypeName = g.Key.ResourcTypeName,
-                                Month = g.Key.Month,
+                                ResourceType = g.Key.ResourcTypeName,
+                                Month = g.FirstOrDefault().ClientBooking.Date.Month,
+                                TotalPrice = g.Sum(b=> b.Price),
                                 UsageCount = g.Count()
                             })
-                            .OrderByDescending(r => r.UsageCount)
+                            .OrderBy(r => r.ResourceType)
                             .ToListAsync();
             return report;
         }
