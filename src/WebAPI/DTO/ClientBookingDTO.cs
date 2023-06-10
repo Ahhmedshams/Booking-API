@@ -9,8 +9,8 @@
         public string Location { get; set; }
         public BookingStatus Status { get; set; }
         public decimal TotalCost { get; set; }
-        public string UserId { get; set; }
-        public int ServiceId { get; set; }
+        public string UserEmail { get; set; }
+        public string ServiceName { get; set; }
     }
 
 

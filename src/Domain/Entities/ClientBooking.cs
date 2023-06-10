@@ -12,6 +12,7 @@ namespace Domain.Entities
         Pending,
         Completed
     }
+
     public class ClientBooking: BaseEntity
     {
         public int Id { get; set; }

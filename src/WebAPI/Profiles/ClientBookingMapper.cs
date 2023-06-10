@@ -9,7 +9,10 @@ namespace WebAPI.Profiles
         public ClientBookingMapper()
         {
             CreateMap<ClientBookingDTO, ClientBooking>();
-            CreateMap<ClientBooking, ClientBookingDTO>();
+
+            CreateMap<ClientBooking, ClientBookingDTO>()
+                .ForMember(cb => cb.UserEmail, o => o.MapFrom(c => c.User.Email))
+                .ForMember(cb => cb.ServiceName, o => o.MapFrom(c => c.Service.Name));
 
         }
 
