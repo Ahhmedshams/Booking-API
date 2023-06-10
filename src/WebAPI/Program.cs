@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Infrastructure.Identity.EmailSettings;
 
 namespace WebAPI
 {
@@ -20,18 +22,21 @@ namespace WebAPI
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddRazorPages();
+            builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
-
+            builder.Services.AddScoped<IMailService, MailService>();
+            builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
             /*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                            .AddEntityFrameworkStores<ApplicationDbContext>();*/
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-              .AddEntityFrameworkStores<ApplicationDbContext>();
+             .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("Default");
 
             builder.Services.AddAuthentication(options =>
             {
@@ -71,7 +76,7 @@ namespace WebAPI
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.MapRazorPages();
             app.MapControllers();
 
             app.Run();

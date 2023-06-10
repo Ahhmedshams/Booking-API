@@ -25,7 +25,9 @@ namespace Infrastructure
             services.AddScoped<IResourceMetadataRepo, ResourceMetadataRepository>();
             services.AddScoped<IResourceRepo, ResourceRepository>();
             services.AddScoped<IResourceDataRepo, ResourceDataRepository>();
-
+            services.AddScoped<IScheduleRepo, ScheduleRepository>();
+            services.AddScoped<IScheduleItemRepo, ScheduleItemRepository>();
+            services.AddScoped<AccountRepository, AccountRepository>();
             services.AddScoped(typeof(IAsyncRepository<>), typeof(CRUDRepository<>));
             services.AddScoped<IBookingItemRepo, BookItemRepository>();
             services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();

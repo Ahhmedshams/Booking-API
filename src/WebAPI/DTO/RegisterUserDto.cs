@@ -10,11 +10,10 @@ namespace WebAPI.DTO
         public string FirstName { get; set; } 
         public string LastName { get; set; }
         [Required]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
-
-        public DateTime CreatedOn { get; set; }
 
     }
 }
