@@ -1,11 +1,13 @@
 ﻿using Application.DTO;
 using AutoMapper;
 using Domain.Identity;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -19,74 +21,129 @@ namespace WebAPI.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
-        private readonly IConfiguration config;
+        private readonly AccountRepository accountRepo;
 
-        public AccountController(UserManager<ApplicationUser> _userManager,IMapper _mapper,IConfiguration config) {
+        public AccountController(UserManager<ApplicationUser> _userManager, IMapper _mapper, AccountRepository accountRepo)
+        {
             userManager = _userManager;
             mapper = _mapper;
-            this.config = config;
+            this.accountRepo = accountRepo;
         }
 
         [HttpPost("register")]
+        /*  [ServiceFilter(typeof(ValidationFilterAttribute))]*/
         public async Task<IActionResult> Register(RegisterUserDto _user)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 ApplicationUser user = mapper.Map<ApplicationUser>(_user);
-                IdentityResult result = await userManager.CreateAsync(user,_user.Password);
+                object result = await accountRepo.Register(user, _user.Password);
 
-                if(result.Succeeded)
+                if (result is IdentityResult)
                 {
                     return Ok("Created Successfully");
                 }
-                else
+                else if (result is IEnumerable<IdentityError> errorList)
                 {
-                    return BadRequest(result.Errors);
+                    return BadRequest(errorList);
                 }
             }
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginUserDto _user)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-               ApplicationUser user = await userManager.FindByEmailAsync(_user.Email);
+                ApplicationUser user = await userManager.FindByEmailAsync(_user.Email);
 
-                if (user != null && await userManager.CheckPasswordAsync(user ,_user.Password))
+                if (user != null && await userManager.CheckPasswordAsync(user, _user.Password))
                 {
-                    List<Claim> myClaims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, user.Id),
-                        new Claim(ClaimTypes.Name, user.UserName)
-                    };
+                    JwtSecurityToken myToken = await accountRepo.Login(user);
 
-                    var roles = await userManager.GetRolesAsync(user);
-                    if (roles != null)
-                    {
-                        foreach(var role in roles)
-                        {
-                            myClaims.Add(new Claim(ClaimTypes.Role, role));
-                        }
-                    }
-
-                    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SecurityKey"]));
-                    SigningCredentials credentials =new SigningCredentials(securityKey,SecurityAlgorithms.HmacSha256);
-
-                    JwtSecurityToken myToken = new JwtSecurityToken(
-                        expires:DateTime.Now.AddDays(25),
-                        claims:myClaims,
-                        signingCredentials:credentials
-                        );
                     return Ok(new
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(myToken),
-                        expiration=myToken.ValidTo
+                        expiration = myToken.ValidTo
                     });
                 }
             }
-            return BadRequest("Invalid Password");
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("Change/Email")]
+        public async Task<IActionResult> ChangeEmailAsync(ChangeEmailDTO ChangeEmailDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var Result = await accountRepo.ChangeEmailAsync(ChangeEmailDto.OldEmail, ChangeEmailDto.NewEmail, ChangeEmailDto.Password);
+                if (Result.Succeeded)
+                {
+                    return Ok("Email has been changed successfully");
+                }
+                return Unauthorized("Your email or password incorrect");
+            }
+            else
+            {
+                return BadRequest("Email Is Invalid");
+            }
+        }
+        [HttpPost("Change/Password")]
+        public async Task<IActionResult> ChangePasswordAsync(ChangePasswordDTO ChangePasswordDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var Result = await accountRepo.ChangePasswordAsync(ChangePasswordDto.Email, ChangePasswordDto.CurrentPassword, ChangePasswordDto.NewPassword);
+                if (Result.Succeeded)
+                {
+                    return Ok("Password has been changed successfully");
+                }
+                return Unauthorized("Your email or password incorrect");
+            }
+
+            return BadRequest(ModelState.Values);
+        }
+
+        [HttpPost]
+        [Route("ForgetPassword")]
+        public async Task<IActionResult> ForgetPasswordAsync([EmailAddress] string Email)
+        {
+            if (Email != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    var Result = await accountRepo.ForgetPasswordAsync(Email);
+                    return Ok(Result);
+                }
+                return BadRequest("Email IS Invalid");
+            }
+            return BadRequest("Email Is Required");
+        }
+
+        [HttpPost]
+        [Route("ResetPassword")]
+        private async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
+        {
+            if (ResetPasswordDto != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    var Result = await accountRepo.ResetPasswordAsync(ResetPasswordDto.Email, ResetPasswordDto.Token, ResetPasswordDto.Password);
+                    if (Result.Succeeded)
+                    {
+                        return Ok("Password Has Been Reset Successfully");
+                    }
+                    string Errors = string.Empty;
+                    foreach (var Error in Result.Errors)
+                    {
+                        Errors += Error.Description.Substring(0, Error.Description.Length - 1) + ", ";
+                    }
+                    return BadRequest(Errors.Substring(0, Errors.Length - 2));
+                }
+                return BadRequest(ModelState.Values);
+            }
+            return BadRequest("All Fields Are Required");
         }
     }
 }
