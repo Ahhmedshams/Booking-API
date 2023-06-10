@@ -40,21 +40,31 @@
                 AddSearchBy(b => b.Date == specParams.Date.Value);
             }
 
-            if(specParams.Time.HasValue)
+            if(specParams.StartTime.HasValue)
             {
-                AddSearchBy(b => b.StartTime == specParams.Time.Value);
+                AddSearchBy(b => b.StartTime == specParams.StartTime.Value);
             }
 
-            if(specParams.ServiceId.HasValue)
+            if (specParams.EndTime.HasValue)
+            {
+                AddSearchBy(b => b.StartTime == specParams.EndTime.Value);
+            }
+
+            if (specParams.Status.HasValue)
+            {
+                AddSearchBy(b => b.Status == specParams.Status);
+            }
+
+            if (specParams.ServiceId.HasValue)
             {
                 AddSearchBy(b => b.ServiceId == specParams.ServiceId.Value);
             }
 
-            //if(specParams.UserId != null)
-            //{
-            //    AddSearchBy(b => b.UserId == specParams.UserId);
-            //}
-            
+            if (specParams.UserId != null)
+            {
+                AddSearchBy(b => b.UserId == specParams.UserId);
+            }
+
         }
     }
 }
