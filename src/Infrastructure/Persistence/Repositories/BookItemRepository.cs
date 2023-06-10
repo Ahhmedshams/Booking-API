@@ -149,5 +149,27 @@ namespace Infrastructure.Persistence.Repositories
                             .ToListAsync();
             return report;
         }
+
+        public async Task<IEnumerable<dynamic>> ResTypeSoldPerMonthReport(DateTime startDate, DateTime endDate)
+        {
+            var report = await _context.Set<BookingItem>()
+                            .Where(b => b.ClientBooking.Date.Date >= startDate.Date &&
+                                        b.ClientBooking.Date.Date <= endDate.Date &&
+                                        b.IsDeleted == false)
+                            .GroupBy(b => new
+                            {
+                                ResourcTypeName = b.Resource.ResourceType.Name,
+                                Month = new DateTime(b.ClientBooking.Date.Year, b.ClientBooking.Date.Month,1)
+                            })
+                            .Select(g => new
+                            {
+                                ResourceTypeName = g.Key.ResourcTypeName,
+                                Month = g.Key.Month,
+                                UsageCount = g.Count()
+                            })
+                            .OrderByDescending(r => r.UsageCount)
+                            .ToListAsync();
+            return report;
+        }
     }
 }
