@@ -11,7 +11,7 @@ namespace Infrastructure.Persistence.Repositories
         public Schedule GetByResourceId(int resourceId)
         {
             Schedule schedule = _context.Schedule.Where(s => s.ResourceId == resourceId).FirstOrDefault();
-            if (schedule == null) return null;
+           // if (schedule == null) return null;
             return schedule;
         }
 
@@ -24,7 +24,7 @@ namespace Infrastructure.Persistence.Repositories
             if (ScheduleItems.Count() != 0)
             {
                 SoftDelete(ScheduleItems);
-                _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); //catch excpetion
                 return ("Schedule And Schedule Items Deleted");
             }
             return ("Schedule Deleted");

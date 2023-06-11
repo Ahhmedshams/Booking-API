@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
         [HttpPut("/Edit")]
         public async Task<IActionResult> Edit([FromBody] ScheduleItemDTO scheduleItemDto)
         {
-            var data = await scheduleItemRepo.FindAsync(scheduleItemDto.Day, scheduleItemDto.StartTime, scheduleItemDto.EndTime);
+            var data = await scheduleItemRepo.FindAsync(scheduleItemDto.ScheduleId,scheduleItemDto.Day, scheduleItemDto.StartTime, scheduleItemDto.EndTime);
             if (data == null)
                 return CustomResult($"No Schedule Item Found With Given Data", HttpStatusCode.NotFound);
             /* var  scheduleCheck = CheckSchedule(sheduleId);

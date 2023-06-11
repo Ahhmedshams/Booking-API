@@ -61,6 +61,25 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPut("Edit/{scheduleId:int}")]
+        public async Task<IActionResult> Edit(int scheduleId,ScheduleReqDTO scheduleReqDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                bool scheduleCheck = scheduleRepo.IsExist(scheduleId);
+                if (scheduleCheck)
+                    {
+                        Schedule schedule  =mapper.Map<Schedule>(scheduleReqDTO);
+                        var result = await scheduleRepo.EditAsync(scheduleId, schedule, res => res.ScheduleID);
+                        ScheduleDTO scheduleDto = mapper.Map<ScheduleDTO>(result);
+                        return CustomResult(result);
+                    }
+
+            }
+            return BadRequest("All Data Required");
+
+        }
+
         [HttpDelete("SoftDelete/{id:int}")]
         public async Task<IActionResult> SoftDelete(int id)
         {
