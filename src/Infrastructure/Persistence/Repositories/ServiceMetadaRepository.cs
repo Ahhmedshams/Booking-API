@@ -15,28 +15,39 @@ namespace Infrastructure.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<ServiceMetadata>> AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
+        public async Task AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
         {
             await _context.Set<ServiceMetadata>().AddRangeAsync(serviceMetadata);
             await _context.SaveChangesAsync();
-            return serviceMetadata;
         }
 
-        public async Task<bool> CheckDuplicateKey(int serviceId, int resTypeId)
+        public async Task EditOne(int serviceId, int resId)
         {
-            var objectExist = await GetServiceMDByIdAsync(serviceId, resTypeId);
-            if (objectExist == null)
-                return false;
-            return true;
+            await DeleteOne(serviceId, resId);
+            ServiceMetadata serviceMD = new();
+            serviceMD.ServiceId = serviceId;
+            serviceMD.ResourceTypeId = resId;
+            await AddAsync(serviceMD);
+
+
         }
 
-        public async Task DeleteBulk(int serviceId)
+        public async Task EditBulk(int serviceId, IEnumerable<int> resIds)
         {
-            await _context.Set<ServiceMetadata>().Where(s => s.ServiceId == serviceId).ExecuteDeleteAsync();
-            await _context.SaveChangesAsync();
+            await DeleteBulk(serviceId);
+            List<ServiceMetadata> serviceMetadatas = new();
+            ServiceMetadata serviceMD = new();
+            foreach (int resId in resIds)
+            {
+                serviceMD.ServiceId = serviceId;
+                serviceMD.ResourceTypeId = resId;
+                serviceMetadatas.Add(serviceMD);
+            }
+            await AddBulk(serviceMetadatas);
+
         }
 
-        public async Task<ServiceMetadata> DeleteServiceMDAsyn(int serviceId, int resId)
+        public async Task<ServiceMetadata> DeleteOne(int serviceId, int resId)
         {
             var foundEntity = await _context.Set<ServiceMetadata>()
                     .FindAsync(serviceId, resId);
@@ -49,18 +60,20 @@ namespace Infrastructure.Persistence.Repositories
 
             return foundEntity;
         }
-
-        public async Task<ServiceMetadata> EditServiceMDAsyn(int serviceId, int resId, ServiceMetadata entity)
+        
+        public async Task DeleteBulk(int serviceId)
         {
-            var foundEntity = await GetServiceMDByIdAsync(serviceId, resId);
+            await _context.Set<ServiceMetadata>().Where(s => s.ServiceId == serviceId).ExecuteDeleteAsync();
+            await _context.SaveChangesAsync();
+        }
 
-            if (foundEntity == null)
-                return null;
 
-            await DeleteServiceMDAsyn(serviceId, resId);
-            await AddAsync(entity);
-
-            return foundEntity;
+        public async Task<bool> CheckDuplicateKey(int serviceId, int resTypeId)
+        {
+            var objectExist = await GetById(serviceId, resTypeId);
+            if (objectExist == null)
+                return false;
+            return true;
         }
 
         public async Task<IEnumerable<ServiceMetadata>> GetByResourceId(int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
@@ -83,7 +96,7 @@ namespace Infrastructure.Persistence.Repositories
             return servicesMetadata;
         }
 
-        public async Task<ServiceMetadata> GetServiceMDByIdAsync(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
+        public async Task<ServiceMetadata> GetById(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
         {
             var query = _context.Set<ServiceMetadata>().AsQueryable();
             if (includes.Length > 0)
@@ -120,6 +133,8 @@ namespace Infrastructure.Persistence.Repositories
         {
             return SpecificationEvaluator<ServiceMetadata>.GetQuery(_context.Set<ServiceMetadata>(), spec);
         }
+
+        
     }
        
 }
