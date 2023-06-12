@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230610210943_add column")]
+    partial class addcolumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,9 +296,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.Property<int>("ScheduleId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Day")
                         .HasColumnType("datetime2");
 
@@ -323,10 +323,15 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Shift")
                         .HasColumnType("bit");
 
-                    b.HasKey("ScheduleId", "Day", "StartTime", "EndTime");
+                    b.HasKey("Day", "StartTime", "EndTime");
+
+                    b.HasIndex("ScheduleId");
 
                     b.ToTable("ScheduleItem");
                 });

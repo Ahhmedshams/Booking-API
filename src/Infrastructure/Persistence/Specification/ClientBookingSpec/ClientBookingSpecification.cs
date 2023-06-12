@@ -1,11 +1,24 @@
-﻿namespace Infrastructure.Persistence.Specification.ClientBookingSpec
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Persistence.Specification.ClientBookingSpec
 {
     public class ClientBookingSpecification : BaseSpecification<ClientBooking>
     {
+        //protected readonly UserManager<ApplicationUser> _userManager;
+        
+
+        //public ClientBookingSpecification(UserManager<ApplicationUser> userManager)
+        //{
+        //    _userManager = userManager;
+        //}
+
         public ClientBookingSpecification(ClientBookingSpecParam specParams)
            : base(b => b.IsDeleted == false)
         {
             AddOrderBy(b => b.Date);
+            AddIncludes(b => b.User);
+            AddIncludes(b => b.Service);
 
             ApplyPagging(specParams.PageSize *(specParams.PageIndex - 1) , specParams.PageSize);
             if (!string.IsNullOrEmpty(specParams.Sort))
@@ -55,16 +68,28 @@
                 AddSearchBy(b => b.Status == specParams.Status);
             }
 
-            if (specParams.ServiceId.HasValue)
-            {
-                AddSearchBy(b => b.ServiceId == specParams.ServiceId.Value);
-            }
+            //if (specParams.ServiceId != null)
+            //{
+            //    AddSearchBy(b => b.ServiceId == specParams.ServiceId);
+            //}
 
-            if (specParams.UserId != null)
-            {
-                AddSearchBy(b => b.UserId == specParams.UserId);
-            }
+            //if (specParams.UserEmail != null)
+            //{
+            //    var user = GetUser(specParams.UserEmail);
+                
+            //    if(user != null)
+            //    {
+            //        AddSearchBy(b => b.UserId == user.Id.ToString());
+            //    }
+            //}
 
         }
+
+        //private async Task<ApplicationUser> GetUser(string email)
+        //{
+        //    ApplicationUser user =await _userManager.FindByEmailAsync(email);
+        //    return user;
+        //}
+       
     }
 }

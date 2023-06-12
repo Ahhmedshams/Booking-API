@@ -10,6 +10,7 @@ namespace Domain.Entities
 
         [ForeignKey("ResourceType")]
         public int ResourceTypeId { get; set; }
+        public int NoOfResources { get; set; }
         public ResourceType ResourceType { get; set; }
     }
 }
