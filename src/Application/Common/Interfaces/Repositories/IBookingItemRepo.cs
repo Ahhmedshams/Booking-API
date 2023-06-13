@@ -6,7 +6,7 @@ namespace Application.Common.Interfaces.Repositories
     public interface IBookingItemRepo: IAsyncRepository<BookingItem>
     {
         Task<IEnumerable<BookingItem>> GetAllBooksWithSpec(ISpecification<BookingItem> spec);
-        Task<IEnumerable<dynamic>> Top5ResourcesReport(DateTime startDate , DateTime endDate);
+        Task<IEnumerable<dynamic>> TopResourcesReport(DateTime startDate , DateTime endDate, int number);
         Task<IEnumerable<dynamic>> ResourceTypeBookingsReport(DateTime startDate , DateTime endDate);
         Task<IEnumerable<dynamic>> ResTypeSoldPerMonthReport(DateTime startDate , DateTime endDate);
         Task<IEnumerable<BookingItem>> AddBulk(IEnumerable<BookingItem> bookingItems);
