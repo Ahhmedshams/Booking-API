@@ -16,7 +16,7 @@ namespace Application.Common.Interfaces.Repositories
 
         Task<IdentityResult> ChangePasswordAsync(string Email, string CurrentPassword, string NewPassword);
 
-        Task<string?> ForgetPasswordAsync(string Email);
+        Task<bool> ForgetPasswordAsync(string Email);
 
         Task<IdentityResult> ResetPasswordAsync(string Email, string Token, string NewPassword);
 

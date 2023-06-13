@@ -1,5 +1,6 @@
 ﻿using Application.DTO;
 using AutoMapper;
+using CoreApiResponse;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Eventing.Reader;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -17,7 +19,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
@@ -109,16 +111,13 @@ namespace WebAPI.Controllers
         [Route("ForgetPassword")]
         public async Task<IActionResult> ForgetPasswordAsync([EmailAddress] string Email)
         {
-            if (Email != null)
-            {
-                if (ModelState.IsValid)
-                {
-                    var Result = await accountRepo.ForgetPasswordAsync(Email);
-                    return Ok(Result);
-                }
-                return BadRequest("Email IS Invalid");
-            }
-            return BadRequest("Email Is Required");
+            if (Email == null || !ModelState.IsValid)
+                return BadRequest("Check your email input");
+            var Result = await accountRepo.ForgetPasswordAsync(Email);
+            if (Result)
+                return CustomResult("If your email matches one of our registerd account, we will send and email with resetting password steps");
+            else
+                return CustomResult("Something went wrong. Please try again later", System.Net.HttpStatusCode.ServiceUnavailable);
         }
 
         [HttpPost]
