@@ -1,5 +1,7 @@
 ﻿using Infrastructure.Identity.EmailSettings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -26,9 +28,24 @@ namespace Infrastructure.Persistence.Repositories
             IdentityResult result = await userManager.CreateAsync(_user, password);
             if (result.Succeeded)
             {
-               /* var token = await userManager.GenerateEmailConfirmationTokenAsync(_user);
-                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account",
-                    new { userId = _user.Id, token = token }, Request.);*/
+                var userFromDb = await userManager.FindByEmailAsync(_user.Email);
+                if (userFromDb != null)
+                {
+                    var token = await userManager.GenerateEmailConfirmationTokenAsync(userFromDb);
+                    // Send the confirmation email
+                    var EncodingConfirmToken = Encoding.UTF8.GetBytes(token);
+                    var ValidEncodingConfirmToken = WebEncoders.Base64UrlEncode(EncodingConfirmToken);
+
+                    var mailData = new MailData
+                    {
+                        EmailTo = userFromDb.Email,
+                        EmailToName = userFromDb.UserName,
+                        EmailSubject = "Confirm your email",
+                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:URL"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
+                    };
+                    mailService.SendMail(mailData);
+                    
+                }
                 return result;
             }
             else
@@ -126,6 +143,15 @@ namespace Infrastructure.Persistence.Repositories
             }
             return true ;
         }
+
+        /*public async Task<string> ConfirmEailAsync(string Email)
+        {
+            var user = await userManager.FindByEmailAsync(Email);
+            if(user != null)
+            {
+
+            }
+        }*/
 
         public async Task<IdentityResult> ResetPasswordAsync(string Email, string Token, string NewPassword)
         {

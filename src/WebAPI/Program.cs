@@ -33,11 +33,20 @@ namespace WebAPI
             builder.Services.AddScoped<IMailService, MailService>();
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
-            /*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                           .AddEntityFrameworkStores<ApplicationDbContext>();*/
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("Default");
-
+                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders()
+                .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("Default");
+            builder.Services.Configure<IdentityOptions>(opt =>
+            {
+                /*opt.Password.RequireDigit = false;
+                 opt.Password.RequireLowercase = false;
+                 opt.Password.RequireUppercase = false;
+                 opt.Password.RequireNonAlphanumeric = false;
+                 opt.Password.RequiredLength = 8;*/
+                opt.User.RequireUniqueEmail = true;
+                opt.SignIn.RequireConfirmedEmail = true;
+                //opt.Password.RequiredUniqueChars = 1;
+            });
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

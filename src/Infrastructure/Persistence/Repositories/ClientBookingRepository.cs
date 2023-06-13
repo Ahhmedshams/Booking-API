@@ -75,7 +75,10 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<int> BookingsNoReport(DateTime? startDate, DateTime? endDate)
         {
             var report = await _context.Set<ClientBooking>()
-                                .Where(b => b.Date.Date >= startDate && b.Date.Date <= endDate && b.IsDeleted == false)
+                                .Where(b => b.Date.Date >= startDate && 
+                                       b.Date.Date <= endDate && 
+                                       b.Status == BookingStatus.Completed &&
+                                       b.IsDeleted == false)
                                 .CountAsync();
             return report;
         }

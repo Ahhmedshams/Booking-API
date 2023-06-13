@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using WebAPI.DTO;
 
 namespace WebAPI.Profiles
 {
@@ -6,10 +7,9 @@ namespace WebAPI.Profiles
     {
         public ServiceMetadataMapper()
         {
-            CreateMap<ServiceMetadataDTO, ServiceMetadata>();
-
-            CreateMap<ServiceMetadata, ServiceMetadataDTO>();
-                
+            
+            CreateMap<ServiceMetadata, ServiceMetadataDTO>().ReverseMap();
+            CreateMap<ServiceMetadata, ServiceMDReqDTO>().ReverseMap();
         }
     }
 }

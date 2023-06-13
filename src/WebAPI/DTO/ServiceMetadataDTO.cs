@@ -6,4 +6,9 @@
         public int ResourceTypeId { get; set; }
     }
 
+    public class ServiceMDReqDTO
+    {
+        public int ResourceTypeId { get; set; }
+    }
+
 }

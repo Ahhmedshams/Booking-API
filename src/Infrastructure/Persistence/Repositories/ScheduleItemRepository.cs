@@ -53,9 +53,9 @@ namespace Infrastructure.Persistence.Repositories
 
         }
 
-        public async Task<ScheduleItem> FindAsync(DateTime day, TimeOnly startTime, TimeOnly endTime)
+        public async Task<ScheduleItem> FindAsync(int scheduleId, DateTime day, TimeOnly startTime, TimeOnly endTime)
         {
-            return await _context.ScheduleItem.FirstOrDefaultAsync(s => s.Day == day && s.StartTime == startTime && s.EndTime == endTime);
+            return await _context.ScheduleItem.FirstOrDefaultAsync(s => s.ScheduleId==scheduleId &&s.Day == day && s.StartTime == startTime && s.EndTime == endTime);
         }
 
 

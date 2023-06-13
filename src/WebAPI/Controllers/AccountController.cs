@@ -6,8 +6,10 @@ using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Eventing.Reader;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,6 +41,7 @@ namespace WebAPI.Controllers
             if (ModelState.IsValid)
             {
                 ApplicationUser user = mapper.Map<ApplicationUser>(_user);
+
                 object result = await accountRepo.Register(user, _user.Password);
 
                 if (result is IdentityResult)
@@ -51,6 +54,32 @@ namespace WebAPI.Controllers
                 }
             }
             return BadRequest(ModelState);
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+            {
+                return BadRequest("Invalid email confirmation link");
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest("Invalid email confirmation link");
+            }
+            var DecodingResetToken = WebEncoders.Base64UrlDecode(token);
+            var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
+            var result = await userManager.ConfirmEmailAsync(user, ValidToken);
+            if (result.Succeeded)
+            {
+                return Ok("Email confirmed successfully");
+            }
+            else
+            {
+                return BadRequest("Unable to confirm email");
+            }
         }
 
         [HttpPost("login")]
@@ -122,7 +151,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("ResetPassword")]
-        private async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
+        public async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
         {
             if (ResetPasswordDto != null)
             {
