@@ -6,7 +6,7 @@
         Inactive,
         PendingApproval
     }
-    public class Service: BaseEntity
+    public class Service : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

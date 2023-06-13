@@ -114,8 +114,10 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<BookingItem>.GetQuery(_context.Set<BookingItem>(), spec);
         }
 
-        public async Task<IEnumerable<dynamic>> Top5ResourcesReport(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<dynamic>> TopResourcesReport(DateTime startDate, DateTime endDate, int number)
         {
+            if (number == 0)
+                number = 5;
             var top5Resources = await _context.Set<BookingItem>()
                             .Where(b => b.ClientBooking.Date.Date >= startDate.Date &&
                                         b.ClientBooking.Date.Date <= endDate.Date &&
@@ -127,7 +129,7 @@ namespace Infrastructure.Persistence.Repositories
                                 TotalPrice = g.Sum(b => b.Price)
                             })
                             .OrderByDescending(r => r.TotalPrice)
-                            .Take(5)
+                            .Take(number)
                             .ToListAsync();
 
             return top5Resources;

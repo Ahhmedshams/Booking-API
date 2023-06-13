@@ -32,9 +32,7 @@ namespace WebAPI.Controllers
         {
             var spec = new ServiceMetadataSpecification(specParams);
             var metadata = await metadataRepo.GetAllServiceMDWithSpec(spec);
-            if (metadata.Count() == 0)
-                return CustomResult("No Service Metadata Found", HttpStatusCode.NotFound);
-
+            
             var metadataDTO = mapper.Map<IEnumerable<ServiceMetadata>, 
                                          IEnumerable<ServiceMetadataDTO>>(metadata);
             return CustomResult(metadataDTO);

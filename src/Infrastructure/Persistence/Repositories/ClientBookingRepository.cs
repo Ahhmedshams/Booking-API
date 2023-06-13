@@ -64,11 +64,25 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<ClientBooking>.GetQuery(_context.Set<ClientBooking>(), spec);
         }
 
-        public async Task<decimal> PriceReport(DateTime? startDate, DateTime? endDate)
+        public async Task<decimal> PriceReport(DateTime? startDate, DateTime? endDate, int serviceId)
         {
-            var report = await _context.Set<ClientBooking>()
-                                .Where(b => b.Date.Date >= startDate && b.Date.Date <= endDate && b.IsDeleted == false)
+            var report = 0.0M;
+            if (serviceId == 0) 
+            {
+                report = await _context.Set<ClientBooking>()
+                               .Where(b => b.Date.Date >= startDate &&
+                                      b.Date.Date <= endDate && 
+                                      b.IsDeleted == false)
+                               .SumAsync(b => b.TotalCost);
+                return report;
+            }
+            report = await _context.Set<ClientBooking>()
+                                .Where(b => b.ServiceId == serviceId &&
+                                       b.Date.Date >= startDate && 
+                                       b.Date.Date <= endDate && 
+                                       b.IsDeleted == false)
                                 .SumAsync(b => b.TotalCost);
+
             return report;
         }
 

@@ -46,7 +46,8 @@ namespace Infrastructure.Persistence.Repositories
 
         private IQueryable<Service> ApplySpecification(ISpecification<Service> spec)
         {
-            return SpecificationEvaluator<Service>.GetQuery(_context.Set<Service>(), spec);
+            var query = _context.Set<Service>().Include(s => s.Metadata).ThenInclude(s=>s.ResourceType);
+            return SpecificationEvaluator<Service>.GetQuery(query, spec);
         }
     }
 }
