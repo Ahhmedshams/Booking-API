@@ -1,18 +1,13 @@
-﻿using AutoMapper;
-using Azure.Core;
-using Infrastructure.Identity;
-using Infrastructure.Identity.EmailSettings;
+﻿using Infrastructure.Identity.EmailSettings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -33,9 +28,24 @@ namespace Infrastructure.Persistence.Repositories
             IdentityResult result = await userManager.CreateAsync(_user, password);
             if (result.Succeeded)
             {
-               /* var token = await userManager.GenerateEmailConfirmationTokenAsync(_user);
-                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account",
-                    new { userId = _user.Id, token = token }, Request.);*/
+                var userFromDb = await userManager.FindByEmailAsync(_user.Email);
+                if (userFromDb != null)
+                {
+                    var token = await userManager.GenerateEmailConfirmationTokenAsync(userFromDb);
+                    // Send the confirmation email
+                    var EncodingConfirmToken = Encoding.UTF8.GetBytes(token);
+                    var ValidEncodingConfirmToken = WebEncoders.Base64UrlEncode(EncodingConfirmToken);
+
+                    var mailData = new MailData
+                    {
+                        EmailTo = userFromDb.Email,
+                        EmailToName = userFromDb.UserName,
+                        EmailSubject = "Confirm your email",
+                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:URL"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
+                    };
+                    mailService.SendMail(mailData);
+                    
+                }
                 return result;
             }
             else
@@ -97,13 +107,13 @@ namespace Infrastructure.Persistence.Repositories
             return IdentityResult.Failed();
         }
 
-        public async Task<string?> ForgetPasswordAsync(string Email)
+        public async Task<bool> ForgetPasswordAsync(string Email)
         {
             var user = await userManager.FindByEmailAsync(Email);
             if (user != null)
             {
                 string ResetToken = await userManager.GeneratePasswordResetTokenAsync(user);
-                if (ResetToken!=null)
+                if (ResetToken != null)
                 {
                     var EncodingResetToken = Encoding.UTF8.GetBytes(ResetToken);
                     var ValidEncodingResetToken = WebEncoders.Base64UrlEncode(EncodingResetToken); // To prevent special characters and make URL that will be generated valid
@@ -111,17 +121,37 @@ namespace Infrastructure.Persistence.Repositories
                     {
                         EmailTo = Email,
                         EmailToName = user.UserName,
-                        EmailSubject = "Reset Your Password",
-                        EmailBody = $"Click to the following link to reset your password \n {config["Server:URL"]}/ResetPassword?Email={Email}&Token={ValidEncodingResetToken}",
+                        EmailSubject = "Password Reset",
+                        EmailBody =
+                        //$"Click to the following link to reset your password \n {config["Server:URL"]}/ResetPassword?Email={Email}&Token={ValidEncodingResetToken}",
+                        $"Dear {user.UserName},\r\n" +
+                        "We received a request to reset your password. Please use the following token to reset your password:\r\n\n" +
+                        $"{ValidEncodingResetToken} \r\n\n" +
+                        "Click the link below to reset your password\r\n" +
+                        $"{config["Server:Client"]}/resetPassword\r\n" +
+                        "If you did not request a password reset, please ignore this email.\r\n\n" +
+                        "Best regards,\r\n" +
+                        "Sona\r\n"
                     };
                     if (mailService.SendMail(mailData))
                     {
-                        return "If your email is found, you will receive a link to reset your password";
+                        return true;
                     }
+                    else return false;
                 }
+                else return false;
             }
-            return null;
+            return true ;
         }
+
+        /*public async Task<string> ConfirmEailAsync(string Email)
+        {
+            var user = await userManager.FindByEmailAsync(Email);
+            if(user != null)
+            {
+
+            }
+        }*/
 
         public async Task<IdentityResult> ResetPasswordAsync(string Email, string Token, string NewPassword)
         {

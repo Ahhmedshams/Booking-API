@@ -10,7 +10,7 @@ namespace Application.Common.Interfaces.Repositories
     {
         Task<IEnumerable<ScheduleItem>> AddRangeAsync(IEnumerable<ScheduleItem> entities);
         IEnumerable<ScheduleItem> AddRange(IEnumerable<ScheduleItem> entities);
-        Task<ScheduleItem> FindAsync(DateTime day, TimeOnly startTime, TimeOnly endTime);
+        Task<ScheduleItem> FindAsync(int scheduleId,DateTime day, TimeOnly startTime, TimeOnly endTime);
         bool IsExist(int id, DateTime Day, TimeOnly startTime, TimeOnly endTime);
         bool IsExistWithId(int id);
         ScheduleItem Delete(int id, DateTime day, TimeOnly startTime, TimeOnly endTime);

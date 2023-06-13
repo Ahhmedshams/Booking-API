@@ -1,13 +1,17 @@
 ﻿using Application.DTO;
 using AutoMapper;
+using CoreApiResponse;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Eventing.Reader;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -17,7 +21,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
@@ -37,6 +41,7 @@ namespace WebAPI.Controllers
             if (ModelState.IsValid)
             {
                 ApplicationUser user = mapper.Map<ApplicationUser>(_user);
+
                 object result = await accountRepo.Register(user, _user.Password);
 
                 if (result is IdentityResult)
@@ -49,6 +54,32 @@ namespace WebAPI.Controllers
                 }
             }
             return BadRequest(ModelState);
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+            {
+                return BadRequest("Invalid email confirmation link");
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest("Invalid email confirmation link");
+            }
+            var DecodingResetToken = WebEncoders.Base64UrlDecode(token);
+            var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
+            var result = await userManager.ConfirmEmailAsync(user, ValidToken);
+            if (result.Succeeded)
+            {
+                return Ok("Email confirmed successfully");
+            }
+            else
+            {
+                return BadRequest("Unable to confirm email");
+            }
         }
 
         [HttpPost("login")]
@@ -109,21 +140,18 @@ namespace WebAPI.Controllers
         [Route("ForgetPassword")]
         public async Task<IActionResult> ForgetPasswordAsync([EmailAddress] string Email)
         {
-            if (Email != null)
-            {
-                if (ModelState.IsValid)
-                {
-                    var Result = await accountRepo.ForgetPasswordAsync(Email);
-                    return Ok(Result);
-                }
-                return BadRequest("Email IS Invalid");
-            }
-            return BadRequest("Email Is Required");
+            if (Email == null || !ModelState.IsValid)
+                return BadRequest("Check your email input");
+            var Result = await accountRepo.ForgetPasswordAsync(Email);
+            if (Result)
+                return CustomResult("If your email matches one of our registerd account, we will send and email with resetting password steps");
+            else
+                return CustomResult("Something went wrong. Please try again later", System.Net.HttpStatusCode.ServiceUnavailable);
         }
 
         [HttpPost]
         [Route("ResetPassword")]
-        private async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
+        public async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
         {
             if (ResetPasswordDto != null)
             {
