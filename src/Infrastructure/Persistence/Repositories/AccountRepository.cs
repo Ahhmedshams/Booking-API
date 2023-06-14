@@ -138,7 +138,7 @@ namespace Infrastructure.Persistence.Repositories
                     "<div class=\"container\">\r\n    " +
                     $"<p>Dear {user.UserName},</p>\r\n    " +
                     "<p>We received a request to reset your password. Please use the following token to reset your password:</p>\r\n    " +
-                    $"<p>{ValidEncodingResetToken}</p>" +
+                    $"<p>{ResetToken}</p>" +
                     "<p>Click the link below to reset your password</p>\r\n" +
                     $"<a " +
                     $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
@@ -194,7 +194,7 @@ namespace Infrastructure.Persistence.Repositories
             {
                 var DecodingResetToken = WebEncoders.Base64UrlDecode(Token);
                 var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
-                var Result = await userManager.ResetPasswordAsync(User, ValidToken, NewPassword);
+                var Result = await userManager.ResetPasswordAsync(User, Token, NewPassword);
                 return Result;
             }
             return IdentityResult.Failed(new IdentityError() { Code = "Email Not Found", Description = "This email is not found" });
