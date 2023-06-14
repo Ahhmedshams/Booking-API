@@ -11,6 +11,7 @@ namespace Infrastructure.Persistence.Specification.ServiceMetadataSpec
         public ServiceMetadataSpecification(ServiceMetadataSpecParams specParams)
             :base(m => m.IsDeleted == false)
         {
+            AddIncludes(s => s.ResourceType);
             ApplyPagging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
 
             if (specParams.ServiceId.HasValue)
