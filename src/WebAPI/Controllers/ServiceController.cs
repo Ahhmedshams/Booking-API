@@ -1,12 +1,9 @@
 ﻿
 using AutoMapper;
 using CoreApiResponse;
-using Infrastructure.Persistence.Specification;
 using Infrastructure.Persistence.Specification.ServiceSpec;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 
 namespace WebAPI.Controllers
 {
@@ -30,7 +27,7 @@ namespace WebAPI.Controllers
         {
             var spec = new ServiceSpecification(specParams);
             var services = await serviceRepo.GetAllServicesWithSpec(spec);
-            var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceResDTO>>(services);
+            var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceDTO>>(services);
             return CustomResult(servicesDTO);
         }
 

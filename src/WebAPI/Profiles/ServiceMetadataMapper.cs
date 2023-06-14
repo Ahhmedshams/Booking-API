@@ -8,7 +8,9 @@ namespace WebAPI.Profiles
         public ServiceMetadataMapper()
         {
             
-            CreateMap<ServiceMetadata, ServiceMetadataDTO>().ReverseMap();
+            CreateMap<ServiceMetadata, ServiceMetadataDTO>()
+                .ForMember(des => des.ResourceTypeName, opt => opt.MapFrom(src => src.ResourceType.Name))
+                .ReverseMap();
             CreateMap<ServiceMetadata, ServiceMDReqDTO>().ReverseMap();
         }
     }
