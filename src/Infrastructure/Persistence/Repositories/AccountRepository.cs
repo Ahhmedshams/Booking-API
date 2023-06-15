@@ -47,7 +47,7 @@ namespace Infrastructure.Persistence.Repositories
                         EmailTo = userFromDb.Email,
                         EmailToName = userFromDb.UserName,
                         EmailSubject = "Confirm your email",
-                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:URL"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
+                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:Client"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
                     };
                     mailService.SendMail(mailData);
                     
