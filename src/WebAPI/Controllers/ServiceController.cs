@@ -13,12 +13,12 @@ namespace WebAPI.Controllers
     {
         private readonly IServiceRepo serviceRepo;
         private readonly IMapper mapper;
-
-        public ServiceController(IServiceRepo _serviceRepo,
-                                IMapper _mapper)
+        private readonly UploadImage _uploadImage;
+        public ServiceController(IServiceRepo _serviceRepo,IMapper _mapper, UploadImage uploadImage)
         {
             serviceRepo = _serviceRepo;
             mapper = _mapper;
+            _uploadImage = uploadImage;
         }
 
         
@@ -32,18 +32,21 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(ServiceDTO serviceDTO)
+        public async Task<IActionResult> Add( [FromForm] ServiceDTO serviceDTO)
         {
-            serviceDTO.Id = 0;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
 
             if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
                 return CustomResult("Invalid value for ServiceStatus", HttpStatusCode.BadRequest);
 
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
+
+            if (serviceDTO.UploadedImage != null)
+                service.Image = await _uploadImage.UploadToCloud(serviceDTO.UploadedImage);
+
             await serviceRepo.AddAsync(service);
-            serviceDTO.Id = service.Id;
             return CustomResult(serviceDTO);
         }
 
