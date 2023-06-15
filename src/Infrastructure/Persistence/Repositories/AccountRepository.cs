@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -172,6 +174,34 @@ namespace Infrastructure.Persistence.Repositories
                 return await userManager.VerifyUserTokenAsync(User, "Default", "ResetPassword", ValidToken);
             }
             return false;
+        }
+
+
+
+        public async Task<ApplicationUser> GetByID(string ID)
+        {
+            return await userManager.FindByIdAsync(ID);
+        }
+
+        public async Task EditAsync(string id, ApplicationUser entity)
+        {
+            var FoundUser = await userManager.FindByIdAsync(id);
+            if (FoundUser != null)
+            {
+                FoundUser.FirstName = entity?.FirstName;
+                FoundUser.LastName = entity?.LastName;
+                FoundUser.Email = entity?.Email;
+                FoundUser.PhoneNumber = entity?.PhoneNumber;
+                FoundUser.CreditCardNumber = entity?.CreditCardNumber;
+                FoundUser.Address = entity?.Address;
+
+                var result = await userManager.UpdateAsync(FoundUser);
+
+                if (!result.Succeeded)
+                {
+                    throw new Exception("Failed to update user email.");
+                }
+            };
         }
     }
 }

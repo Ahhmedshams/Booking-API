@@ -1,5 +1,6 @@
 ﻿using Application.DTO;
 using AutoMapper;
+using CoreApiResponse;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using WebAPI.DTO;
@@ -19,7 +21,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
@@ -79,6 +81,9 @@ namespace WebAPI.Controllers
                 return BadRequest("Unable to confirm email");
             }
         }
+
+
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginUserDto _user)
@@ -143,7 +148,7 @@ namespace WebAPI.Controllers
                 if (ModelState.IsValid)
                 {
                     var Result = await accountRepo.ForgetPasswordAsync(Email);
-                    return Ok(Result);
+                    return CustomResult(Result);
                 }
                 return BadRequest("Email IS Invalid");
             }
@@ -174,5 +179,24 @@ namespace WebAPI.Controllers
             }
             return BadRequest("All Fields Are Required");
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetById(string? id)
+        {
+            if (id == null)
+                return CustomResult($"Need To provide Id {id}", HttpStatusCode.NotFound);
+
+            var user = await accountRepo.GetByID(id);
+            if (user == null)
+                return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
+
+            var Result = mapper.Map<UserResponce>(user);
+
+
+            return CustomResult(Result);
+        }
+
+       
     }
 }
