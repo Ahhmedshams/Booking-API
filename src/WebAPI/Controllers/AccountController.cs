@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Eventing.Reader;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -143,16 +144,13 @@ namespace WebAPI.Controllers
         [Route("ForgetPassword")]
         public async Task<IActionResult> ForgetPasswordAsync([EmailAddress] string Email)
         {
-            if (Email != null)
-            {
-                if (ModelState.IsValid)
-                {
-                    var Result = await accountRepo.ForgetPasswordAsync(Email);
-                    return CustomResult(Result);
-                }
-                return BadRequest("Email IS Invalid");
-            }
-            return BadRequest("Email Is Required");
+            if (Email == null || !ModelState.IsValid)
+                return BadRequest("Check your email input");
+            var Result = await accountRepo.ForgetPasswordAsync(Email);
+            if (Result)
+                return CustomResult("If your email matches one of our registerd account, we will send and email with resetting password steps");
+            else
+                return CustomResult("Something went wrong. Please try again later", System.Net.HttpStatusCode.ServiceUnavailable);
         }
 
         [HttpPost]

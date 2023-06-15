@@ -27,8 +27,6 @@ namespace WebAPI.Controllers
         {
             var spec = new BookingItemSpecification(specParams);
             var bookingItems = await bookingItemRepo.GetAllBooksWithSpec(spec);
-            if (bookingItems.Count() == 0)
-                return CustomResult("No Booking Items Found", HttpStatusCode.NotFound);
             var bookingItemsDTO = mapper.Map<IEnumerable<BookingItem>, IEnumerable<BookingItemDTO>>(bookingItems);
             return CustomResult(bookingItemsDTO);
         }

@@ -39,6 +39,18 @@ namespace WebAPI.Controllers
             return CustomResult(resourceDTO);
         }
 
+        [HttpGet("ResourceType/{id:int}")]
+        public async Task<IActionResult> GetAllByResourceType(int id)
+        {
+            IEnumerable<Resource> resource =  _resourceRepo.Find(e=>e.ResourceTypeId==id);
+            if (resource.Count() == 0)
+                return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
+
+            List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
+
+            return CustomResult(resourceDTO);
+        }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {

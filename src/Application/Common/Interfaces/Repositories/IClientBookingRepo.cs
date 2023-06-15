@@ -5,7 +5,7 @@ namespace Application.Common.Interfaces.Repositories
     public interface IClientBookingRepo: IAsyncRepository<ClientBooking>
     {
         Task<IEnumerable<ClientBooking>> GetAllBookingsWithSpec(ISpecification<ClientBooking> spec);
-        Task<decimal> PriceReport(DateTime? startDate, DateTime? endDate);
+        Task<decimal> PriceReport(DateTime? startDate, DateTime? endDate, int serviceId);
         Task<int> CancelledBookingsReport(DateTime? startDate, DateTime? endDate);
         Task<int> BookingsNoReport(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<ClientBooking>> GetAllBookings();

@@ -1,7 +1,6 @@
 ﻿
 using AutoMapper;
 using CoreApiResponse;
-using Infrastructure.Persistence.Specification;
 using Infrastructure.Persistence.Specification.ServiceSpec;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -14,12 +13,12 @@ namespace WebAPI.Controllers
     {
         private readonly IServiceRepo serviceRepo;
         private readonly IMapper mapper;
-
-        public ServiceController(IServiceRepo _serviceRepo,
-                                IMapper _mapper)
+        private readonly UploadImage _uploadImage;
+        public ServiceController(IServiceRepo _serviceRepo,IMapper _mapper, UploadImage uploadImage)
         {
             serviceRepo = _serviceRepo;
             mapper = _mapper;
+            _uploadImage = uploadImage;
         }
 
         
@@ -28,26 +27,26 @@ namespace WebAPI.Controllers
         {
             var spec = new ServiceSpecification(specParams);
             var services = await serviceRepo.GetAllServicesWithSpec(spec);
-            if (services.Count() == 0)
-                return CustomResult("No Services Found", HttpStatusCode.NotFound);
-
             var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceDTO>>(services);
             return CustomResult(servicesDTO);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(ServiceDTO serviceDTO)
+        public async Task<IActionResult> Add( ServiceDTO serviceDTO)
         {
-            serviceDTO.Id = 0;
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
 
             if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
                 return CustomResult("Invalid value for ServiceStatus", HttpStatusCode.BadRequest);
 
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
+
+            //if (serviceDTO.UploadedImage != null)
+            //    service.Image = await _uploadImage.UploadToCloud(serviceDTO.UploadedImage);
+
             await serviceRepo.AddAsync(service);
-            serviceDTO.Id = service.Id;
             return CustomResult(serviceDTO);
         }
 

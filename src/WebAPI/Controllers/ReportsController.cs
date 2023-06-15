@@ -27,9 +27,9 @@ namespace WebAPI.Controllers
             _mapper = mapper;
         }
         [HttpGet("TotalPrice")]
-        public async Task<IActionResult> TopPricesReport(DateTime startDate , DateTime endDate)
+        public async Task<IActionResult> TopPricesReport(DateTime startDate , DateTime endDate, int serviceId)
         {
-            var totalPrice = await _clientBookingRepo.PriceReport(startDate, endDate); 
+            var totalPrice = await _clientBookingRepo.PriceReport(startDate, endDate, serviceId); 
             return CustomResult(new {TotalPrice = totalPrice });
         }
 
@@ -48,11 +48,11 @@ namespace WebAPI.Controllers
 
         }
 
-        [HttpGet("Top5Resources")]
-        public async Task<IActionResult> Top5ResourcesReport(DateTime startDate, DateTime endDate)
+        [HttpGet("TopResources")]
+        public async Task<IActionResult> TopResourcesReport(DateTime startDate, DateTime endDate, int number)
         {
-            var top5Resources = await _bookingItemRepo.Top5ResourcesReport(startDate, endDate);
-            return CustomResult(top5Resources);
+            var topResources = await _bookingItemRepo.TopResourcesReport(startDate, endDate, number);
+            return CustomResult(topResources);
         }
 
         [HttpGet("ResTypeBookingsNo")]
@@ -69,8 +69,8 @@ namespace WebAPI.Controllers
             return CustomResult(resTypeSoldPerMonth);
         }
 
-        [HttpGet("NewCustomerNo")]
-        public async Task<IActionResult> NewCustomerReport(DateTime startDate, DateTime endDate)
+        [HttpGet("CustomerNo")]
+        public async Task<IActionResult> CustomerReport(DateTime startDate, DateTime endDate)
         {
             var newCustomerNo = await _userRepo.UserReport(startDate, endDate);
             return CustomResult(new {NewCustomerNo = newCustomerNo});

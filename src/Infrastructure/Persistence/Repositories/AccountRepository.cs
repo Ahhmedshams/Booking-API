@@ -1,7 +1,6 @@
-﻿using AutoMapper;
-using Azure.Core;
-using Infrastructure.Identity;
-using Infrastructure.Identity.EmailSettings;
+﻿using Infrastructure.Identity.EmailSettings;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -9,14 +8,12 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+using MimeKit;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -116,30 +113,72 @@ namespace Infrastructure.Persistence.Repositories
             return IdentityResult.Failed();
         }
 
-        public async Task<string?> ForgetPasswordAsync(string Email)
+        public async Task<bool> ForgetPasswordAsync(string Email)
         {
             var user = await userManager.FindByEmailAsync(Email);
             if (user != null)
             {
                 string ResetToken = await userManager.GeneratePasswordResetTokenAsync(user);
-                if (ResetToken!=null)
+                if (ResetToken != null)
                 {
                     var EncodingResetToken = Encoding.UTF8.GetBytes(ResetToken);
                     var ValidEncodingResetToken = WebEncoders.Base64UrlEncode(EncodingResetToken); // To prevent special characters and make URL that will be generated valid
-                    MailData mailData = new MailData()
+
+                    var message = new MimeMessage();
+
+                    // Set the sender address
+                    message.From.Add(new MailboxAddress(config["MailSettings:SenderName"],config["MailSettings:SenderEmail"]));
+
+                    // Set the recipient address
+                    message.To.Add(new MailboxAddress(user.UserName, Email));
+
+                    // Set the subject
+                    message.Subject = "Password Reset";
+
+                    var bodybuilder = new BodyBuilder();
+                    bodybuilder.HtmlBody =
+                    "</head>\r\n<body>\r\n  " +
+                    "<div class=\"container\">\r\n    " +
+                    $"<p>Dear {user.UserName},</p>\r\n    " +
+                    "<p>We received a request to reset your password. Please use the following token to reset your password:</p>\r\n    " +
+                    $"<p>{ResetToken}</p>" +
+                    "<p>Click the link below to reset your password</p>\r\n" +
+                    $"<a " +
+                    $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
+                    $" href={config["Server:Client"]}/resetPassword>Reset Password</a>\r\n    " +
+                    "<p>If you did not request a password reset, please ignore this email.</p>\r\n    " +
+                    "<p>Best regards,</p>\r" +
+                    "<p>Sona</p>\r\n  " +
+                    "</div>\r\n</body>\r\n</html>";
+
+                    message.Body = bodybuilder.ToMessageBody();
+
+                    try
                     {
-                        EmailTo = Email,
-                        EmailToName = user.UserName,
-                        EmailSubject = "Reset Your Password",
-                        EmailBody = $"Click to the following link to reset your password \n {config["Server:URL"]}/ResetPassword?Email={Email}&Token={ValidEncodingResetToken}",
-                    };
-                    if (mailService.SendMail(mailData))
+                        using (var client = new SmtpClient())
+                        {
+                            // Connect to the SMTP server
+                            client.Connect(config["MailSettings:Server"], int.Parse(config["MailSettings:Port"]), SecureSocketOptions.StartTls);
+
+                            // Authenticate if required
+                            client.Authenticate(config["MailSettings:UserName"], config["MailSettings:Password"]);
+
+                            // Send the message
+                            client.Send(message);
+
+                            // Disconnect from the server
+                            client.Disconnect(true);
+                            return true;
+                        }
+                    }
+                    catch
                     {
-                        return "If your email is found, you will receive a link to reset your password";
+                        return false;
                     }
                 }
+                else return false;
             }
-            return null;
+            return true ;
         }
 
         /*public async Task<string> ConfirmEailAsync(string Email)
@@ -158,7 +197,7 @@ namespace Infrastructure.Persistence.Repositories
             {
                 var DecodingResetToken = WebEncoders.Base64UrlDecode(Token);
                 var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
-                var Result = await userManager.ResetPasswordAsync(User, ValidToken, NewPassword);
+                var Result = await userManager.ResetPasswordAsync(User, Token, NewPassword);
                 return Result;
             }
             return IdentityResult.Failed(new IdentityError() { Code = "Email Not Found", Description = "This email is not found" });
