@@ -83,5 +83,20 @@ namespace WebAPI.Controllers
             await clientBookingRepo.DeleteAsync(id);
             return CustomResult(HttpStatusCode.NoContent);
         }
+        [HttpPost("CreateNewBooking")]
+        public async Task<IActionResult> CreateNewBooking (ClientBooking2DTO clientBooking2DTO)
+        {
+            var result = await clientBookingRepo.CreateNewBooking
+                (clientBooking2DTO.UserID,
+                clientBooking2DTO.Date,
+                clientBooking2DTO.ServiceID,
+                clientBooking2DTO.Location,
+                clientBooking2DTO.StartTime,
+                clientBooking2DTO.EndTime,
+                clientBooking2DTO.ResourceIDs);
+
+            return CustomResult(result,HttpStatusCode.Created);
+
+        }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using Application.Common.Models;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -6,6 +9,7 @@ namespace Infrastructure.Persistence.Repositories
     {
         public ScheduleRepository(ApplicationDbContext context) : base(context)
         {
+           
         }
 
         public Schedule GetByResourceId(int resourceId)
@@ -40,30 +44,26 @@ namespace Infrastructure.Persistence.Repositories
             }
             return null;
         }
-        public List<AvailableResources> GetAvailableResources(DateTime fromDate, DateTime toDate, int resourceTypeId)
+        public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime)
         {
-            var query = from r in _context.Resource
-                        join rt in _context.ResourceTypes on r.ResourceTypeId equals rt.Id
-                        join s in _context.Schedule on r.Id equals s.ResourceId into sGroup
-                        from s in sGroup.DefaultIfEmpty()
-                        join si in _context.ScheduleItem on s.ScheduleID equals si.ScheduleId into siGroup
-                        from si in siGroup.DefaultIfEmpty()
-                        where rt.Id == resourceTypeId
-                              && (s.FromDate <= toDate && s.ToDate >= fromDate)
-                              && si.Available == true
-                        select new AvailableResources
-                        {
-                            ResourceId = r.Id,
-                            Name = r.Name,
-                            Day = si.Day,
-                            StartTime = si.StartTime,
-                            EndTime = si.EndTime
-                        };
+            //string formatted = _day.ToString("yyyy-MM-dd");
+            //string formatstart = _startTime.ToString("hh:mm:ss");
+                var day = _day;
+                var startTime = _startTime;
+                var endTime = _endTime;
+                int serviceId = 1;
 
-            /*            var distinctQuery = query.Distinct();
-            */
-            var result = query.ToList();
-            return result;
+                var results = _context.Resource
+                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4",
+                        new SqlParameter("@param1", day),
+                        new SqlParameter("@param2", serviceId),
+                        new SqlParameter("@param3", startTime),
+                        new SqlParameter("@param4", endTime)
+                        )
+                      .IgnoreQueryFilters()
+                      .ToList();
+                return results;
+
         }
 
         public bool IsExist(int id)

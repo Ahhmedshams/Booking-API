@@ -13,6 +13,6 @@ namespace Application.Common.Interfaces.Repositories
         bool IsExist(int id);
         Schedule AddSchedule(Schedule schedule);
 
-        List<AvailableResources> GetAvailableResources(DateTime fromDate, DateTime toDate, int resourceTypeId);
+        List<Resource> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime);
     }
 }
