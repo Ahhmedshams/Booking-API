@@ -7,6 +7,8 @@ namespace WebAPI.Profiles
         public ResourceDataMapper()
         {
             CreateMap<ResourceData,ResourceDataRespIDValueDTO>().ReverseMap();
+            CreateMap<ResourceData, ResourceDataRespDTO>().ReverseMap();
         }
+        
     }
 }
