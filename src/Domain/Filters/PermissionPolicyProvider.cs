@@ -15,7 +15,11 @@ namespace Domain.Filters
         {
             FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
         }
-        public Task<AuthorizationPolicy> GetDefaultPolicyAsync() => FallbackPolicyProvider.GetDefaultPolicyAsync();
+        public Task<AuthorizationPolicy> GetDefaultPolicyAsync() {
+
+            return Task.FromResult(new AuthorizationPolicyBuilder().RequireAssertion(context => true).Build());
+
+        }
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
             if (policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
@@ -26,6 +30,6 @@ namespace Domain.Filters
             }
             return FallbackPolicyProvider.GetPolicyAsync(policyName);
         }
-        public Task<AuthorizationPolicy> GetFallbackPolicyAsync() => FallbackPolicyProvider.GetDefaultPolicyAsync();
+        public Task<AuthorizationPolicy> GetFallbackPolicyAsync() => GetDefaultPolicyAsync();
     }
 }
