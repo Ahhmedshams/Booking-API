@@ -20,12 +20,14 @@ namespace Infrastructure.Persistence.Repositories
     public class AccountRepository : IAccountRepository
     {
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration config;
         private readonly IMailService mailService;
 
-        public AccountRepository(UserManager<ApplicationUser> _userManager,IConfiguration config, IMailService _MailService) 
+        public AccountRepository(UserManager<ApplicationUser> _userManager, RoleManager<IdentityRole> roleManager,IConfiguration config, IMailService _MailService) 
         {
             userManager = _userManager;
+            this.roleManager=roleManager;
             this.config = config;
             mailService = _MailService;
         }
@@ -72,7 +74,19 @@ namespace Infrastructure.Persistence.Repositories
                         foreach (var role in roles)
                         {
                             myClaims.Add(new Claim(ClaimTypes.Role, role));
+                               var identityRole = roleManager.Roles.FirstOrDefault(r => r.Name == role);
+                                if (identityRole != null)
+                    {
+                        var roleClaims = await roleManager.GetClaimsAsync(identityRole);
+                        if (roleClaims.Any(c => c.Type == "Permission"))
+                        {
+                            foreach(var claim in roleClaims)
+                                myClaims.Add(claim);
                         }
+
+
+                    }
+                }
                     }
 
                     var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SecurityKey"]));
@@ -81,7 +95,9 @@ namespace Infrastructure.Persistence.Repositories
                     JwtSecurityToken myToken = new JwtSecurityToken(
                         expires: DateTime.Now.AddDays(25),
                         claims: myClaims,
-                        signingCredentials: credentials
+                        signingCredentials: credentials,
+                            issuer: config["JWT:Issuer"],
+                         audience: config["JWT:Audience"]
                         );
                     return myToken; 
                 

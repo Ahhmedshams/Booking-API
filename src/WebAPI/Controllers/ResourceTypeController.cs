@@ -1,6 +1,8 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using AutoMapper;
 using CoreApiResponse;
+using Infrastructure.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -20,6 +22,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Permissions.ResourceTypes.Index)]
         public async Task< IActionResult> GetAll()
         {
             IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync();

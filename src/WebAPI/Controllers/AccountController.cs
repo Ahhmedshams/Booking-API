@@ -3,6 +3,7 @@ using AutoMapper;
 using CoreApiResponse;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -87,6 +88,8 @@ namespace WebAPI.Controllers
 
 
         [HttpPost("login")]
+        [Authorize(Policy = "GuestUser")]
+
         public async Task<IActionResult> Login(LoginUserDto _user)
         {
             if (ModelState.IsValid)
