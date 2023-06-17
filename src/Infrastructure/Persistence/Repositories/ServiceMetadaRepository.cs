@@ -15,7 +15,12 @@ namespace Infrastructure.Persistence.Repositories
         {
         }
 
-        public async Task AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
+
+		public async Task AddOne(ServiceMetadata serviceMetadata)
+		{
+			await _context.Set<ServiceMetadata>().AddAsync(serviceMetadata);
+		}
+		public async Task AddBulk(IEnumerable<ServiceMetadata> serviceMetadata)
         {
             await _context.Set<ServiceMetadata>().AddRangeAsync(serviceMetadata);
             await _context.SaveChangesAsync();
@@ -134,7 +139,7 @@ namespace Infrastructure.Persistence.Repositories
             return SpecificationEvaluator<ServiceMetadata>.GetQuery(_context.Set<ServiceMetadata>(), spec);
         }
 
-        
-    }
+		
+	}
        
 }

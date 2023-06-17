@@ -47,7 +47,7 @@ namespace Infrastructure.Persistence.Repositories
                         EmailTo = userFromDb.Email,
                         EmailToName = userFromDb.UserName,
                         EmailSubject = "Confirm your email",
-                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:URL"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
+                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:Client"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
                     };
                     mailService.SendMail(mailData);
                     
@@ -121,8 +121,8 @@ namespace Infrastructure.Persistence.Repositories
                 string ResetToken = await userManager.GeneratePasswordResetTokenAsync(user);
                 if (ResetToken != null)
                 {
-                    var EncodingResetToken = Encoding.UTF8.GetBytes(ResetToken);
-                    var ValidEncodingResetToken = WebEncoders.Base64UrlEncode(EncodingResetToken); // To prevent special characters and make URL that will be generated valid
+                   /* var EncodingResetToken = Encoding.UTF8.GetBytes(ResetToken);
+                    var ValidEncodingResetToken = WebEncoders.Base64UrlEncode(EncodingResetToken);*/ // To prevent special characters and make URL that will be generated valid
 
                     var message = new MimeMessage();
 
@@ -181,22 +181,14 @@ namespace Infrastructure.Persistence.Repositories
             return true ;
         }
 
-        /*public async Task<string> ConfirmEailAsync(string Email)
-        {
-            var user = await userManager.FindByEmailAsync(Email);
-            if(user != null)
-            {
-
-            }
-        }*/
 
         public async Task<IdentityResult> ResetPasswordAsync(string Email, string Token, string NewPassword)
         {
             var User = await userManager.FindByEmailAsync(Email);
             if (User != null)
             {
-                var DecodingResetToken = WebEncoders.Base64UrlDecode(Token);
-                var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
+                /*var DecodingResetToken = WebEncoders.Base64UrlDecode(Token);
+                var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);*/
                 var Result = await userManager.ResetPasswordAsync(User, Token, NewPassword);
                 return Result;
             }
