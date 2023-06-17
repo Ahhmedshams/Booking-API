@@ -8,7 +8,8 @@ namespace Domain.Common
         public AuthAutoMapper()
         {
             CreateMap<RegisterUserDto, ApplicationUser>().ReverseMap();
-            CreateMap<UserResponce, ApplicationUser>().ReverseMap();
+            CreateMap<UserResponce, ApplicationUser>().ReverseMap(); 
+                CreateMap<EditUserDTO, ApplicationUser>().ReverseMap();
         }
     }
 }

@@ -227,18 +227,23 @@ namespace Infrastructure.Persistence.Repositories
             var FoundUser = await userManager.FindByIdAsync(id);
             if (FoundUser != null)
             {
-                FoundUser.FirstName = entity?.FirstName;
-                FoundUser.LastName = entity?.LastName;
-                FoundUser.Email = entity?.Email;
-                FoundUser.PhoneNumber = entity?.PhoneNumber;
-                FoundUser.CreditCardNumber = entity?.CreditCardNumber;
-                FoundUser.Address = entity?.Address;
+                FoundUser.FirstName = entity.FirstName ?? FoundUser.FirstName;
+                FoundUser.LastName = entity.LastName ?? FoundUser.LastName;
+                FoundUser.Email = entity.Email ?? FoundUser.Email;
+                FoundUser.UserName = entity.UserName ?? FoundUser.UserName;
+                FoundUser.PhoneNumber = entity.PhoneNumber ?? FoundUser.PhoneNumber;
+                FoundUser.CreditCardNumber = entity.CreditCardNumber ?? FoundUser.CreditCardNumber;
+                FoundUser.Address = entity.Address ?? FoundUser.Address;
 
                 var result = await userManager.UpdateAsync(FoundUser);
 
                 if (!result.Succeeded)
                 {
-                    throw new Exception("Failed to update user email.");
+                    foreach(var er in result.Errors)
+                    {
+                        throw new Exception(er.Description);
+                    }
+                    
                 }
             };
         }

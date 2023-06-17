@@ -179,7 +179,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet("{Id:Guid}")]
         public async Task<IActionResult> GetById(string? id)
         {
             if (id == null)
@@ -193,6 +193,23 @@ namespace WebAPI.Controllers
 
 
             return CustomResult(Result);
+        }
+
+        [HttpPatch("{Id:Guid}")]
+        public async Task<IActionResult> EditUser(string Id, EditUserDTO user)
+        {
+
+            try
+            {
+                var AppUser = mapper.Map<ApplicationUser>(user);
+                await accountRepo.EditAsync(Id,AppUser);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.BadRequest);
+            }
+            return CustomResult();
+
         }
 
        
