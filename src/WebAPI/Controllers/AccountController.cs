@@ -155,7 +155,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("ResetPassword")]
-        public async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
+        public async Task<IActionResult> ConfirmResetPasswordAsync(ResetPasswordDTO ResetPasswordDto)
         {
             if (ResetPasswordDto != null)
             {
