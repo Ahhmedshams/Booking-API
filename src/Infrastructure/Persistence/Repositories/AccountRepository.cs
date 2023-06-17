@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 
@@ -46,7 +49,7 @@ namespace Infrastructure.Persistence.Repositories
                         EmailTo = userFromDb.Email,
                         EmailToName = userFromDb.UserName,
                         EmailSubject = "Confirm your email",
-                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:URL"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
+                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:Client"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
                     };
                     mailService.SendMail(mailData);
                     
@@ -134,8 +137,8 @@ namespace Infrastructure.Persistence.Repositories
                 string ResetToken = await userManager.GeneratePasswordResetTokenAsync(user);
                 if (ResetToken != null)
                 {
-                    var EncodingResetToken = Encoding.UTF8.GetBytes(ResetToken);
-                    var ValidEncodingResetToken = WebEncoders.Base64UrlEncode(EncodingResetToken); // To prevent special characters and make URL that will be generated valid
+                   /* var EncodingResetToken = Encoding.UTF8.GetBytes(ResetToken);
+                    var ValidEncodingResetToken = WebEncoders.Base64UrlEncode(EncodingResetToken);*/ // To prevent special characters and make URL that will be generated valid
 
                     var message = new MimeMessage();
 
@@ -154,7 +157,7 @@ namespace Infrastructure.Persistence.Repositories
                     "<div class=\"container\">\r\n    " +
                     $"<p>Dear {user.UserName},</p>\r\n    " +
                     "<p>We received a request to reset your password. Please use the following token to reset your password:</p>\r\n    " +
-                    $"<p>{ValidEncodingResetToken}</p>" +
+                    $"<p>{ResetToken}</p>" +
                     "<p>Click the link below to reset your password</p>\r\n" +
                     $"<a " +
                     $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
@@ -194,23 +197,15 @@ namespace Infrastructure.Persistence.Repositories
             return true ;
         }
 
-        /*public async Task<string> ConfirmEailAsync(string Email)
-        {
-            var user = await userManager.FindByEmailAsync(Email);
-            if(user != null)
-            {
-
-            }
-        }*/
 
         public async Task<IdentityResult> ResetPasswordAsync(string Email, string Token, string NewPassword)
         {
             var User = await userManager.FindByEmailAsync(Email);
             if (User != null)
             {
-                var DecodingResetToken = WebEncoders.Base64UrlDecode(Token);
-                var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
-                var Result = await userManager.ResetPasswordAsync(User, ValidToken, NewPassword);
+                /*var DecodingResetToken = WebEncoders.Base64UrlDecode(Token);
+                var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);*/
+                var Result = await userManager.ResetPasswordAsync(User, Token, NewPassword);
                 return Result;
             }
             return IdentityResult.Failed(new IdentityError() { Code = "Email Not Found", Description = "This email is not found" });
@@ -226,6 +221,39 @@ namespace Infrastructure.Persistence.Repositories
                 return await userManager.VerifyUserTokenAsync(User, "Default", "ResetPassword", ValidToken);
             }
             return false;
+        }
+
+
+
+        public async Task<ApplicationUser> GetByID(string ID)
+        {
+            return await userManager.FindByIdAsync(ID);
+        }
+
+        public async Task EditAsync(string id, ApplicationUser entity)
+        {
+            var FoundUser = await userManager.FindByIdAsync(id);
+            if (FoundUser != null)
+            {
+                FoundUser.FirstName = entity.FirstName ?? FoundUser.FirstName;
+                FoundUser.LastName = entity.LastName ?? FoundUser.LastName;
+                FoundUser.Email = entity.Email ?? FoundUser.Email;
+                FoundUser.UserName = entity.UserName ?? FoundUser.UserName;
+                FoundUser.PhoneNumber = entity.PhoneNumber ?? FoundUser.PhoneNumber;
+                FoundUser.CreditCardNumber = entity.CreditCardNumber ?? FoundUser.CreditCardNumber;
+                FoundUser.Address = entity.Address ?? FoundUser.Address;
+
+                var result = await userManager.UpdateAsync(FoundUser);
+
+                if (!result.Succeeded)
+                {
+                    foreach(var er in result.Errors)
+                    {
+                        throw new Exception(er.Description);
+                    }
+                    
+                }
+            };
         }
     }
 }

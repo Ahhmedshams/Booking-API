@@ -9,7 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Identity.EmailSettings;
+using Azure.Storage.Blobs;
 using Domain.Entities;
+using Microsoft.Extensions.DependencyInjection;
+
 using Domain.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
@@ -26,6 +29,7 @@ namespace WebAPI
             // Add services to the container.
 
             builder.Services.AddControllers();
+           
             builder.Services.AddRazorPages();
             builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -65,6 +69,11 @@ namespace WebAPI
             builder.Services.AddScoped<IMailService, MailService>();
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
+            #region AzureUpload
+            builder.Services.AddSingleton(e => new BlobServiceClient(builder.Configuration["AzureStorage:ConnectionString"]));
+            builder.Services.AddSingleton(e => e.GetRequiredService<BlobServiceClient>().GetBlobContainerClient(builder.Configuration["AzureStorage:ImageContainer"]));
+            builder.Services.AddSingleton<UploadImage>(); 
+            #endregion
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders()
