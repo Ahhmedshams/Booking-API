@@ -22,7 +22,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Permissions.ResourceTypes.Index)]
+      //  [Authorize(Permissions.ResourceTypes.Index)]
         public async Task< IActionResult> GetAll()
         {
             IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync();
