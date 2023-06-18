@@ -1,6 +1,7 @@
 ﻿using Application.Common.Helpers;
 using Domain.Entities;
 using Infrastructure.Persistence.Specification;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -148,66 +149,124 @@ namespace Infrastructure.Persistence.Repositories
 
                     if (resultBookingItem == 1)
                     {
+                        int result = 2;
                         foreach (var item in resourceID)
                         {
+                            var result1Param = new SqlParameter("@param3", SqlDbType.Int) { Direction = ParameterDirection.Output };
                             await _context.Database.ExecuteSqlRawAsync(
-                             "EXEC FillBookingItemTableWithScheduleShown @param1,@param2",
-                             new SqlParameter("@param1", resultBookingID),
-                             new SqlParameter("@param2", item)
-                             );
+                                "EXEC FillBookingItemTableWithScheduleShown @param1, @param2, @param3 OUTPUT",
+                                new SqlParameter("@param1", resultBookingID),
+                                new SqlParameter("@param2", item),
+                                result1Param // pass the SqlParameter instance for output parameter
+                            );
+                            result = (int)result1Param.Value;
                         }
+                        var result2Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         await _context.Database.ExecuteSqlRawAsync(
                             "EXEC FillBookingItemTableWithScheduleInvisible @param1",
-                            new SqlParameter("@param1", resultBookingID)
-                            );
-                        await _context.Database.ExecuteSqlRawAsync(
-                           "EXEC FillBookingItemTableNoScheduleInvisible @param1",
-                           new SqlParameter("@param1", resultBookingID)
-                           );
+                            new SqlParameter("@param1", resultBookingID),
+                            result2Param
+                        );
 
+                        var result2 = (int)result2Param.Value;
+
+                        var result3Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                        await _context.Database.ExecuteSqlRawAsync(
+                            "EXEC FillBookingItemTableNoScheduleInvisible @param1 , @param2 OUTPUT",
+                            new SqlParameter("@param1", resultBookingID),
+                            result3Param);
+                        var result3 = (int)result3Param.Value;
+
+                        if (result == 0 || result2 == 0 || result3 == 0)
+                        {
+                            await transaction.RollbackAsync();
+                        }
+                        else
+                        {
+                            await transaction.CommitAsync();
+                        }
                     }
 
                     else if (resultBookingItem == 2)
                     {
+                        int result = 2;
                         foreach (var item in resourceID)
                         {
+                            var result1Param = new SqlParameter("@param3", SqlDbType.Int) { Direction = ParameterDirection.Output };
                             await _context.Database.ExecuteSqlRawAsync(
-                             "EXEC FillBookingItemTableWithScheduleShown @param1,@param2",
+                             "EXEC FillBookingItemTableWithScheduleShown @param1,@param2 @param3 OUTPUT",
                              new SqlParameter("@param1", resultBookingID),
-                             new SqlParameter("@param2", item)
-                             );
+                             new SqlParameter("@param2", item),
+                             result1Param);
+                            result = (int)result1Param.Value;
                         }
+                        var result2Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         await _context.Database.ExecuteSqlRawAsync(
                             "EXEC FillBookingItemTableWithScheduleInvisible @param1",
-                            new SqlParameter("@param1", resultBookingID)
+                            new SqlParameter("@param1", resultBookingID),
+                            result2Param
                             );
+                        var result2 = (int)result2Param.Value;
 
+                        if (result == 0 || result2 == 0)
+                        {
+                            await transaction.RollbackAsync();
+                        }
+                        else
+                        {
+                            await transaction.CommitAsync();
+                        }
                     }
                     else if (resultBookingItem == 3)
                     {
+                        int result = 2;
                         foreach (var item in resourceID)
                         {
+                            var result1Param = new SqlParameter("@param3", SqlDbType.Int) { Direction = ParameterDirection.Output };
                             await _context.Database.ExecuteSqlRawAsync(
                              "EXEC FillBookingItemTableWithScheduleShown @param1,@param2",
                              new SqlParameter("@param1", resultBookingID),
-                             new SqlParameter("@param2", item)
-                             );
+                             new SqlParameter("@param2", item),
+                             result1Param);
+                            result = (int)result1Param.Value;
                         }
+                        var result2Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         await _context.Database.ExecuteSqlRawAsync(
                          "EXEC FillBookingItemTableNoScheduleInvisible @param1",
-                         new SqlParameter("@param1", resultBookingID)
-                         );
+                         new SqlParameter("@param1", resultBookingID),
+                         result2Param);
+                       var result2  = (int)result2Param.Value;
+
+                        if (result == 0 || result2 == 0)
+                        {
+                            await transaction.RollbackAsync();
+                        }
+                        else
+                        {
+                            await transaction.CommitAsync();
+                        }
 
                     }
                     else if (resultBookingItem == 4)
                     {
+                        int result = 2;
                         foreach (var item in resourceID)
                         {
+                            var result1Param = new SqlParameter("@param3", SqlDbType.Int) { Direction = ParameterDirection.Output };
                             await _context.Database.ExecuteSqlRawAsync(
                              "EXEC FillBookingItemTableWithScheduleShown @param1,@param2",
                              new SqlParameter("@param1", resultBookingID),
-                             new SqlParameter("@param2", item)
-                             );
+                             new SqlParameter("@param2", item),
+                             result1Param);
+                            result = (int)result1Param.Value;
+                        }
+                        if (result == 0 )
+                        {
+                            await transaction.RollbackAsync();
+                        }
+                        else
+                        {
+                            await transaction.CommitAsync();
                         }
 
                     }
@@ -215,18 +274,20 @@ namespace Infrastructure.Persistence.Repositories
                     {
                         return 6;
                     }
-                    await transaction.CommitAsync();
+                  
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    Console.WriteLine("Transaction failed. Exception: " + ex.Message);
+                    Console.WriteLine("Transaction failed. Exception: " + ex.GetBaseException().Message);
                 }
+
                 return resultBookingID;
-
-
             }
         }
+
+        
     }
 
 }
+
