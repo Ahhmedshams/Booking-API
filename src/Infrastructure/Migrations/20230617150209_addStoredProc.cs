@@ -56,7 +56,7 @@ END;";
             migrationBuilder.Sql(proc1);
 
 
-            var proc2 = @"alter PROC proc2
+            var proc2 = @"create PROC proc2
 @serviceID int		--shown 0 and schedule 1
 with encryption 
 as
@@ -101,7 +101,7 @@ END";
             migrationBuilder.Sql(proc2);
 
 
-            migrationBuilder.Sql(@"alter proc proc3 @serviceID int			--shown 0 and schedule 0
+            migrationBuilder.Sql(@"create proc proc3 @serviceID int			--shown 0 and schedule 0
 with encryption 
 as
 BEGIN
@@ -142,7 +142,7 @@ CREATE TABLE #TempInVisibleResourceTypeIDsNoSchedule (
 			return @output; -- Return the output value
 END");
 
-            migrationBuilder.Sql(@"alter proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time
+            migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time
 as
 BEGIN try --1
 IF EXISTS (
@@ -441,7 +441,7 @@ as
 
 
             // Fill Booking item Table
-            migrationBuilder.Sql(@"alter proc FillBookingItemTableWithScheduleInvisible @BookingID int 
+            migrationBuilder.Sql(@"create proc FillBookingItemTableWithScheduleInvisible @BookingID int 
 with encryption 
 as
 CREATE TABLE #prices (
@@ -525,7 +525,7 @@ BEGIN CATCH
 END CATCH");
 
 
-            migrationBuilder.Sql(@"alter proc FillBookingItemTableNoScheduleInvisible @BookingID int 
+            migrationBuilder.Sql(@"create proc FillBookingItemTableNoScheduleInvisible @BookingID int 
 with encryption 
 as
 CREATE TABLE #prices2 (
@@ -585,7 +585,7 @@ BEGIN CATCH
 END CATCH");
 
 
-            migrationBuilder.Sql(@"alter proc FillBookingItemTableWithScheduleShown @BookingID int , @ResourceID int 
+            migrationBuilder.Sql(@"create proc FillBookingItemTableWithScheduleShown @BookingID int , @ResourceID int 
 with encryption 
 as
 CREATE TABLE #TempResourceTypeID (
@@ -658,7 +658,7 @@ END CATCH;");
 
 
 
-            migrationBuilder.Sql(@"alter PROCEDURE CheckServerTypeInBookingItem
+            migrationBuilder.Sql(@"create PROCEDURE CheckServerTypeInBookingItem
 	@serviceID INT,
 	@OUTPUT INT OUTPUT
 WITH ENCRYPTION
