@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,18 @@ namespace Infrastructure.Persistence.Repositories
     {
         public ResourceReviewRepository( ApplicationDbContext context ) : base( context ) { }
 
+        public async Task<ResourceReview> Patch(int id, ResourceReview resourceReview)
+        {
+            var FoundReview =  _context.ResourceReview.FirstOrDefault( r => r.Id == id );
+            if (FoundReview == null)
+                return null;
+            
+            FoundReview.Rating = resourceReview?.Rating ?? FoundReview.Rating;
+            FoundReview.Description = resourceReview?.Description ?? FoundReview.Description;
+
+            await _context.SaveChangesAsync();
+            return FoundReview;
+
+        }
     }
 }

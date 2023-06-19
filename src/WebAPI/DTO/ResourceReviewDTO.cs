@@ -15,6 +15,15 @@ namespace WebAPI.DTO
 
     }
 
+    public class ResourceReviewEditDTO
+    {
+
+        [Range(1, 5, ErrorMessage = "Rate should be between 1 - 5.")]
+        public int Rating { get; set; }
+        public string Description { get; set; }
+
+    }
+
 
 
     public record ResourceReviewResDTO(

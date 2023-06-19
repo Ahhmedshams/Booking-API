@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using Application.Common.Interfaces.Repositories;
+using AutoMapper;
 using CoreApiResponse;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using WebAPI.DTO;
 
 namespace WebAPI.Controllers
@@ -98,6 +100,40 @@ namespace WebAPI.Controllers
 
             var resultDTO = mapper.Map<ResourceReviewResDTO>(Review);
             return CustomResult(resultDTO);
+        }
+
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == 0)
+                return CustomResult($"No Review Type IS Available With id {id}", HttpStatusCode.BadRequest);
+
+            bool result = await resourceReviewRepo.SoftDeleteAsync(id);
+            if (!result)
+                return CustomResult($"No Review is available with id {id}", HttpStatusCode.BadRequest);
+
+
+            return CustomResult(HttpStatusCode.NoContent);
+        }
+
+
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> Edit(int id , ResourceReviewEditDTO resourceReviewDTO)
+        {
+
+            if (!ModelState.IsValid)
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+            var ResourceReview = mapper.Map<ResourceReview>(resourceReviewDTO);
+
+
+            var result = await resourceReviewRepo.Patch(id, ResourceReview);
+
+            if(result == null)
+                return CustomResult($"No Review is available with id {id}", HttpStatusCode.BadRequest);
+            else
+                 return CustomResult(result);
         }
 
 

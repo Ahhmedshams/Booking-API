@@ -8,7 +8,7 @@ namespace WebAPI.Profiles
         {
             CreateMap<ResourceReview, ResourceReviewDTO>().ReverseMap();
             CreateMap<ResourceReview, ResourceReviewResDTO>().ReverseMap();
-           // CreateMap< List<ResourceReview>, List< ResourceReviewResDTO>>().ReverseMap();
+            CreateMap< ResourceReview, ResourceReviewEditDTO>().ReverseMap();
 
 
         }
