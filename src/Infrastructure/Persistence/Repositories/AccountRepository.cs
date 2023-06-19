@@ -230,6 +230,8 @@ namespace Infrastructure.Persistence.Repositories
             return await userManager.FindByIdAsync(ID);
         }
 
+
+
         public async Task EditAsync(string id, ApplicationUser entity)
         {
             var FoundUser = await userManager.FindByIdAsync(id);
@@ -254,6 +256,15 @@ namespace Infrastructure.Persistence.Repositories
                     
                 }
             };
+        }
+
+        public async Task<bool> IsExistAsync(string id)
+        {
+          var user = await  userManager.FindByIdAsync(id);
+            if(user != null)
+                return true;
+            else
+                return false;
         }
     }
 }

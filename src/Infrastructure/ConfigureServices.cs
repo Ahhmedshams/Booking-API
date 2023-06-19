@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Domain.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
@@ -33,8 +34,10 @@ namespace Infrastructure
             services.AddScoped<IServiceMetadataRepo, ServiceMetadaRepository>();
             services.AddScoped<IClientBookingRepo, ClientBookingRepository>();
             services.AddScoped<IApplicationUserRepo, ApplicationUserRepository>();
-            services.AddCors();
             services.AddScoped<IServiceRepo, ServiceRepository>();
+            services.AddScoped<IAccountRepository,AccountRepository>();
+            services.AddScoped<IResourceReviewRepo, ResourceReviewRepository>();
+            services.AddCors();
             services.AddScoped<ApplicationDbContextInitializer>();
 
 
