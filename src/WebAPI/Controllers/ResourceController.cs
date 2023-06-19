@@ -5,6 +5,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -17,14 +18,17 @@ namespace WebAPI.Controllers
         private readonly IResourceTypeRepo _resourceTypeRepo;
         private readonly IResourceDataRepo _resourceDataRepo;
         private readonly IResourceMetadataRepo _resourceMetadataRepo;
+        private readonly UploadImage _uploadImage;
 
-        public ResourceController(IMapper mapper, IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo, IResourceDataRepo resourceDataRepo, IResourceMetadataRepo resourceMetadataRepo)
+        public ResourceController(IMapper mapper, IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo, 
+            IResourceDataRepo resourceDataRepo, IResourceMetadataRepo resourceMetadataRepo, UploadImage uploadImage)
         {
             _mapper = mapper;
             _resourceRepo = resourceRepo;
             _resourceTypeRepo = resourceTypeRepo;
             _resourceDataRepo = resourceDataRepo;
             _resourceMetadataRepo = resourceMetadataRepo;
+            _uploadImage = uploadImage;
         }
 
         [HttpGet]
@@ -64,7 +68,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(ResourceReqDTO resourceDTO)
+        public async Task<IActionResult> Add([FromForm]ResourceReqDTO resourceDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
@@ -72,9 +76,20 @@ namespace WebAPI.Controllers
             var ResoureceType = await _resourceTypeRepo.IsExistAsync(resourceDTO.ResourceTypeId);
             if (!ResoureceType)
                 return CustomResult($"No Resource Type Are Available With id {resourceDTO.ResourceTypeId}", HttpStatusCode.BadRequest);
-
            
             var resource = _mapper.Map<Resource>(resourceDTO);
+
+            if (resourceDTO.UploadedImages != null && resourceDTO.UploadedImages.Any())
+            {
+                var entityType = "ResourceImage";
+                var images = await _uploadImage.UploadToCloud(resourceDTO.UploadedImages, entityType);
+
+                if (images != null && images.Any())
+                {
+                    var resourceImages = images.OfType<ResourceImage>().ToList();
+                    resource.Images = resourceImages;
+                }
+            }
             var result = await _resourceRepo.AddAsync(resource);
             return CustomResult(result);
             
