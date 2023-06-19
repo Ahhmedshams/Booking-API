@@ -11,24 +11,11 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public string Uri { get; set; }
-        public string Discriminator { get; set; }
     }
 
-    [Table("Images")]
-    public class ServiceImage : ImageEntity
-    {
-        public Service Service { get; set; }
-    }
+    public class ServiceImage : ImageEntity{}
 
-    [Table("Images")]
-    public class ResourceTypeImage : ImageEntity
-    {
-        public ResourceType ResourceType { get; set; }
-    }
+    public class ResourceTypeImage : ImageEntity { }
 
-    [Table("Images")]
-    public class ResourceImage : ImageEntity
-    {
-        public Resource Resource { get; set; }
-    }
+    public class ResourceImage : ImageEntity { }
 }

@@ -6,15 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class images : Migration
+    public partial class imagesadded : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Image",
-                table: "Services");
-
             migrationBuilder.CreateTable(
                 name: "Images",
                 columns: table => new
@@ -22,7 +18,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Uri = table.Column<string>(type: "nvarchar(2048)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ResourceId = table.Column<int>(type: "int", nullable: true),
                     ResourceTypeId = table.Column<int>(type: "int", nullable: true),
                     ServiceId = table.Column<int>(type: "int", nullable: true),
@@ -37,20 +33,17 @@ namespace Infrastructure.Migrations
                         name: "FK_Images_ResourceTypes_ResourceTypeId",
                         column: x => x.ResourceTypeId,
                         principalTable: "ResourceTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Images_Resource_ResourceId",
                         column: x => x.ResourceId,
                         principalTable: "Resource",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Images_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -74,12 +67,6 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Images");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Image",
-                table: "Services",
-                type: "nvarchar(max)",
-                nullable: true);
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230619114043_images")]
-    partial class images
+    [Migration("20230619154011_images-added")]
+    partial class imagesadded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,7 +128,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -142,7 +142,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("ImageEntity");
 
@@ -673,12 +673,10 @@ namespace Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.Entities.ImageEntity");
 
-                    b.Property<int>("ResourceId")
+                    b.Property<int?>("ResourceId")
                         .HasColumnType("int");
 
                     b.HasIndex("ResourceId");
-
-                    b.ToTable("Images");
 
                     b.HasDiscriminator().HasValue("ResourceImage");
                 });
@@ -687,12 +685,10 @@ namespace Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.Entities.ImageEntity");
 
-                    b.Property<int>("ResourceTypeId")
+                    b.Property<int?>("ResourceTypeId")
                         .HasColumnType("int");
 
                     b.HasIndex("ResourceTypeId");
-
-                    b.ToTable("Images");
 
                     b.HasDiscriminator().HasValue("ResourceTypeImage");
                 });
@@ -701,12 +697,10 @@ namespace Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.Entities.ImageEntity");
 
-                    b.Property<int>("ServiceId")
+                    b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
                     b.HasIndex("ServiceId");
-
-                    b.ToTable("Images");
 
                     b.HasDiscriminator().HasValue("ServiceImage");
                 });
@@ -884,35 +878,23 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ResourceImage", b =>
                 {
-                    b.HasOne("Domain.Entities.Resource", "Resource")
+                    b.HasOne("Domain.Entities.Resource", null)
                         .WithMany("Images")
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Resource");
+                        .HasForeignKey("ResourceId");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceTypeImage", b =>
                 {
-                    b.HasOne("Domain.Entities.ResourceType", "ResourceType")
+                    b.HasOne("Domain.Entities.ResourceType", null)
                         .WithMany("Images")
-                        .HasForeignKey("ResourceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ResourceType");
+                        .HasForeignKey("ResourceTypeId");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceImage", b =>
                 {
-                    b.HasOne("Domain.Entities.Service", "Service")
+                    b.HasOne("Domain.Entities.Service", null)
                         .WithMany("Images")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Service");
+                        .HasForeignKey("ServiceId");
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
