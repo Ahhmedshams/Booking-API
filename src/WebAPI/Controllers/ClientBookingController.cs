@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
         [HttpPost("CreateNewBooking")]
         public async Task<IActionResult> CreateNewBooking (ClientBooking2DTO clientBooking2DTO)
         {
-            var result = await clientBookingRepo.CreateNewBooking
+            int result = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
                 clientBooking2DTO.ServiceID,
@@ -94,7 +94,11 @@ namespace WebAPI.Controllers
                 clientBooking2DTO.StartTime,
                 clientBooking2DTO.EndTime,
                 clientBooking2DTO.ResourceIDs);
-
+            
+            if (result==-1)
+            {
+                return BadRequest("Invalid data entered");
+            }
             return CustomResult(result,HttpStatusCode.Created);
 
         }

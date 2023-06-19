@@ -46,8 +46,7 @@ namespace Infrastructure.Persistence.Repositories
         }
         public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime)
         {
-            //string formatted = _day.ToString("yyyy-MM-dd");
-            //string formatstart = _startTime.ToString("hh:mm:ss");
+           
                 var day = _day;
                 var startTime = _startTime;
                 var endTime = _endTime;
@@ -62,8 +61,14 @@ namespace Infrastructure.Persistence.Repositories
                         )
                       .IgnoreQueryFilters()
                       .ToList();
+            if (results.Count > 0)
+            {
                 return results;
-
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public bool IsExist(int id)
