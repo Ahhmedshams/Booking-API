@@ -14,5 +14,7 @@ namespace Domain.Entities
         public Decimal Price { get; set; }
         public ResourceType ResourceType { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }
+
+        public ICollection<ResourceImage> Images { get; set; }
     }
 }

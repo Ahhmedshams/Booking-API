@@ -32,7 +32,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add( ServiceDTO serviceDTO)
+        public async Task<IActionResult> Add([FromForm] ServiceDTO serviceDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
@@ -43,11 +43,26 @@ namespace WebAPI.Controllers
 
             var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
 
-            //if (serviceDTO.UploadedImage != null)
-            //    service.Image = await _uploadImage.UploadToCloud(serviceDTO.UploadedImage);
+            if (serviceDTO.UploadedImages != null && serviceDTO.UploadedImages.Any())
+            {
+                var entityType = "ServiceImage";
+                var images = await _uploadImage.UploadToCloud(serviceDTO.UploadedImages, entityType);
+
+                if (images != null && images.Any())
+                {
+                    var serviceImages = images.OfType<ServiceImage>().ToList();
+                    service.Images = serviceImages;
+                }
+            }
 
             await serviceRepo.AddAsync(service);
             return CustomResult(serviceDTO);
+            /*
+                        if (serviceDTO.UploadedImage != null)
+                            service.Image = await _uploadImage.UploadToCloud(serviceDTO.UploadedImage);
+
+                        await serviceRepo.AddAsync(service);
+                        return CustomResult(serviceDTO);*/
         }
 
         [HttpPut]
