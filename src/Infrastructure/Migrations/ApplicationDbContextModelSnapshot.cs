@@ -50,7 +50,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("BookingItems");
+                    b.ToTable("BookingItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
@@ -109,7 +109,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ClientBookings");
+                    b.ToTable("ClientBookings", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
@@ -147,7 +147,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource");
+                    b.ToTable("Resource", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -179,7 +179,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData");
+                    b.ToTable("ResourceData", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -218,7 +218,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata");
+                    b.ToTable("ResourceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
@@ -259,7 +259,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ScheduleID] IS NOT NULL");
 
-                    b.ToTable("ResourceSpecialCharacteristics");
+                    b.ToTable("ResourceSpecialCharacteristics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -296,7 +296,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ResourceTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -329,7 +329,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("Schedule");
+                    b.ToTable("Schedule", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
@@ -377,7 +377,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("ScheduleItem");
+                    b.ToTable("ScheduleItem", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
@@ -417,7 +417,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -448,7 +448,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ServiceMetadata");
+                    b.ToTable("ServiceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
