@@ -72,7 +72,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("User/{id:Guid}")]
-        public async Task<IActionResult> GetResourceReview(string id)
+        public async Task<IActionResult> GetUserReview(string id)
         {
             var User = await accountRepo.IsExistAsync(id);
 
@@ -85,6 +85,18 @@ namespace WebAPI.Controllers
                 return CustomResult($"No Review Exist for User Id {id}", System.Net.HttpStatusCode.BadRequest);
 
             var resultDTO = mapper.Map<List<ResourceReviewResDTO>>(result);
+            return CustomResult(resultDTO);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetReviewById(int id)
+        {
+            var Review = await resourceReviewRepo.GetByIdAsync(id);
+
+            if (Review==null)
+                return CustomResult($"No Review Exist  With Id {id}", System.Net.HttpStatusCode.BadRequest);
+
+            var resultDTO = mapper.Map<ResourceReviewResDTO>(Review);
             return CustomResult(resultDTO);
         }
 
