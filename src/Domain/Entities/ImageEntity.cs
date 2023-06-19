@@ -9,6 +9,7 @@ namespace Domain.Entities
 {
     public abstract class ImageEntity : BaseEntity
     {
+        public int Id { get; set; }
         public string Uri { get; set; }
         public string Discriminator { get; set; }
     }

@@ -57,12 +57,6 @@ namespace WebAPI.Controllers
 
             await serviceRepo.AddAsync(service);
             return CustomResult(serviceDTO);
-            /*
-                        if (serviceDTO.UploadedImage != null)
-                            service.Image = await _uploadImage.UploadToCloud(serviceDTO.UploadedImage);
-
-                        await serviceRepo.AddAsync(service);
-                        return CustomResult(serviceDTO);*/
         }
 
         [HttpPut]
