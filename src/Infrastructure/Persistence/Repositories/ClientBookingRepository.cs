@@ -163,7 +163,7 @@ namespace Infrastructure.Persistence.Repositories
                         }
                         var result2Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         await _context.Database.ExecuteSqlRawAsync(
-                            "EXEC FillBookingItemTableWithScheduleInvisible @param1",
+                            "EXEC FillBookingItemTableWithScheduleInvisible @param1 ,@param2 OUTPUT",
                             new SqlParameter("@param1", resultBookingID),
                             result2Param
                         );
@@ -180,9 +180,14 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 || result2 == 0 || result3 == 0)
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
+                            await _context.Database.ExecuteSqlRawAsync(
+                            "EXEC CalculateTotalCost @param1",
+                            new SqlParameter("@param1", resultBookingID));
+
                             await transaction.CommitAsync();
                         }
                     }
@@ -202,18 +207,22 @@ namespace Infrastructure.Persistence.Repositories
                         }
                         var result2Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         await _context.Database.ExecuteSqlRawAsync(
-                            "EXEC FillBookingItemTableWithScheduleInvisible @param1",
+                            "EXEC FillBookingItemTableWithScheduleInvisible @param1 ,@param2 OUTPUT",
                             new SqlParameter("@param1", resultBookingID),
-                            result2Param
-                            );
+                            result2Param);
                         var result2 = (int)result2Param.Value;
 
                         if (result == 0 || result2 == 0)
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
+                            await _context.Database.ExecuteSqlRawAsync(
+                             "EXEC CalculateTotalCost @param1",
+                             new SqlParameter("@param1", resultBookingID));
+
                             await transaction.CommitAsync();
                         }
                     }
@@ -224,7 +233,7 @@ namespace Infrastructure.Persistence.Repositories
                         {
                             var result1Param = new SqlParameter("@param3", SqlDbType.Int) { Direction = ParameterDirection.Output };
                             await _context.Database.ExecuteSqlRawAsync(
-                             "EXEC FillBookingItemTableWithScheduleShown @param1,@param2",
+                             "EXEC FillBookingItemTableWithScheduleShown @param1, @param2,@param3 OUTPUT",
                              new SqlParameter("@param1", resultBookingID),
                              new SqlParameter("@param2", item),
                              result1Param);
@@ -232,7 +241,7 @@ namespace Infrastructure.Persistence.Repositories
                         }
                         var result2Param = new SqlParameter("@param2", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         await _context.Database.ExecuteSqlRawAsync(
-                         "EXEC FillBookingItemTableNoScheduleInvisible @param1",
+                         "EXEC FillBookingItemTableNoScheduleInvisible @param1,@param2 OUTPUT",
                          new SqlParameter("@param1", resultBookingID),
                          result2Param);
                        var result2  = (int)result2Param.Value;
@@ -240,9 +249,14 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 || result2 == 0)
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
+                            await _context.Database.ExecuteSqlRawAsync(
+                            "EXEC CalculateTotalCost @param1",
+                            new SqlParameter("@param1", resultBookingID));
+
                             await transaction.CommitAsync();
                         }
 
@@ -254,7 +268,7 @@ namespace Infrastructure.Persistence.Repositories
                         {
                             var result1Param = new SqlParameter("@param3", SqlDbType.Int) { Direction = ParameterDirection.Output };
                             await _context.Database.ExecuteSqlRawAsync(
-                             "EXEC FillBookingItemTableWithScheduleShown @param1,@param2",
+                             "EXEC FillBookingItemTableWithScheduleShown @param1, @param2 ,@param3 OUTPUT",
                              new SqlParameter("@param1", resultBookingID),
                              new SqlParameter("@param2", item),
                              result1Param);
@@ -263,30 +277,29 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 )
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
+                            await _context.Database.ExecuteSqlRawAsync(
+                            "EXEC CalculateTotalCost @param1",
+                            new SqlParameter("@param1", resultBookingID));
+
                             await transaction.CommitAsync();
                         }
 
-                    }
-                    else
-                    {
-                        return 6;
                     }
                   
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    Console.WriteLine("Transaction failed. Exception: " + ex.GetBaseException().Message);
+                    return -1;
                 }
-
                 return resultBookingID;
             }
         }
 
-        
     }
 
 }

@@ -3,6 +3,7 @@ using AutoMapper;
 using CoreApiResponse;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Eventing.Reader;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using WebAPI.DTO;
@@ -82,7 +84,12 @@ namespace WebAPI.Controllers
             }
         }
 
+
+
+
         [HttpPost("login")]
+        [Authorize(Policy = "GuestUser")]
+
         public async Task<IActionResult> Login(LoginUserDto _user)
         {
             if (ModelState.IsValid)
@@ -151,7 +158,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("ResetPassword")]
-        public async Task<IActionResult> ConfirmResetPasswordAsync([FromForm] ResetPasswordDTO ResetPasswordDto)
+        public async Task<IActionResult> ConfirmResetPasswordAsync(ResetPasswordDTO ResetPasswordDto)
         {
             if (ResetPasswordDto != null)
             {
@@ -173,5 +180,41 @@ namespace WebAPI.Controllers
             }
             return BadRequest("All Fields Are Required");
         }
+
+
+        [HttpGet("{Id:Guid}")]
+        public async Task<IActionResult> GetById(string? id)
+        {
+            if (id == null)
+                return CustomResult($"Need To provide Id {id}", HttpStatusCode.NotFound);
+
+            var user = await accountRepo.GetByID(id);
+            if (user == null)
+                return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
+
+            var Result = mapper.Map<UserResponce>(user);
+
+
+            return CustomResult(Result);
+        }
+
+        [HttpPatch("{Id:Guid}")]
+        public async Task<IActionResult> EditUser(string Id, EditUserDTO user)
+        {
+
+            try
+            {
+                var AppUser = mapper.Map<ApplicationUser>(user);
+                await accountRepo.EditAsync(Id,AppUser);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.BadRequest);
+            }
+            return CustomResult();
+
+        }
+
+       
     }
 }

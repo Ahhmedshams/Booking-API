@@ -16,4 +16,24 @@ namespace WebAPI.DTO
         public string Password { get; set; }
 
     }
+
+
+
+
+    public record UserResponce(
+        string Id,
+        string UserName,
+        string FirstName,
+        string LastName,
+        string Email,
+        string? Address,
+        string? CreditCardNumber,
+        DateTime? LastUpdatedOn,
+        string? PhoneNumber
+
+        );
 }
+
+
+
+

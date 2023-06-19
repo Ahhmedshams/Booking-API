@@ -34,6 +34,29 @@ namespace Infrastructure.Persistence.Repositories
             return ("Schedule Deleted");
         }
 
+        public List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate)
+        {
+            var schedules = _context.Schedule
+                .Where(s => s.FromDate >= fromDate && s.ToDate <= toDate)
+                .GroupBy(s => new { s.FromDate, s.ToDate })
+                .ToList()
+                .Select(g => new AvailableSchedule { FromDate = g.Key.FromDate, ToDate = g.Key.ToDate });
+
+            return schedules.ToList();
+        }
+
+       /* public List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate)
+        {
+
+            var schedules = _context.Schedule
+                .Where(s => s.FromDate >= fromDate && s.ToDate <= toDate)
+                .GroupBy(s => new { s.FromDate, s.ToDate })
+                .Select(g => g.First())
+                .Select(s => new AvailableSchedule { FromDate = s.FromDate, ToDate = s.ToDate });
+      
+            return schedules.ToList();
+        }*/
+
         public Schedule AddSchedule(Schedule schedule)
         {
             var rescourceFound = _context.Resource.Where(r => r.Id == schedule.ResourceId);
@@ -46,8 +69,7 @@ namespace Infrastructure.Persistence.Repositories
         }
         public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime)
         {
-            //string formatted = _day.ToString("yyyy-MM-dd");
-            //string formatstart = _startTime.ToString("hh:mm:ss");
+           
                 var day = _day;
                 var startTime = _startTime;
                 var endTime = _endTime;
@@ -62,8 +84,14 @@ namespace Infrastructure.Persistence.Repositories
                         )
                       .IgnoreQueryFilters()
                       .ToList();
+            if (results.Count > 0)
+            {
                 return results;
-
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public bool IsExist(int id)

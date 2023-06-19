@@ -1,16 +1,8 @@
-﻿using Application.Common.Interfaces.Repositories;
-using Application.Common.Model;
+﻿using Application.Common.Model;
 using AutoMapper;
 using CoreApiResponse;
-using Domain.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebAPI.Controllers
 {

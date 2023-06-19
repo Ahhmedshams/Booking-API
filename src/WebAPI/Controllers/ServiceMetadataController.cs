@@ -109,7 +109,6 @@ namespace WebAPI.Controllers
 
             return await ProcessAddBulk(serviceId,serviceMetadataDTOs, async () =>
             {
-                var addedItems = new List<ServiceMetadataDTO>();
                 var serviceMDs = await ConvertDtoToServiceMD(serviceId, serviceMetadataDTOs);
                 await metadataRepo.AddBulk(serviceMDs);
                 return serviceMDs;
@@ -134,7 +133,8 @@ namespace WebAPI.Controllers
                 return CustomResult($"Duplicate key violation", HttpStatusCode.BadRequest);
 
             var result = await action.Invoke();
-            return CustomResult(new {ServiceId = serviceId, });
+            var ResourceTypes = serviceMetadataDTOs.Select(s => s.ResourceTypeId);
+            return CustomResult(new {ServiceId = serviceId, ResourceTypes });
         }
         private async Task<List<ServiceMDReqDTO>> GetInvalidResourceTypeIds(ServiceMDReqDTO[] serviceMetadataDTOs)
         {
@@ -165,81 +165,84 @@ namespace WebAPI.Controllers
             return duplicateItems;
         }
 
-        private async Task<IEnumerable<ServiceMetadata>> ConvertDtoToServiceMD(int serviceId, ServiceMDReqDTO[] serviceMDReqDTO)
-        {
-            List<ServiceMetadata> serviceMetadata = new();
-            ServiceMetadata serviceMD = new();
-            foreach (var dto in serviceMDReqDTO)
-            {
-                serviceMD.ServiceId = serviceId;
-                serviceMD.ResourceTypeId = dto.ResourceTypeId;
-                serviceMetadata.Add(serviceMD);
-            }
-            return serviceMetadata;
-        }
+		private async Task<IEnumerable<ServiceMetadata>> ConvertDtoToServiceMD(int serviceId, ServiceMDReqDTO[] serviceMDReqDTO)
+		{
+			List<ServiceMetadata> serviceMetadata = new();
 
+			foreach (var dto in serviceMDReqDTO)
+			{
+				ServiceMetadata serviceMD = new ServiceMetadata(); // Create a new instance for each object
+				serviceMD.ServiceId = serviceId;
+				serviceMD.ResourceTypeId = dto.ResourceTypeId;
+				serviceMetadata.Add(serviceMD);
+			}
 
-        //[HttpPut("EditOne")]
-        //public async Task<IActionResult> Edit([FromQuery] int serviceId,
-        //                                      ServiceMetadataUpdateDTO serviceMetadata)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState, HttpStatusCode.BadRequest);
-
-        //    return await ProcessUpdateOne(serviceId, serviceMetadata, async () =>
-        //    {
-        //        await metadataRepo.EditOne(serviceId, serviceMetadata.ResourceTypeId);
-        //        return serviceMetadata;
-        //    });
-        //}
+			return serviceMetadata;
+		}
 
 
 
-        //[HttpPut("EditBulk")]
-        //public async Task<IActionResult> EditBulk(IEnumerable<int> resourceTypes,
-        //                                      [FromQuery] int serviceId)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState, HttpStatusCode.BadRequest);
-        //    return await ProcessEditBulk(serviceId, resourceTypes, async () =>
-        //    {
-        //        await metadataRepo.EditBulk(serviceId, resourceTypes);
-        //        return resourceTypes;
+		//[HttpPut("EditOne")]
+		//public async Task<IActionResult> Edit([FromQuery] int serviceId,
+		//                                      ServiceMetadataUpdateDTO serviceMetadata)
+		//{
+		//    if (!ModelState.IsValid)
+		//        return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-        //    });
-
-        //}
-
-        //private async Task<IActionResult> ProcessUpdateOne(int serviceId,ServiceMetadataUpdateDTO serviceMetadataDTO,
-        //                                                  Func<Task<ServiceMetadataUpdateDTO>> action)
-        //{
-        //    var service = await serviceRepo.GetByIdAsync(serviceId);
-        //    if (service == null)
-        //        return CustomResult($"No service found for Id: {serviceId}", HttpStatusCode.BadRequest);
-
-        //    bool invalidResTypeId = await metadataRepo.IsResTypeExist(serviceMetadataDTO.ResourceTypeId);
-        //    if (!invalidResTypeId)
-        //        return CustomResult($"No Resource Type found for Id: {serviceMetadataDTO.ResourceTypeId}", HttpStatusCode.BadRequest);
-
-        //    var result = await action.Invoke();
-        //    return CustomResult(new {ServiceId = serviceId, ResourceTypeId = serviceMetadataDTO.ResourceTypeId});
-        //}
+		//    return await ProcessUpdateOne(serviceId, serviceMetadata, async () =>
+		//    {
+		//        await metadataRepo.EditOne(serviceId, serviceMetadata.ResourceTypeId);
+		//        return serviceMetadata;
+		//    });
+		//}
 
 
-        //private async Task<IActionResult> ProcessEditBulk(int serviceId,IEnumerable<int> resourceTypes,
-        //                                                  Func<Task<IEnumerable<int>>> action)
-        //{
-        //    var service = await serviceRepo.GetByIdAsync(serviceId);
-        //    if (service == null)
-        //        return CustomResult($"No service found for Id: {serviceId}", HttpStatusCode.BadRequest);
 
-        //    var invalidResTypeIds = await GetInvalidResourceTypeIds2(resourceTypes);
-        //    if (invalidResTypeIds.Count > 0)
-        //        return CustomResult($"No Resource Type found for Ids: {string.Join(", ", invalidResTypeIds)}", HttpStatusCode.BadRequest);
+		//[HttpPut("EditBulk")]
+		//public async Task<IActionResult> EditBulk(IEnumerable<int> resourceTypes,
+		//                                      [FromQuery] int serviceId)
+		//{
+		//    if (!ModelState.IsValid)
+		//        return CustomResult(ModelState, HttpStatusCode.BadRequest);
+		//    return await ProcessEditBulk(serviceId, resourceTypes, async () =>
+		//    {
+		//        await metadataRepo.EditBulk(serviceId, resourceTypes);
+		//        return resourceTypes;
 
-        //    var result = await action.Invoke();
-        //    return CustomResult(new {ServiceId = serviceId, ResoureTypes = resourceTypes});
-        //}
+		//    });
 
-    }
+		//}
+
+		//private async Task<IActionResult> ProcessUpdateOne(int serviceId,ServiceMetadataUpdateDTO serviceMetadataDTO,
+		//                                                  Func<Task<ServiceMetadataUpdateDTO>> action)
+		//{
+		//    var service = await serviceRepo.GetByIdAsync(serviceId);
+		//    if (service == null)
+		//        return CustomResult($"No service found for Id: {serviceId}", HttpStatusCode.BadRequest);
+
+		//    bool invalidResTypeId = await metadataRepo.IsResTypeExist(serviceMetadataDTO.ResourceTypeId);
+		//    if (!invalidResTypeId)
+		//        return CustomResult($"No Resource Type found for Id: {serviceMetadataDTO.ResourceTypeId}", HttpStatusCode.BadRequest);
+
+		//    var result = await action.Invoke();
+		//    return CustomResult(new {ServiceId = serviceId, ResourceTypeId = serviceMetadataDTO.ResourceTypeId});
+		//}
+
+
+		//private async Task<IActionResult> ProcessEditBulk(int serviceId,IEnumerable<int> resourceTypes,
+		//                                                  Func<Task<IEnumerable<int>>> action)
+		//{
+		//    var service = await serviceRepo.GetByIdAsync(serviceId);
+		//    if (service == null)
+		//        return CustomResult($"No service found for Id: {serviceId}", HttpStatusCode.BadRequest);
+
+		//    var invalidResTypeIds = await GetInvalidResourceTypeIds2(resourceTypes);
+		//    if (invalidResTypeIds.Count > 0)
+		//        return CustomResult($"No Resource Type found for Ids: {string.Join(", ", invalidResTypeIds)}", HttpStatusCode.BadRequest);
+
+		//    var result = await action.Invoke();
+		//    return CustomResult(new {ServiceId = serviceId, ResoureTypes = resourceTypes});
+		//}
+
+	}
 }

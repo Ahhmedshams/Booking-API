@@ -4,6 +4,7 @@ using CoreApiResponse;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -43,12 +44,26 @@ namespace WebAPI.Controllers
             return CustomResult(res);
         }
 
+        [HttpGet("GetSchedules")]
+        public IActionResult GetSchedulesByDateRange(DateTime fromDate, DateTime toDate)
+        {
+            var schedules = scheduleRepo.GetSchedules(fromDate, toDate);
+            return CustomResult(schedules);
+        }
+
         [HttpGet("GetAvailableResources")]
         public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime)
         {
             var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime,_endTime);
 
-            return Ok(availableResources);
+            if(availableResources == null)
+            {
+                return Ok(new List<Resource>()); // Return an empty array
+            }
+            else
+            {
+                return Ok(availableResources);
+            }
         }
 
         [HttpGet("{resourceId:int}")]
