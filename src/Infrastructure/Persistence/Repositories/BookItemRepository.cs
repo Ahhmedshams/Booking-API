@@ -174,5 +174,10 @@ namespace Infrastructure.Persistence.Repositories
                             .ToListAsync();
             return report;
         }
+
+        public List<BookingItem> GetAllBooksItemsByBookingId(int bookingID)
+        {
+            return  _context.Set<BookingItem>().Where(b => b.BookingId == bookingID).ToListAsync().Result;
+        }
     }
 }

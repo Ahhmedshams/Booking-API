@@ -9,6 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Identity.EmailSettings;
+using Stripe;
+using Application.Common.Interfaces.Services;
+using Infrastructure.Services;
 
 namespace WebAPI
 {
@@ -38,14 +41,8 @@ namespace WebAPI
                 .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("Default");
             builder.Services.Configure<IdentityOptions>(opt =>
             {
-                /*opt.Password.RequireDigit = false;
-                 opt.Password.RequireLowercase = false;
-                 opt.Password.RequireUppercase = false;
-                 opt.Password.RequireNonAlphanumeric = false;
-                 opt.Password.RequiredLength = 8;*/
                 opt.User.RequireUniqueEmail = true;
                 opt.SignIn.RequireConfirmedEmail = true;
-                //opt.Password.RequiredUniqueChars = 1;
             });
             builder.Services.AddAuthentication(options =>
             {
@@ -64,8 +61,12 @@ namespace WebAPI
 
 
 
+
             /*            builder.Services.AddAuthentication();*/
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

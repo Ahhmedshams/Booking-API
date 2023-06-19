@@ -1,7 +1,9 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Services;
 using Domain.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +37,7 @@ namespace Infrastructure
             services.AddScoped<IApplicationUserRepo, ApplicationUserRepository>();
             services.AddCors();
             services.AddScoped<IServiceRepo, ServiceRepository>();
+            services.AddScoped<IPaymentService, StripePaymentService>();
 
             return services;
         }
