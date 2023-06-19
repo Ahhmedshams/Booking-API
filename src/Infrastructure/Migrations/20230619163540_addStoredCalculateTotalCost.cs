@@ -11,7 +11,7 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"alter proc CalculateTotalCost @bookingID int
+            migrationBuilder.Sql(@"CREATE proc CalculateTotalCost @bookingID int
 with encryption 
 as
 BEGIN TRY
