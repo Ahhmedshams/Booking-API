@@ -10,7 +10,7 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"alter proc CancelPendingBooking @BookingID int 
+            migrationBuilder.Sql(@"create proc CancelPendingBooking @BookingID int 
 with encryption 
 as
 	begin try 
