@@ -11,7 +11,7 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Get Available Resources
-            var proc1 = @"CREATE PROC proc1
+            var proc1 = @"create PROC proc1
 	@serviceID INT
 WITH ENCRYPTION 
 AS
@@ -56,7 +56,7 @@ END;";
             migrationBuilder.Sql(proc1);
 
 
-            var proc2 = @"CREATE PROC proc2
+            var proc2 = @"create PROC proc2
 @serviceID int		--shown 0 and schedule 1
 with encryption 
 as
@@ -101,7 +101,7 @@ END";
             migrationBuilder.Sql(proc2);
 
 
-            migrationBuilder.Sql(@"Create proc proc3 @serviceID int			--shown 0 and schedule 0
+            migrationBuilder.Sql(@"create proc proc3 @serviceID int			--shown 0 and schedule 0
 with encryption 
 as
 BEGIN
@@ -413,7 +413,7 @@ CREATE TABLE #TempResourceTypeID (
 
 
             // Fill Client Booking Table
-            migrationBuilder.Sql(@" CREATE proc FillClientBookingTable
+            migrationBuilder.Sql(@" alter proc FillClientBookingTable
  @UserID nvarchar(50) ,@date date,
  @servicesID int , @location nvarchar(20),
  @startTime time , @endTime time ,@output int output 
@@ -441,7 +441,7 @@ as
 
 
             // Fill Booking item Table
-            migrationBuilder.Sql(@"Create proc FillBookingItemTableWithScheduleInvisible @BookingID int 
+            migrationBuilder.Sql(@"create proc FillBookingItemTableWithScheduleInvisible @BookingID int 
 with encryption 
 as
 CREATE TABLE #prices (
@@ -585,7 +585,7 @@ BEGIN CATCH
 END CATCH");
 
 
-            migrationBuilder.Sql(@"Create proc FillBookingItemTableWithScheduleShown @BookingID int , @ResourceID int 
+            migrationBuilder.Sql(@"create proc FillBookingItemTableWithScheduleShown @BookingID int , @ResourceID int 
 with encryption 
 as
 CREATE TABLE #TempResourceTypeID (

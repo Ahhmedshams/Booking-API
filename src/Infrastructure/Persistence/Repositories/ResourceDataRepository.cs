@@ -43,12 +43,28 @@ namespace Infrastructure.Persistence.Repositories
 
             if (Resource == null)
                 return null ;
+
+            var Review = _context.ResourceReview.Where(rr => rr.ResourceId == id)
+                .GroupBy(rr => rr.ResourceId)
+                .Select(Result => new {
+                    AverageRating = Result.Average(rr => rr.Rating),
+                    NumRatings = Result.Count()
+                }).FirstOrDefault();
+
+
+
             AllResourceData Result = new() { Id= id ,
                 Name= Resource.Name ,
                 Price = Resource.Price ,
                 ResourceTypeId = Resource.ResourceTypeId ,
-                ResourceTypeName = Resource.ResourceType.Name 
+                ResourceTypeName = Resource.ResourceType.Name ,
+                AverageRating = Review?.AverageRating ?? 5,
+                NumRatings = Review?.NumRatings ?? 0
             };
+
+
+            
+
 
 
             var Attributes = await (from RData in _context.ResourceData
@@ -88,13 +104,22 @@ namespace Infrastructure.Persistence.Repositories
             List< AllResourceData> Result = new List< AllResourceData >();
             foreach (var Resource in Resources)
             {
+                var Review = _context.ResourceReview.Where(rr => rr.ResourceId == Resource.Id)
+                .GroupBy(rr => rr.ResourceId)
+                .Select(Result => new {
+                    AverageRating = Result.Average(rr => rr.Rating),
+                    NumRatings = Result.Count()
+                }).FirstOrDefault();
+
                 AllResourceData Record = new()
                 {
                     Id = Resource.Id,
                     Name = Resource.Name,
                     Price = Resource.Price,
                     ResourceTypeId = Resource.ResourceTypeId,
-                    ResourceTypeName = Resource.ResourceType.Name
+                    ResourceTypeName = Resource.ResourceType.Name,
+                    AverageRating = Review?.AverageRating ?? 5,
+                    NumRatings = Review?.NumRatings ?? 0
                 };
 
                 var attrbutes =  Query.Where(r => r.Id == Record.Id);
@@ -139,13 +164,22 @@ namespace Infrastructure.Persistence.Repositories
             List<AllResourceData> Result = new List<AllResourceData>();
             foreach (var Resource in Resources)
             {
+                var Review = _context.ResourceReview.Where(rr => rr.ResourceId == Resource.Id)
+                .GroupBy(rr => rr.ResourceId)
+                .Select(Result => new {
+                    AverageRating = Result.Average(rr => rr.Rating),
+                    NumRatings = Result.Count()
+                }).FirstOrDefault();
+
                 AllResourceData Record = new()
                 {
                     Id = Resource.Id,
                     Name = Resource.Name,
                     Price = Resource.Price,
                     ResourceTypeId = Resource.ResourceTypeId,
-                    ResourceTypeName = Resource.ResourceType.Name
+                    ResourceTypeName = Resource.ResourceType.Name,
+                    AverageRating = Review?.AverageRating ?? 5,
+                    NumRatings = Review?.NumRatings ?? 0
                 };
 
                 var attrbutes = Query.Where(r => r.Id == Record.Id);

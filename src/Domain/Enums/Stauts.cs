@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Common.Helpers
+namespace Domain.Enums
 {
-    interface h
+    public enum PaymentStatus
     {
+        Pending,
+        Successful,
+        Failed,
+        Refunded
     }
 }
