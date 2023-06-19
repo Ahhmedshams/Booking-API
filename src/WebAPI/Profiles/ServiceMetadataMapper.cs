@@ -9,7 +9,7 @@ namespace WebAPI.Profiles
         {
             
             CreateMap<ServiceMetadata, ServiceMetadataDTO>()
-                .ForMember(des => des.ResourceTypeName, opt => opt.MapFrom(src => src.ResourceType.Name))
+                //.ForMember(des => des.ResourceTypeName, opt => opt.MapFrom(src => src.ResourceType.Name))
                 .ReverseMap();
 
             CreateMap<ServiceMetadata, ServiceMDReqDTO>().ReverseMap();
