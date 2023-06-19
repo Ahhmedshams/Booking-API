@@ -13,5 +13,6 @@
         public string Description { get; set; }
         public ServiceStatus Status { get; set; }
         public ICollection<ServiceMetadata> Metadata { get; set; } = new HashSet<ServiceMetadata>();
+        public string? Image { get; set; }
     }
 }

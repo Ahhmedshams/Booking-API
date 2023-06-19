@@ -30,7 +30,7 @@ namespace Domain.Entities
         public decimal TotalCost { get; set; }
         public ApplicationUser User { get; set; }
 
-      
+        public PaymentTransaction paymentTransaction { get; set; }
         public ICollection<BookingItem> BookingItems { get; set; } = new HashSet<BookingItem>();
     }
 }

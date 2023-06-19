@@ -64,7 +64,7 @@ namespace Infrastructure.Persistence.Repositories
 
 
 
-        public async Task<T?> GetByIdAsync<IDType>(IDType id , params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdAsync<IDType>(IDType id, params Expression<Func<T, object>>[] includes)
         {
             var query = _context.Set<T>().AsQueryable();
             if (includes.Length > 0)
