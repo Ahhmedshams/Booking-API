@@ -8,14 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DTO\testDTO.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="DTO\testDTO.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.16.0" />
     <PackageReference Include="CoreApiResponse" Version="1.0.1" />
     <PackageReference Include="MailKit" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />

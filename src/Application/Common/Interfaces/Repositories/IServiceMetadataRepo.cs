@@ -7,6 +7,7 @@ namespace Application.Common.Interfaces.Repositories
     {
         Task<IEnumerable<ServiceMetadata>> GetAllServiceMDWithSpec(ISpecification<ServiceMetadata> spec);
         Task AddBulk(IEnumerable<ServiceMetadata> serviceMetadata);
+        Task AddOne(ServiceMetadata serviceMetadata);
         Task EditOne(int serviceId, int resId);
         Task EditBulk(int serviceId,IEnumerable<int> resIds);
 

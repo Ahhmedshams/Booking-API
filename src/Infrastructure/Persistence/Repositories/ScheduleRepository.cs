@@ -34,6 +34,29 @@ namespace Infrastructure.Persistence.Repositories
             return ("Schedule Deleted");
         }
 
+        public List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate)
+        {
+            var schedules = _context.Schedule
+                .Where(s => s.FromDate >= fromDate && s.ToDate <= toDate)
+                .GroupBy(s => new { s.FromDate, s.ToDate })
+                .ToList()
+                .Select(g => new AvailableSchedule { FromDate = g.Key.FromDate, ToDate = g.Key.ToDate });
+
+            return schedules.ToList();
+        }
+
+       /* public List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate)
+        {
+
+            var schedules = _context.Schedule
+                .Where(s => s.FromDate >= fromDate && s.ToDate <= toDate)
+                .GroupBy(s => new { s.FromDate, s.ToDate })
+                .Select(g => g.First())
+                .Select(s => new AvailableSchedule { FromDate = s.FromDate, ToDate = s.ToDate });
+      
+            return schedules.ToList();
+        }*/
+
         public Schedule AddSchedule(Schedule schedule)
         {
             var rescourceFound = _context.Resource.Where(r => r.Id == schedule.ResourceId);

@@ -21,5 +21,9 @@ namespace Application.Common.Interfaces.Repositories
         Task<IdentityResult> ResetPasswordAsync(string Email, string Token, string NewPassword);
 
         Task<bool> ValidateTokenAsync(string Email, string Token);
+
+        Task EditAsync(string id, ApplicationUser entity);
+
+        Task<bool> IsExistAsync(string  id);
     }
 }
