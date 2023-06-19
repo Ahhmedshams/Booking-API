@@ -11,7 +11,7 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Get Available Resources
-            var proc1 = @"alter PROC proc1
+            var proc1 = @"create PROC proc1
 	@serviceID INT
 WITH ENCRYPTION 
 AS
@@ -413,7 +413,7 @@ CREATE TABLE #TempResourceTypeID (
 
 
             // Fill Client Booking Table
-            migrationBuilder.Sql(@" create proc FillClientBookingTable
+            migrationBuilder.Sql(@" alter proc FillClientBookingTable
  @UserID nvarchar(50) ,@date date,
  @servicesID int , @location nvarchar(20),
  @startTime time , @endTime time ,@output int output 
