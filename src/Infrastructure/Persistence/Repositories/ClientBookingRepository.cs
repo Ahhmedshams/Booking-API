@@ -180,6 +180,7 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 || result2 == 0 || result3 == 0)
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
@@ -214,6 +215,7 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 || result2 == 0)
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
@@ -247,6 +249,7 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 || result2 == 0)
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
@@ -274,6 +277,7 @@ namespace Infrastructure.Persistence.Repositories
                         if (result == 0 )
                         {
                             await transaction.RollbackAsync();
+                            return -1;
                         }
                         else
                         {
@@ -285,23 +289,17 @@ namespace Infrastructure.Persistence.Repositories
                         }
 
                     }
-                    else
-                    {
-                        return 6;
-                    }
                   
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    Console.WriteLine("Transaction failed. Exception: " + ex.GetBaseException().Message);
+                    return -1;
                 }
-
                 return resultBookingID;
             }
         }
 
-        
     }
 
 }

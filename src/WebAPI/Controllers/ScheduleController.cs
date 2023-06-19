@@ -56,7 +56,14 @@ namespace WebAPI.Controllers
         {
             var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime);
 
-            return Ok(availableResources);
+            if(availableResources == null)
+            {
+                return Ok(new List<Resource>()); // Return an empty array
+            }
+            else
+            {
+                return Ok(availableResources);
+            }
         }
 
         [HttpGet("{resourceId:int}")]
