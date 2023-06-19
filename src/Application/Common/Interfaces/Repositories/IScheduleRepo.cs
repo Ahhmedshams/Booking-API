@@ -14,6 +14,6 @@ namespace Application.Common.Interfaces.Repositories
         Schedule AddSchedule(Schedule schedule);
 
         List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate);
-        List<AvailableResources> GetAvailableResources(DateTime fromDate, DateTime toDate, int resourceTypeId);
+        public List<Resource> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime);
     }
 }
