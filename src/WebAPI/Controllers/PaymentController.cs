@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
            // var bookingItems = await bookingItemRepo.GetAllBooksItemsByBookingId(3);
 
 
-            var paymentUrl = paymentService.MakePayment(bookingItemRepo, 400, 20);
+            var paymentUrl = paymentService.MakePayment(bookingItemRepo, 400, 3);
 
             return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
         }

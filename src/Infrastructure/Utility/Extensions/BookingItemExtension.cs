@@ -19,7 +19,7 @@ namespace Infrastructure.Utility.Extensions
             foreach (var bookingItem in  bookingItems)
             {
                 var lineItem = new SessionLineItemOptions() { Quantity = 1, PriceData = new SessionLineItemPriceDataOptions() { Currency = "egp",
-                UnitAmount = (int) (bookingItem.Price * 100), ProductData = new() { Name = bookingItem?.Resource?.Name ?? "any thing name"} }
+                UnitAmount = (int) (bookingItem.Price * 100), ProductData = new() { Name = bookingItem?.Resource?.Name ?? "any thing name"}}
                };
 
                 sessionLineItemOptions.Add(lineItem);

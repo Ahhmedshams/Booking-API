@@ -10,7 +10,7 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"alter proc SetBookingStatusConfiremed @bookingID int
+            migrationBuilder.Sql(@"create proc SetBookingStatusConfiremed @bookingID int
 with encryption 
 as
 	IF EXISTS 
@@ -27,7 +27,7 @@ as
 	end 
 	else 
 	return 0");
-            migrationBuilder.Sql(@"alter PROCEDURE SetBookingStatuscompleted
+            migrationBuilder.Sql(@"create PROCEDURE SetBookingStatuscompleted
     @bookingID INT
 WITH ENCRYPTION
 AS

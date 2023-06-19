@@ -413,7 +413,7 @@ CREATE TABLE #TempResourceTypeID (
 
 
             // Fill Client Booking Table
-            migrationBuilder.Sql(@" alter proc FillClientBookingTable
+            migrationBuilder.Sql(@" create proc FillClientBookingTable
  @UserID nvarchar(50) ,@date date,
  @servicesID int , @location nvarchar(20),
  @startTime time , @endTime time ,@output int output 

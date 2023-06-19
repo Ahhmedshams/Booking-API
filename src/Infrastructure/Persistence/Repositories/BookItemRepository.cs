@@ -177,7 +177,9 @@ namespace Infrastructure.Persistence.Repositories
 
         public List<BookingItem> GetAllBooksItemsByBookingId(int bookingID)
         {
-            return  _context.Set<BookingItem>().Where(b => b.BookingId == bookingID).ToListAsync().Result;
+            return  _context.Set<BookingItem>().Where(b => b.BookingId == bookingID)
+                .Include(b => b.ClientBooking)
+                .ThenInclude(u => u.User).ToListAsync().Result;
         }
     }
 }

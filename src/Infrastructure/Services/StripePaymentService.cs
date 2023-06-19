@@ -36,12 +36,24 @@ namespace Infrastructure.Services
 
             var sessionLineItemOptions = bookingItems.ToSessionLineItemOptionsObject();
 
+            var metadata = new Dictionary<string, string>();
+            metadata.Add("bookingID", bookingID.ToString());
+
+            string clientReferenceId = bookingItems[0].ClientBooking.UserId;
+
             var options = new SessionCreateOptions
             {
                 SuccessUrl = configuration["Stripe:SuccessUrl"],
-                LineItems = sessionLineItemOptions,             
+                LineItems = sessionLineItemOptions,
                 Mode = "payment",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                ClientReferenceId = clientReferenceId,
+               // PaymentIntentData = new() { ReceiptEmail = bookingItems[0].ClientBooking.User.Email },
+
+                // TODO: complete data for invoice
+               // InvoiceCreation = new() { Enabled = true, InvoiceData = new() { Footer = "Swift Reserve Invoice"} },
+              //  Metadata = metadata
+                
             };
             var service = new SessionService();
             

@@ -10,7 +10,7 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-			migrationBuilder.Sql(@"ALTER proc FillBookingItemTableWithScheduleInvisible @BookingID int ,@output int output 
+			migrationBuilder.Sql(@"alter proc FillBookingItemTableWithScheduleInvisible @BookingID int ,@output int output 
 with encryption 
 as
 CREATE TABLE #prices (
@@ -92,7 +92,7 @@ BEGIN CATCH
 		 set @output = 0; -- Set the output variable value
 		 return @output;
 END CATCH");
-			migrationBuilder.Sql(@"ALTER proc FillBookingItemTableNoScheduleInvisible @BookingID int, @output int output
+			migrationBuilder.Sql(@"alter proc FillBookingItemTableNoScheduleInvisible @BookingID int, @output int output
 with encryption 
 as
 CREATE TABLE #prices2 (

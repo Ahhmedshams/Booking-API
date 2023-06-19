@@ -43,7 +43,7 @@ namespace Infrastructure
             services.AddScoped<IServiceRepo, ServiceRepository>();
             services.AddScoped<IPaymentService, StripePaymentService>();
             services.AddScoped<ApplicationDbContextInitializer>();
-
+            services.AddScoped<IPayemntTransactionRepository, PaymentTransactionRepository>();
 
             return services;
         }

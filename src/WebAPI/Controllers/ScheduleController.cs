@@ -54,7 +54,7 @@ namespace WebAPI.Controllers
         [HttpGet("GetAvailableResources")]
         public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime)
         {
-            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime,_endTime);
+            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime);
 
             return Ok(availableResources);
         }
