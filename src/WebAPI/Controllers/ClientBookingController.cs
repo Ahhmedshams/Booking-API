@@ -5,6 +5,7 @@ using System.Net;
 using Infrastructure.Persistence.Specification.ClientBookingSpec;
 using Infrastructure.Persistence.Specification;
 using WebAPI.DTO;
+using Application.Common.Interfaces.Services;
 
 namespace WebAPI.Controllers
 {
@@ -14,12 +15,17 @@ namespace WebAPI.Controllers
     {
         private readonly IClientBookingRepo clientBookingRepo;
         private readonly IMapper mapper;
+        private readonly IPaymentService paymentService;
+        private readonly IBookingItemRepo bookingItemRepo;
+
 
         public ClientBookingController(IClientBookingRepo _clientBookingRepo,
-                                        IMapper _mapper)
+                                        IMapper _mapper, IPaymentService paymentService, IBookingItemRepo bookingItemRepo)
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
+            this.paymentService=paymentService;
+            this.bookingItemRepo=bookingItemRepo;
         }
 
         [HttpGet]
@@ -86,7 +92,7 @@ namespace WebAPI.Controllers
         [HttpPost("CreateNewBooking")]
         public async Task<IActionResult> CreateNewBooking (ClientBooking2DTO clientBooking2DTO)
         {
-            int result = await clientBookingRepo.CreateNewBooking
+            int bookingID = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
                 clientBooking2DTO.ServiceID,
@@ -95,11 +101,17 @@ namespace WebAPI.Controllers
                 clientBooking2DTO.EndTime,
                 clientBooking2DTO.ResourceIDs);
             
-            if (result==-1)
+            if (bookingID==-1)
             {
                 return BadRequest("Invalid data entered");
             }
-            return CustomResult(result,HttpStatusCode.Created);
+
+            var booking = await clientBookingRepo.GetByIdAsync(bookingID);
+
+            var paymentUrl = paymentService.MakePayment(bookingItemRepo, booking?.TotalCost ?? 0, bookingID);
+
+            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
+
 
         }
     }

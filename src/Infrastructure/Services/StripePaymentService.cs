@@ -32,6 +32,7 @@ namespace Infrastructure.Services
         {
          
             // TODO: read all showable items, sum all material in one item, sum all items like cars in one item.
+            // TODO: Case when booking items counts is 0
             var bookingItems = bookingItemRepo.GetAllBooksItemsByBookingId(bookingID);
 
             var sessionLineItemOptions = bookingItems.ToSessionLineItemOptionsObject();
@@ -52,7 +53,7 @@ namespace Infrastructure.Services
 
                 // TODO: complete data for invoice
                // InvoiceCreation = new() { Enabled = true, InvoiceData = new() { Footer = "Swift Reserve Invoice"} },
-              //  Metadata = metadata
+                Metadata = metadata
                 
             };
             var service = new SessionService();

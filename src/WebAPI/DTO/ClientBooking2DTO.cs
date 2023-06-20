@@ -8,7 +8,7 @@
         public string EndTime { get; set; }
         public string Location { get; set; }
         public BookingStatus ?Status { get; set; }
-        public decimal TotalCost { get; set; }
+        public decimal? TotalCost { get; set; }
         public string UserID { get; set; }
         public int ServiceID { get; set; }
         public List<int> ResourceIDs { get; set; }

@@ -179,7 +179,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             return  _context.Set<BookingItem>().Where(b => b.BookingId == bookingID)
                 .Include(b => b.ClientBooking)
-                .ThenInclude(u => u.User).ToListAsync().Result;
+                .ToListAsync().Result;
         }
     }
 }

@@ -124,6 +124,7 @@ namespace WebAPI
 
             StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

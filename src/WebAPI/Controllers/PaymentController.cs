@@ -23,11 +23,10 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Checkout()
         {
-            var bookingItemSpec = new BookingItemSpecParams() { BookId = 3 };
-           // var bookingItems = await bookingItemRepo.GetAllBooksItemsByBookingId(3);
+           
 
 
-            var paymentUrl = paymentService.MakePayment(bookingItemRepo, 400, 3);
+            var paymentUrl = paymentService.MakePayment(bookingItemRepo, 400, 7);
 
             return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
         }

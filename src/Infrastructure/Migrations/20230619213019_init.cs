@@ -32,6 +32,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreditCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedById = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedById = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -57,12 +59,27 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentMethods",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentMethods", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ResourceTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Shown = table.Column<bool>(type: "bit", nullable: false),
+                    HasSchedual = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -81,6 +98,7 @@ namespace Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Active"),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -203,6 +221,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ResourceTypeId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
@@ -249,12 +268,13 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "Date", nullable: false),
-                    Time = table.Column<TimeSpan>(type: "Time", nullable: false),
-                    Duration = table.Column<TimeSpan>(type: "Time", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "Time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "Time", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Pending"),
                     ServiceId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -282,6 +302,7 @@ namespace Infrastructure.Migrations
                 {
                     ServiceId = table.Column<int>(type: "int", nullable: false),
                     ResourceTypeId = table.Column<int>(type: "int", nullable: false),
+                    NoOfResources = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -301,6 +322,35 @@ namespace Infrastructure.Migrations
                         principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourceReview",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ResourceId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Rating = table.Column<int>(type: "int", precision: 1, scale: 5, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceReview", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourceReview_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ResourceReview_Resource_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resource",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -384,27 +434,98 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ScheduleItem",
+                name: "paymentTransactions",
                 columns: table => new
                 {
-                    Day = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
-                    ScheduleId = table.Column<int>(type: "int", nullable: false),
-                    Available = table.Column<bool>(type: "bit", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClientBookingId = table.Column<int>(type: "int", nullable: false),
+                    PaymentMethodId = table.Column<int>(type: "int", nullable: false),
+                    TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Error = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ScheduleItem", x => new { x.Day, x.StartTime, x.EndTime });
+                    table.PrimaryKey("PK_paymentTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_paymentTransactions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_paymentTransactions_ClientBookings_ClientBookingId",
+                        column: x => x.ClientBookingId,
+                        principalTable: "ClientBookings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_paymentTransactions_PaymentMethods_PaymentMethodId",
+                        column: x => x.PaymentMethodId,
+                        principalTable: "PaymentMethods",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScheduleItem",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScheduleId = table.Column<int>(type: "int", nullable: false),
+                    Day = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "TIME", nullable: false),
+                    Shift = table.Column<bool>(type: "bit", nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScheduleItem", x => x.ID);
                     table.ForeignKey(
                         name: "FK_ScheduleItem_Schedule_ScheduleId",
                         column: x => x.ScheduleId,
                         principalTable: "Schedule",
                         principalColumn: "ScheduleID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourceSpecialCharacteristics",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TotalCapacity = table.Column<int>(type: "int", nullable: false),
+                    AvailableCapacity = table.Column<int>(type: "int", nullable: false),
+                    ScheduleID = table.Column<int>(type: "int", nullable: true),
+                    ResourceID = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceSpecialCharacteristics", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_ResourceSpecialCharacteristics_Resource_ResourceID",
+                        column: x => x.ResourceID,
+                        principalTable: "Resource",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ResourceSpecialCharacteristics_ScheduleItem_ScheduleID",
+                        column: x => x.ScheduleID,
+                        principalTable: "ScheduleItem",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateIndex(
@@ -447,13 +568,6 @@ namespace Infrastructure.Migrations
                 filter: "[Email] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_UserName",
-                table: "AspNetUsers",
-                column: "UserName",
-                unique: true,
-                filter: "[UserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -476,6 +590,22 @@ namespace Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_paymentTransactions_ClientBookingId",
+                table: "paymentTransactions",
+                column: "ClientBookingId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_paymentTransactions_PaymentMethodId",
+                table: "paymentTransactions",
+                column: "PaymentMethodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_paymentTransactions_UserId",
+                table: "paymentTransactions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Resource_ResourceTypeId",
                 table: "Resource",
                 column: "ResourceTypeId");
@@ -489,6 +619,29 @@ namespace Infrastructure.Migrations
                 name: "IX_ResourceMetadata_ResourceTypeId",
                 table: "ResourceMetadata",
                 column: "ResourceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceReview_ResourceId",
+                table: "ResourceReview",
+                column: "ResourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceReview_UserId",
+                table: "ResourceReview",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceSpecialCharacteristics_ResourceID",
+                table: "ResourceSpecialCharacteristics",
+                column: "ResourceID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceSpecialCharacteristics_ScheduleID",
+                table: "ResourceSpecialCharacteristics",
+                column: "ScheduleID",
+                unique: true,
+                filter: "[ScheduleID] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schedule_ResourceId",
@@ -528,10 +681,16 @@ namespace Infrastructure.Migrations
                 name: "BookingItems");
 
             migrationBuilder.DropTable(
+                name: "paymentTransactions");
+
+            migrationBuilder.DropTable(
                 name: "ResourceData");
 
             migrationBuilder.DropTable(
-                name: "ScheduleItem");
+                name: "ResourceReview");
+
+            migrationBuilder.DropTable(
+                name: "ResourceSpecialCharacteristics");
 
             migrationBuilder.DropTable(
                 name: "ServiceMetadata");
@@ -543,16 +702,22 @@ namespace Infrastructure.Migrations
                 name: "ClientBookings");
 
             migrationBuilder.DropTable(
+                name: "PaymentMethods");
+
+            migrationBuilder.DropTable(
                 name: "ResourceMetadata");
 
             migrationBuilder.DropTable(
-                name: "Schedule");
+                name: "ScheduleItem");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Services");
+
+            migrationBuilder.DropTable(
+                name: "Schedule");
 
             migrationBuilder.DropTable(
                 name: "Resource");
