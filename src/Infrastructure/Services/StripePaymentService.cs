@@ -10,6 +10,7 @@ using Infrastructure.Persistence.Repositories;
 
 using AutoMapper;
 using Infrastructure.Utility.Extensions;
+using Stripe;
 
 namespace Infrastructure.Services
 {
@@ -23,9 +24,32 @@ namespace Infrastructure.Services
         }
 
 
-        public Task<bool> CancelPayment(int bookingID)
+        public Task<bool> CancelPayment(string paymentID)
         {
-            throw new NotImplementedException();
+
+            var paymentIntentService = new PaymentIntentService();
+
+            var payment = paymentIntentService.Get(paymentID);
+
+
+            var options = new RefundCreateOptions
+            {
+                Charge = payment.LatestChargeId,
+            };
+            var service = new RefundService();
+
+            //TODO: handle exception for charge not found
+            // TODO: handle Stripe.StripeException: Charge ch_3NL2cjJSb1KZM6uY1LEycZmT has already been refunded.
+
+            var refund =  service.Create(options);
+
+
+
+            if (refund.Status == "succeeded")
+                return Task.FromResult(true);
+
+            return Task.FromResult(false);
+
         }
 
         public async Task<string> MakePayment(IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
@@ -33,7 +57,22 @@ namespace Infrastructure.Services
          
             // TODO: read all showable items, sum all material in one item, sum all items like cars in one item.
             // TODO: Case when booking items counts is 0
+
+
             var bookingItems = bookingItemRepo.GetAllBooksItemsByBookingId(bookingID);
+
+
+            ClientBooking clientBooking = null;
+            
+            if (bookingItems.Count <= 0) {
+                // TODO: add payment exception
+                throw new InvalidOperationException("no items in the bookings");
+            }
+
+            clientBooking = bookingItems[0].ClientBooking;
+
+            if (clientBooking.Status == BookingStatus.Confirmed)
+                throw new InvalidOperationException("This booking already paid and confirmed.");
 
             var sessionLineItemOptions = bookingItems.ToSessionLineItemOptionsObject();
 
@@ -45,6 +84,7 @@ namespace Infrastructure.Services
             var options = new SessionCreateOptions
             {
                 SuccessUrl = configuration["Stripe:SuccessUrl"],
+                CancelUrl = configuration["Stripe:SuccessUrl"],
                 LineItems = sessionLineItemOptions,
                 Mode = "payment",
                 ExpiresAt = DateTime.UtcNow.AddMinutes(30),
@@ -53,8 +93,8 @@ namespace Infrastructure.Services
 
                 // TODO: complete data for invoice
                // InvoiceCreation = new() { Enabled = true, InvoiceData = new() { Footer = "Swift Reserve Invoice"} },
-                Metadata = metadata
-                
+                Metadata = metadata,
+
             };
             var service = new SessionService();
             

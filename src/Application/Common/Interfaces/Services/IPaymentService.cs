@@ -11,7 +11,7 @@ namespace Application.Common.Interfaces.Services
     {
         public Task<string> MakePayment(IBookingItemRepo bookingItemRepo,decimal amount, int bookingID);
 
-        public Task<bool> CancelPayment(int bookingID);
+        public Task<bool> CancelPayment(string paymentID);
 
 
      //   public Task SetCustomerInfo(string name, string email, string address);

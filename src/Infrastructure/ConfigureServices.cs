@@ -44,6 +44,7 @@ namespace Infrastructure
             services.AddScoped<IPaymentService, StripePaymentService>();
             services.AddScoped<ApplicationDbContextInitializer>();
             services.AddScoped<IPayemntTransactionRepository, PaymentTransactionRepository>();
+            services.AddScoped<IBookingFlowRepo, BookingFlowRepository>();
 
             return services;
         }
