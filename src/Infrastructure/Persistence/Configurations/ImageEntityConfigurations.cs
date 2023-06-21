@@ -16,6 +16,14 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.Property(e => e.Uri)
                    .HasColumnType("nvarchar(2048)");
+            /* builde.Property("Discriminator")
+             .HasMaxLength(200);*/
+
+              builder.HasDiscriminator<string>("Discriminator")
+               .HasValue<ServiceImage>(nameof(ServiceImage))
+               .HasValue<ResourceTypeImage>(nameof(ResourceTypeImage))
+               .HasValue<ResourceImage>(nameof(ResourceImage));
+
         }
     }   
 }
