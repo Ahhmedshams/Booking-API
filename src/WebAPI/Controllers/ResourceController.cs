@@ -30,7 +30,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true , r=> r.Region);
+            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync();
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
