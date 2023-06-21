@@ -12,12 +12,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Application.Common.Interfaces.Repositories
 {
 
-    public interface IRegionRepository : IAsyncRepository<Region> 
+    public interface IRegionRepository : IAsyncRepository<Region>
     {
-        
-     
-        
-       
 
+       
     }
 }
