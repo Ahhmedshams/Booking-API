@@ -19,7 +19,7 @@ namespace Domain.Entities
         [ForeignKey("Region")]
         public int? RegionId { get; set; }
 
-        public Region Region { get; set; }
+        public Region? Region { get; set; }
 
     }
 }
