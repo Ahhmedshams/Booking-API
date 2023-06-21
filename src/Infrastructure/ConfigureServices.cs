@@ -37,9 +37,10 @@ namespace Infrastructure
             services.AddScoped<IServiceRepo, ServiceRepository>();
             services.AddScoped<IAccountRepository,AccountRepository>();
             services.AddScoped<IResourceReviewRepo, ResourceReviewRepository>();
+            services.AddScoped<IResourceSpecialCharacteristicsRepo, ResourceSpecialCharacteristicsRepository>();
             services.AddCors();
             services.AddScoped<ApplicationDbContextInitializer>();
-
+            
 
             return services;
         }
