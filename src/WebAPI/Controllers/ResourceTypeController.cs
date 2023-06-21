@@ -1,10 +1,12 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using AutoMapper;
 using CoreApiResponse;
+using Domain.Entities;
 using Infrastructure.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -14,11 +16,13 @@ namespace WebAPI.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IResourceTypeRepo _resourceTypeRepo;
+        private readonly UploadImage _uploadImage;
 
-        public ResourceTypeController(IMapper mapper, IResourceTypeRepo resourceTypeRepo)
+        public ResourceTypeController(IMapper mapper, IResourceTypeRepo resourceTypeRepo, UploadImage uploadImage)
         {
             _mapper = mapper;
             _resourceTypeRepo = resourceTypeRepo;
+            this._uploadImage = uploadImage;
         }
 
         [HttpGet]
@@ -48,17 +52,30 @@ namespace WebAPI.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Add(string Name)
+        public async Task<IActionResult> Add(ResourceTypeDTO resTypeDto)
         {
             if (!ModelState.IsValid) 
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-           var Result = await _resourceTypeRepo.IsExistAsync(Name);
+           var Result = await _resourceTypeRepo.IsExistAsync(resTypeDto.Name);
             if (Result)
                 return CustomResult("This Name already Exist", HttpStatusCode.BadRequest);
 
-            ResourceType resourceType = new() { Name = Name };
-             await _resourceTypeRepo.AddAsync(resourceType);
+            ResourceType resourceType = _mapper.Map<ResourceType>(resTypeDto);
+
+            if (resTypeDto.UploadedImages != null && resTypeDto.UploadedImages.Any())
+            {
+                var entityType = "ResourceTypeImage";
+                var images = await _uploadImage.UploadToCloud(resTypeDto.UploadedImages, entityType);
+
+                if (images != null && images.Any())
+                {
+                    var resourceTypeImages = images.OfType<ResourceTypeImage>().ToList();
+                    resourceType.Images = resourceTypeImages;
+                }
+            }
+            //esourceType resourceType = new() { Name = Name };
+            await _resourceTypeRepo.AddAsync(resourceType);
 
             return CreatedAtAction("GetById", new { id = resourceType.Id }, resourceType);
         }
