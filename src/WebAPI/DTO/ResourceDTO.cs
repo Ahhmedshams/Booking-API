@@ -7,7 +7,7 @@
         public string Name { get; set; }
         public Decimal Price { get; set; }
 
-        public int RegionId { get; set; }
+        public string RegionName { get; set; }
     }
 
     public class ResourceReqDTO
