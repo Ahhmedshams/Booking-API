@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,5 +15,11 @@ namespace Domain.Entities
         public Decimal Price { get; set; }
         public ResourceType ResourceType { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }
+
+        [ForeignKey("Region")]
+        public int? RegionId { get; set; }
+
+        public Region Region { get; set; }
+
     }
 }
