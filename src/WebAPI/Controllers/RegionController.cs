@@ -9,13 +9,13 @@ namespace WebAPI.Controllers
     [ApiController]
     public class RegionController : BaseController
     {
-       
+
         private readonly IRegionRepository _regionRepo;
         private readonly IMapper _mapper;
 
 
 
-        public RegionController( IRegionRepository regionRepository, IMapper mapper)
+        public RegionController(IRegionRepository regionRepository, IMapper mapper)
         {
             _regionRepo = regionRepository;
             _mapper = mapper;
@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
             return Ok(regionDto);
         }
 
-  
+
 
         [HttpPost]
         public async Task<IActionResult> Create(RegionDTO regionDto)
@@ -94,30 +94,31 @@ namespace WebAPI.Controllers
             return Ok(regionDto);
         }
 
-        //[HttpPut("{id}")]
+        [HttpPut("{id}")]
 
-        //public async Task<IActionResult> Update(int id, RegionDTO regionDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        public async Task<IActionResult> Update(int id, RegionDTO regionDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //    var regionToUpdate = await _regionRepo.GetByIdAsync(id);
+            var regionToUpdate = await _regionRepo.GetByIdAsync(id);
 
-        //    if (regionToUpdate == null)
-        //    {
-        //        return NotFound($"Region with ID {id} not found.");
-        //    }
+            if (regionToUpdate == null)
+            {
+                return NotFound($"Region with ID {id} not found.");
+            }
 
-        //    var region = _mapper.Map<Region>(regionDto);
-        //    await _regionRepo.UpdateRegion(region);
-        //    return Ok(region);
-        //}
+            var region = _mapper.Map<Region>(regionDto);
+
+            await _regionRepo.EditAsync( id , region, r => r.Id);
+            return Ok(region);
+        }
 
 
 
-        //[HttpPut("{id}")]
+        // [HttpPut("{id}")]
         //public async Task<IActionResult> Update(int id, Region region)
         //{
         //    if (!ModelState.IsValid)
