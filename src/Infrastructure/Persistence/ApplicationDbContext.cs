@@ -7,6 +7,7 @@ namespace Infrastructure.Persistence
 {
     public class ApplicationDbContext:IdentityDbContext<ApplicationUser>
     {
+      
         public ApplicationDbContext() { }
         public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<ResourceType>  ResourceTypes { get; set; }
@@ -20,6 +21,9 @@ namespace Infrastructure.Persistence
         public DbSet<PaymentTransaction> paymentTransactions { get; set; }
 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }    
+       
+        public DbSet<Region> Regions { get; set; }
+
         DbSet<Service> Services { get; set; }
         DbSet<ServiceMetadata> ServiceMetadata { get; set; }
         DbSet<BookingItem> BookingItems { get; set; }
