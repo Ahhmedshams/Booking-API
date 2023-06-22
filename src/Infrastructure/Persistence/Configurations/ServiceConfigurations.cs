@@ -9,7 +9,10 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.Property(s => s.Name)
                    .IsRequired();
-            builder.Property(s => s.Description)
+            builder.HasIndex(s => s.Name)
+                .IsUnique();
+
+			builder.Property(s => s.Description)
                    .IsRequired();
             builder.Property(s => s.Status)
                     .HasConversion<string>()
