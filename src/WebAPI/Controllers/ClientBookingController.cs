@@ -101,14 +101,14 @@ namespace WebAPI.Controllers
                 clientBooking2DTO.EndTime,
                 clientBooking2DTO.ResourceIDs);
             
-            if (bookingID==-1)
+            if (result==-1)
             {
                 return BadRequest("Invalid data entered");
             }
 
-            var booking = await clientBookingRepo.GetByIdAsync(bookingID);
+            var booking = await clientBookingRepo.GetByIdAsync(result);
 
-            var paymentUrl = paymentService.MakePayment(bookingItemRepo, booking?.TotalCost ?? 0, bookingID);
+            var paymentUrl = paymentService.MakePayment(bookingItemRepo, booking?.TotalCost ?? 0, result);
 
             return CustomResult("created", paymentUrl, HttpStatusCode.Created);
 
