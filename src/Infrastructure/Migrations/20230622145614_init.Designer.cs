@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230620110211_changeBookingStatus")]
-    partial class changeBookingStatus
+    [Migration("20230622145614_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,6 +113,40 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ClientBookings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ImageEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Uri")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ImageEntity");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
@@ -519,9 +553,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -806,6 +837,42 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceImage", b =>
+                {
+                    b.HasBaseType("Domain.Entities.ImageEntity");
+
+                    b.Property<int?>("ResourceId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ResourceId");
+
+                    b.HasDiscriminator().HasValue("ResourceImage");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResourceTypeImage", b =>
+                {
+                    b.HasBaseType("Domain.Entities.ImageEntity");
+
+                    b.Property<int?>("ResourceTypeId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ResourceTypeId");
+
+                    b.HasDiscriminator().HasValue("ResourceTypeImage");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ServiceImage", b =>
+                {
+                    b.HasBaseType("Domain.Entities.ImageEntity");
+
+                    b.Property<int?>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasDiscriminator().HasValue("ServiceImage");
+                });
+
             modelBuilder.Entity("Domain.Entities.BookingItem", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -1040,6 +1107,27 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceImage", b =>
+                {
+                    b.HasOne("Domain.Entities.Resource", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ResourceId");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResourceTypeImage", b =>
+                {
+                    b.HasOne("Domain.Entities.ResourceType", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ResourceTypeId");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ServiceImage", b =>
+                {
+                    b.HasOne("Domain.Entities.Service", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ServiceId");
+                });
+
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
                 {
                     b.Navigation("BookingItems");
@@ -1050,6 +1138,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("ResourceSpecialCharacteristics");
 
                     b.Navigation("Schedules");
@@ -1057,6 +1147,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Metadata");
                 });
 
@@ -1072,6 +1164,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Metadata");
                 });
 #pragma warning restore 612, 618
