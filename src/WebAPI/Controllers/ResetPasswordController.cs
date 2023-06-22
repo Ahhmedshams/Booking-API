@@ -1,5 +1,4 @@
-﻿using Infrastructure.Migrations;
-using Infrastructure.Persistence.Repositories;
+﻿using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Mvc;
 namespace WebAPI.Controllers
 {

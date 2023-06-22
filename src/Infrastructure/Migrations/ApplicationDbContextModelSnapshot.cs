@@ -50,7 +50,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("BookingItems");
+                    b.ToTable("BookingItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
@@ -109,7 +109,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ClientBookings");
+                    b.ToTable("ClientBookings", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
@@ -126,7 +126,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
@@ -183,7 +183,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("paymentTransactions");
+                    b.ToTable("paymentTransactions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ImageEntity", b =>
@@ -248,6 +248,9 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<int>("ResourceTypeId")
                         .HasColumnType("int");
 
@@ -255,7 +258,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource");
+                    b.ToTable("Resource", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -287,7 +290,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData");
+                    b.ToTable("ResourceData", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -326,7 +329,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata");
+                    b.ToTable("ResourceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceReview", b =>
@@ -371,7 +374,48 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ResourceReview");
+                    b.ToTable("ResourceReview", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("AvailableCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ResourceID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ScheduleID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalCapacity")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ResourceID")
+                        .IsUnique();
+
+                    b.HasIndex("ScheduleID")
+                        .IsUnique()
+                        .HasFilter("[ScheduleID] IS NOT NULL");
+
+                    b.ToTable("ResourceSpecialCharacteristics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -408,7 +452,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ResourceTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -441,22 +485,16 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("Schedule");
+                    b.ToTable("Schedule", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.Property<int>("ScheduleId")
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Day")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("TIME");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("TIME");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<bool>("Available")
                         .ValueGeneratedOnAdd()
@@ -468,6 +506,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<DateTime>("Day")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("TIME");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -476,12 +520,20 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Shift")
                         .HasColumnType("bit");
 
-                    b.HasKey("ScheduleId", "Day", "StartTime", "EndTime");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("TIME");
 
-                    b.ToTable("ScheduleItem");
+                    b.HasKey("ID");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("ScheduleItem", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
@@ -521,7 +573,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -552,7 +604,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ServiceMetadata");
+                    b.ToTable("ServiceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
@@ -946,6 +998,23 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
+                {
+                    b.HasOne("Domain.Entities.Resource", "Resource")
+                        .WithOne("ResourceSpecialCharacteristics")
+                        .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ResourceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.ScheduleItem", "scheduleItem")
+                        .WithOne("ResourceSpecialCharacteristics")
+                        .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ScheduleID");
+
+                    b.Navigation("Resource");
+
+                    b.Navigation("scheduleItem");
+                });
+
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.HasOne("Domain.Entities.Resource", "Resource")
@@ -1069,6 +1138,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
+                    b.Navigation("ResourceSpecialCharacteristics");
+
                     b.Navigation("Images");
 
                     b.Navigation("Schedules");
@@ -1084,6 +1155,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.Navigation("ScheduleItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
+                {
+                    b.Navigation("ResourceSpecialCharacteristics");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>

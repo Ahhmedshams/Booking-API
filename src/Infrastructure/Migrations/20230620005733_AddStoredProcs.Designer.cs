@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230619151925_payment")]
-    partial class payment
+    [Migration("20230620005733_AddStoredProcs")]
+    partial class AddStoredProcs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -343,6 +343,47 @@ namespace Infrastructure.Migrations
                     b.ToTable("ResourceReview");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("AvailableCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ResourceID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ScheduleID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalCapacity")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ResourceID")
+                        .IsUnique();
+
+                    b.HasIndex("ScheduleID")
+                        .IsUnique()
+                        .HasFilter("[ScheduleID] IS NOT NULL");
+
+                    b.ToTable("ResourceSpecialCharacteristics");
+                });
+
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
                 {
                     b.Property<int>("Id")
@@ -415,17 +456,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.Property<int>("ScheduleId")
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Day")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("TIME");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("TIME");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<bool>("Available")
                         .ValueGeneratedOnAdd()
@@ -437,6 +472,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<DateTime>("Day")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("TIME");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -445,10 +486,18 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Shift")
                         .HasColumnType("bit");
 
-                    b.HasKey("ScheduleId", "Day", "StartTime", "EndTime");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("TIME");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ScheduleId");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -882,6 +931,23 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
+                {
+                    b.HasOne("Domain.Entities.Resource", "Resource")
+                        .WithOne("ResourceSpecialCharacteristics")
+                        .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ResourceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.ScheduleItem", "scheduleItem")
+                        .WithOne("ResourceSpecialCharacteristics")
+                        .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ScheduleID");
+
+                    b.Navigation("Resource");
+
+                    b.Navigation("scheduleItem");
+                });
+
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.HasOne("Domain.Entities.Resource", "Resource")
@@ -984,6 +1050,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
+                    b.Navigation("ResourceSpecialCharacteristics");
+
                     b.Navigation("Schedules");
                 });
 
@@ -995,6 +1063,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.Navigation("ScheduleItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
+                {
+                    b.Navigation("ResourceSpecialCharacteristics");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>

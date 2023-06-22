@@ -6,6 +6,8 @@ namespace Application.Common.Interfaces.Repositories
     public interface IBookingItemRepo: IAsyncRepository<BookingItem>
     {
         Task<IEnumerable<BookingItem>> GetAllBooksWithSpec(ISpecification<BookingItem> spec);
+        List<BookingItem> GetAllBooksItemsByBookingId(int bookingID);
+
         Task<IEnumerable<dynamic>> TopResourcesReport(DateTime startDate , DateTime endDate, int number);
         Task<IEnumerable<dynamic>> ResourceTypeBookingsReport(DateTime startDate , DateTime endDate);
         Task<IEnumerable<dynamic>> ResTypeSoldPerMonthReport(DateTime startDate , DateTime endDate);
@@ -18,6 +20,8 @@ namespace Application.Common.Interfaces.Repositories
         Task<bool> IsClientBookExis(int bookId);
         Task<bool> IsResourecExist(int resId);
         Task<bool> CheckDuplicateKey(int bookId, int resId);
+
+
 
     }
 }

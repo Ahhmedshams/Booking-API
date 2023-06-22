@@ -5,6 +5,7 @@ using System.Net;
 using Infrastructure.Persistence.Specification.ClientBookingSpec;
 using Infrastructure.Persistence.Specification;
 using WebAPI.DTO;
+using Application.Common.Interfaces.Services;
 
 namespace WebAPI.Controllers
 {
@@ -14,12 +15,17 @@ namespace WebAPI.Controllers
     {
         private readonly IClientBookingRepo clientBookingRepo;
         private readonly IMapper mapper;
+        private readonly IPaymentService paymentService;
+        private readonly IBookingItemRepo bookingItemRepo;
+
 
         public ClientBookingController(IClientBookingRepo _clientBookingRepo,
-                                        IMapper _mapper)
+                                        IMapper _mapper, IPaymentService paymentService, IBookingItemRepo bookingItemRepo)
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
+            this.paymentService=paymentService;
+            this.bookingItemRepo=bookingItemRepo;
         }
 
         [HttpGet]
@@ -82,6 +88,31 @@ namespace WebAPI.Controllers
                 return CustomResult($"No Client's Book found for this Id {id}", HttpStatusCode.NotFound);
             await clientBookingRepo.DeleteAsync(id);
             return CustomResult(HttpStatusCode.NoContent);
+        }
+        [HttpPost("CreateNewBooking")]
+        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO)
+        {
+            var result = await clientBookingRepo.CreateNewBooking
+                (clientBooking2DTO.UserID,
+                clientBooking2DTO.Date,
+                clientBooking2DTO.ServiceID,
+                clientBooking2DTO.Location,
+                clientBooking2DTO.StartTime,
+                clientBooking2DTO.EndTime,
+                clientBooking2DTO.ResourceIDs);
+            
+            if (result==-1)
+            {
+                return BadRequest("Invalid data entered");
+            }
+
+            var booking = await clientBookingRepo.GetByIdAsync(result);
+
+            var paymentUrl = paymentService.MakePayment(bookingItemRepo, booking?.TotalCost ?? 0, result);
+
+            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
+
+
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230619073003_Review")]
-    partial class Review
+    [Migration("20230620110211_changeBookingStatus")]
+    partial class changeBookingStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,6 +113,80 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ClientBookings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethods");
+                });
+
+            modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ClientBookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientBookingId")
+                        .IsUnique();
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("paymentTransactions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
@@ -269,6 +343,47 @@ namespace Infrastructure.Migrations
                     b.ToTable("ResourceReview");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("AvailableCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ResourceID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ScheduleID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalCapacity")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ResourceID")
+                        .IsUnique();
+
+                    b.HasIndex("ScheduleID")
+                        .IsUnique()
+                        .HasFilter("[ScheduleID] IS NOT NULL");
+
+                    b.ToTable("ResourceSpecialCharacteristics");
+                });
+
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
                 {
                     b.Property<int>("Id")
@@ -341,17 +456,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
                 {
-                    b.Property<int>("ScheduleId")
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Day")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("TIME");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("TIME");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<bool>("Available")
                         .ValueGeneratedOnAdd()
@@ -363,6 +472,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<DateTime>("Day")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("TIME");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -371,10 +486,18 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Shift")
                         .HasColumnType("bit");
 
-                    b.HasKey("ScheduleId", "Day", "StartTime", "EndTime");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("TIME");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ScheduleId");
 
                     b.ToTable("ScheduleItem");
                 });
@@ -721,6 +844,33 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
+                        .WithOne("paymentTransaction")
+                        .HasForeignKey("Domain.Entities.PaymentTransaction", "ClientBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Identity.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ClientBooking");
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
@@ -779,6 +929,23 @@ namespace Infrastructure.Migrations
                     b.Navigation("Resource");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
+                {
+                    b.HasOne("Domain.Entities.Resource", "Resource")
+                        .WithOne("ResourceSpecialCharacteristics")
+                        .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ResourceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.ScheduleItem", "scheduleItem")
+                        .WithOne("ResourceSpecialCharacteristics")
+                        .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ScheduleID");
+
+                    b.Navigation("Resource");
+
+                    b.Navigation("scheduleItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -876,10 +1043,15 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
                 {
                     b.Navigation("BookingItems");
+
+                    b.Navigation("paymentTransaction")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
+                    b.Navigation("ResourceSpecialCharacteristics");
+
                     b.Navigation("Schedules");
                 });
 
@@ -891,6 +1063,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.Navigation("ScheduleItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
+                {
+                    b.Navigation("ResourceSpecialCharacteristics");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>

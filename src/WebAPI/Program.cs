@@ -12,10 +12,16 @@ using Infrastructure.Identity.EmailSettings;
 using Azure.Storage.Blobs;
 using Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
+using Stripe;
+using Application.Common.Interfaces.Services;
+using Infrastructure.Services;
 
 using Domain.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
+using Sieve.Models;
+using Sieve.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace WebAPI
 {
@@ -69,6 +75,11 @@ namespace WebAPI
             builder.Services.AddScoped<IMailService, MailService>();
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
+            //builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
+            //builder.Services.Configure<SieveOptions>(builder.Configuration.GetSection("Sieve"));
+
+
+
             #region AzureUpload
             builder.Services.AddSingleton(e => new BlobServiceClient(builder.Configuration["AzureStorage:ConnectionString"]));
             builder.Services.AddSingleton(e => e.GetRequiredService<BlobServiceClient>().GetBlobContainerClient(builder.Configuration["AzureStorage:ImageContainer"]));
@@ -85,14 +96,8 @@ namespace WebAPI
 
             builder.Services.Configure<IdentityOptions>(opt =>
             {
-                /*opt.Password.RequireDigit = false;
-                 opt.Password.RequireLowercase = false;
-                 opt.Password.RequireUppercase = false;
-                 opt.Password.RequireNonAlphanumeric = false;
-                 opt.Password.RequiredLength = 8;*/
                 opt.User.RequireUniqueEmail = true;
                 opt.SignIn.RequireConfirmedEmail = true;
-                //opt.Password.RequiredUniqueChars = 1;
             });
             builder.Services.AddAuthentication(options =>
             {
@@ -125,8 +130,12 @@ namespace WebAPI
             });
 
 
+
             /*            builder.Services.AddAuthentication();*/
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
 
             var app = builder.Build();
 
@@ -136,12 +145,12 @@ namespace WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
 
-                //using (var scope = app.Services.CreateScope())
-                //{
-                //    var initializaer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
-                //    await initializaer.InitailizeAsync();
-                //    await initializaer.SeedAsync();
-                //}
+                using (var scope = app.Services.CreateScope())
+                {
+                    var initializaer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+                    await initializaer.InitailizeAsync();
+                    await initializaer.SeedAsync();
+                }
 
             }
 
