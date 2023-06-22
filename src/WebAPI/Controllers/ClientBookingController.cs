@@ -84,9 +84,9 @@ namespace WebAPI.Controllers
             return CustomResult(HttpStatusCode.NoContent);
         }
         [HttpPost("CreateNewBooking")]
-        public async Task<IActionResult> CreateNewBooking (ClientBooking2DTO clientBooking2DTO)
+        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO)
         {
-            int result = await clientBookingRepo.CreateNewBooking
+            var result = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
                 clientBooking2DTO.ServiceID,

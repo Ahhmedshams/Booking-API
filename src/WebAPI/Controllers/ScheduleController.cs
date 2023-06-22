@@ -1,10 +1,15 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Models;
 using AutoMapper;
 using CoreApiResponse;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -17,20 +22,27 @@ namespace WebAPI.Controllers
         private readonly IMapper mapper;
         private readonly IScheduleRepo scheduleRepo;
 
-        public ScheduleController(IMapper mapper, IScheduleRepo scheduleRepo)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+
+        public ScheduleController(IMapper mapper, IScheduleRepo scheduleRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             this.mapper = mapper;
             this.scheduleRepo = scheduleRepo;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value; 
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<Schedule> resource = scheduleRepo.GetAll();
             if (resource.Count() == 0)
                 return CustomResult("No Schedule Are Available", HttpStatusCode.NotFound);
 
-            return CustomResult(resource);
+            var FilteredSchedules = _sieveProcessor.Apply(sieveModel, resource.AsQueryable());
+
+            return CustomResult(FilteredSchedules);
         }
 
         [HttpPost("Add")]
@@ -45,26 +57,56 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetSchedules")]
-        public IActionResult GetSchedulesByDateRange(DateTime fromDate, DateTime toDate)
+        public IActionResult GetSchedulesByDateRange(DateTime fromDate, DateTime toDate, [FromQuery] SieveModel sieveModel)
         {
-            var schedules = scheduleRepo.GetSchedules(fromDate, toDate);
-            return CustomResult(schedules);
+            var schedules = scheduleRepo.GetSchedules(fromDate, toDate, sieveModel);
+
+            var FilteredSchedules = _sieveProcessor.Apply<Application.Common.Models.AvailableSchedule>(sieveModel, schedules.AsQueryable());
+
+            return CustomResult(FilteredSchedules);
         }
 
-        [HttpGet("GetAvailableResources")]
-        public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime)
-        {
-            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime,_endTime);
 
-            if(availableResources == null)
+        [HttpGet("GetAvailableResources")]
+        public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel)
+        {
+            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel);
+            var FilteredAvailableResources = _sieveProcessor.Apply<Resource>(sieveModel, availableResources.AsQueryable());
+
+            if (availableResources == null)
             {
                 return Ok(new List<Resource>()); // Return an empty array
             }
             else
             {
-                return Ok(availableResources);
+                return Ok(FilteredAvailableResources);
             }
         }
+        //[HttpGet("GetAvailableResources")]
+        //public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel)
+        //{
+        //    var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel);
+        //    var filteredAvailableResources = _sieveProcessor.Apply<Resource>(sieveModel, availableResources.AsQueryable());
+
+        //    if (filteredAvailableResources == null)
+        //    {
+        //        return Ok(new List<ResourceWithDataDTO>()); 
+        //    }
+        //    else
+        //    {
+        //        var resourceDTOs = filteredAvailableResources.Select(r => new ResourceWithDataDTO
+        //        {
+        //            ResourceTypeId = r.ResourceTypeId,
+        //            Price = r.Price,
+        //            Name = r.Name                   
+        //        }).ToList();
+
+        //        return Ok(resourceDTOs);
+        //    }
+        //}
+
+
+
 
         [HttpGet("{resourceId:int}")]
         public IActionResult GetByResourceId(int resourceId)

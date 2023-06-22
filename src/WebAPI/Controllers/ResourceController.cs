@@ -4,6 +4,9 @@ using CoreApiResponse;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -18,37 +21,46 @@ namespace WebAPI.Controllers
         private readonly IResourceDataRepo _resourceDataRepo;
         private readonly IResourceMetadataRepo _resourceMetadataRepo;
 
-        public ResourceController(IMapper mapper, IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo, IResourceDataRepo resourceDataRepo, IResourceMetadataRepo resourceMetadataRepo)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+
+        public ResourceController(IMapper mapper, IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo, IResourceDataRepo resourceDataRepo, IResourceMetadataRepo resourceMetadataRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             _mapper = mapper;
             _resourceRepo = resourceRepo;
             _resourceTypeRepo = resourceTypeRepo;
             _resourceDataRepo = resourceDataRepo;
             _resourceMetadataRepo = resourceMetadataRepo;
+
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value; // Access the value of SieveOptions from IOptions<T>
+
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync();
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
+            IQueryable<ResourceRespDTO>? FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
 
-            return CustomResult(resourceDTO);
+
+            return CustomResult(FilteredSchedules);
         }
 
         [HttpGet("ResourceType/{id:int}")]
-        public async Task<IActionResult> GetAllByResourceType(int id)
+        public async Task<IActionResult> GetAllByResourceType(int id, [FromQuery] SieveModel sieveModel)
         {
             IEnumerable<Resource> resource =  _resourceRepo.Find(e=>e.ResourceTypeId==id);
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
-
-            return CustomResult(resourceDTO);
+            var FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
+            return CustomResult(FilteredSchedules);
         }
 
         [HttpGet("{id:int}")]

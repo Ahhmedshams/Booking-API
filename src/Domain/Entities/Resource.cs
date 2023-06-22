@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Sieve.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,7 +13,11 @@ namespace Domain.Entities
     {
         public int Id { get; set; } 
         public int ResourceTypeId { get; set; }
+
+        [Sieve(CanFilter = true, CanSort = true)]
         public string Name { get; set; }
+
+        [Sieve(CanFilter = true, CanSort = true)]
         public Decimal Price { get; set; }
 
         public ResourceType ResourceType { get; set; }

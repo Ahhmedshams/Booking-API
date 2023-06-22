@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Domain.Common;
 using Microsoft.EntityFrameworkCore;
+using Sieve.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

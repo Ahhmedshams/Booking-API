@@ -1,4 +1,5 @@
 ﻿using Application.Common.Models;
+using Sieve.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Application.Common.Interfaces.Repositories
         bool IsExist(int id);
         Schedule AddSchedule(Schedule schedule);
 
-        List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate);
-        public List<Resource> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime);
+        List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate, SieveModel sieveModel);
+        public List<Resource> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime, SieveModel sieveModel);
     }
 }
