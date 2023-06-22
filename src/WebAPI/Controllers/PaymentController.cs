@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
 using CoreApiResponse;
+using Infrastructure.Factories;
 using Infrastructure.Persistence.Specification.BookingItemSpec;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,14 @@ namespace WebAPI.Controllers
     [ApiController]
     public class PaymentController : BaseController
     {
+        private readonly PaymentFactory paymentFactory;
         private readonly IPaymentService paymentService;
         private readonly IPayemntTransactionRepository payemntTransactionRepository;
         private readonly IBookingItemRepo bookingItemRepo;
 
-        public PaymentController(IPaymentService paymentService, IPayemntTransactionRepository payemntTransactionRepository, IBookingItemRepo bookingItemRepo)
+        public PaymentController(PaymentFactory paymentFactory,IPaymentService paymentService, IPayemntTransactionRepository payemntTransactionRepository, IBookingItemRepo bookingItemRepo)
         {
+            this.paymentFactory=paymentFactory;
             this.paymentService=paymentService;
             this.payemntTransactionRepository=payemntTransactionRepository;
             this.bookingItemRepo=bookingItemRepo;
@@ -24,12 +27,11 @@ namespace WebAPI.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Checkout()
+        public async Task<IActionResult> Checkout(string paymentType)
         {
-           
 
-
-            var paymentUrl = paymentService.MakePayment(bookingItemRepo, 400, 2);
+            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
+            var paymentUrl = service.MakePayment(bookingItemRepo, 400, 2);
 
             return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
         }

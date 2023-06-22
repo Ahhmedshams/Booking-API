@@ -133,12 +133,12 @@ namespace WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
 
-                //using (var scope = app.Services.CreateScope())
-                //{
-                //    var initializaer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
-                //    await initializaer.InitailizeAsync();
-                //    await initializaer.SeedAsync();
-                //}
+                using (var scope = app.Services.CreateScope())
+                {
+                    var initializaer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+                    await initializaer.InitailizeAsync();
+                    await initializaer.SeedAsync();
+                }
 
             }
 

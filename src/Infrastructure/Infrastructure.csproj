@@ -20,6 +20,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
+    <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="Stripe.net" Version="41.20.0" />
   </ItemGroup>
 

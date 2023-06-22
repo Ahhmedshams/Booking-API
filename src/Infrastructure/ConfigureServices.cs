@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
 using Domain.Identity;
+using Infrastructure.Factories;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
@@ -41,10 +42,19 @@ namespace Infrastructure
             services.AddScoped<IResourceReviewRepo, ResourceReviewRepository>();
             services.AddCors();
             services.AddScoped<IServiceRepo, ServiceRepository>();
+
             services.AddScoped<IPaymentService, StripePaymentService>();
+            services.AddScoped<IPaymentService, PaypalPaymentService>();
+
+            services.AddScoped<StripePaymentService, StripePaymentService>();
+            services.AddScoped<PaypalPaymentService, PaypalPaymentService>();
+
             services.AddScoped<ApplicationDbContextInitializer>();
             services.AddScoped<IPayemntTransactionRepository, PaymentTransactionRepository>();
             services.AddScoped<IBookingFlowRepo, BookingFlowRepository>();
+
+
+            services.AddSingleton<PaymentFactory>();
 
             return services;
         }
