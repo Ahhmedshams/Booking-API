@@ -30,7 +30,7 @@ namespace Infrastructure.Identity.EmailSettings
 
                 using (SmtpClient MailClient = new SmtpClient())
                 {
-                    MailClient.Connect(MailSettings.Server, MailSettings.Port, SecureSocketOptions.StartTls);
+                    MailClient.Connect(MailSettings.Server, MailSettings.Port, SecureSocketOptions.SslOnConnect);
                     MailClient.Timeout = 6000;
                     MailClient.Authenticate(MailSettings.UserName, MailSettings.Password);
                     MailClient.Send(EmailMessage);
