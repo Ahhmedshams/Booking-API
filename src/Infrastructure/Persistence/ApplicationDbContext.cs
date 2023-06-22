@@ -18,6 +18,10 @@ namespace Infrastructure.Persistence
         public DbSet<ResourceReview> ResourceReview { get; set; }
 
         public DbSet<PaymentTransaction> paymentTransactions { get; set; }
+        public DbSet<ImageEntity> Images { get; set; }
+        public DbSet<ServiceImage> ServiceImages { get; set; }
+        public DbSet<ResourceTypeImage> ResourceTypeImages { get; set; }
+        public DbSet<ResourceImage> ResourceImages { get; set; }
 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }    
         DbSet<Service> Services { get; set; }

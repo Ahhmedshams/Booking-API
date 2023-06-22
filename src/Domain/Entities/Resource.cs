@@ -22,6 +22,8 @@ namespace Domain.Entities
 
         public ResourceType ResourceType { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }
+
+        public ICollection<ResourceImage> Images { get; set; }
         public ResourceSpecialCharacteristics? ResourceSpecialCharacteristics { get; set; }
     }
 }
