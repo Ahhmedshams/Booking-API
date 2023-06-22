@@ -14,17 +14,19 @@ namespace Domain.Entities
         [Range(1, int.MaxValue, ErrorMessage = "TotalCapacity must be at least 1.")]
         public  int TotalCapacity { get; set; }
 
+        private int _availableCapacity;
         public int AvailableCapacity
         {
-            get 
-            { 
-                return this.AvailableCapacity; 
+            get
+            {
+                return _availableCapacity;
             }
             set
             {
-                AvailableCapacity = Math.Min(Math.Max(value, 0), TotalCapacity);
+                _availableCapacity = Math.Min(Math.Max(value, 0), TotalCapacity);
             }
         }
+
         [ForeignKey("scheduleItem")]
         public int? ScheduleID { get; set; }
 
@@ -36,7 +38,6 @@ namespace Domain.Entities
         public ResourceSpecialCharacteristics()
         {
             AvailableCapacity = TotalCapacity;
-
         }
     }
 

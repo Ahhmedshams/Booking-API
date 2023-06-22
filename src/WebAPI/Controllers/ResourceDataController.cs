@@ -1,7 +1,11 @@
 ﻿using Application.Common.Model;
 using AutoMapper;
 using CoreApiResponse;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -15,22 +19,29 @@ namespace WebAPI.Controllers
         private readonly IResourceRepo _resourceRepo;
         private readonly IResourceMetadataRepo _resourceMetadataRepo;
 
-        public ResourceDataController(IMapper mapper, IResourceDataRepo resourceDataRepo, IResourceRepo resourceRepo, IResourceMetadataRepo resourceMetadataRepo)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+
+        public ResourceDataController(IMapper mapper, IResourceDataRepo resourceDataRepo, IResourceRepo resourceRepo, IResourceMetadataRepo resourceMetadataRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             _mapper = mapper;
             _resourceDataRepo = resourceDataRepo;
             _resourceRepo = resourceRepo;
             _resourceMetadataRepo = resourceMetadataRepo;
+
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel)
         {
             var Result = await _resourceDataRepo.GetAllData();
             if (Result.Count() == 0)
                 return CustomResult("No Resource Data Are Available ", HttpStatusCode.NotFound);
 
-            return CustomResult(Result);
+            var FilteredResource = _sieveProcessor.Apply(sieveModel, Result.AsQueryable());
+            return CustomResult(FilteredResource);
 
         }
        

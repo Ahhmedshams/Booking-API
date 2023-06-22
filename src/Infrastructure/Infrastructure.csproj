@@ -22,6 +22,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
     <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="Stripe.net" Version="41.20.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+    <PackageReference Include="Sieve" Version="2.5.5" />
   </ItemGroup>
 
   <ItemGroup>

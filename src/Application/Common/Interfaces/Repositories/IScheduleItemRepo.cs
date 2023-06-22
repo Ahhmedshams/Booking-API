@@ -12,7 +12,7 @@ namespace Application.Common.Interfaces.Repositories
         IEnumerable<ScheduleItem> AddRange(IEnumerable<ScheduleItem> entities);
         Task<ScheduleItem> FindAsync(int scheduleId,DateTime day, TimeOnly startTime, TimeOnly endTime);
         bool IsExist(int id, DateTime Day, TimeOnly startTime, TimeOnly endTime);
-        bool IsExistWithId(int id);
+        bool IsExistWithId(int? id);
         ScheduleItem Delete(int id, DateTime day, TimeOnly startTime, TimeOnly endTime);
     }
 }

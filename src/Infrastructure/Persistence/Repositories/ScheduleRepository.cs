@@ -1,6 +1,8 @@
 ﻿using Application.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Sieve.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Infrastructure.Persistence.Repositories
@@ -34,7 +36,7 @@ namespace Infrastructure.Persistence.Repositories
             return ("Schedule Deleted");
         }
 
-        public List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate)
+        public List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate,SieveModel sieveModel)
         {
             var schedules = _context.Schedule
                 .Where(s => s.FromDate >= fromDate && s.ToDate <= toDate)
@@ -67,7 +69,7 @@ namespace Infrastructure.Persistence.Repositories
             }
             return null;
         }
-        public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime)
+        public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime, SieveModel sieveModel)
         {
            
                 var day = _day;
