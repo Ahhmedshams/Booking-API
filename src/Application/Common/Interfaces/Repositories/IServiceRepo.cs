@@ -9,5 +9,6 @@ namespace Application.Common.Interfaces.Repositories
         Task<IEnumerable<Service>> GetAllServicesWithSpec(ISpecification<Service> spec);
         Task<Service> GetServiceByIdWithSpec(ISpecification<Service> spec);
         Task DeleteSoft(int id);
+        Task<IEnumerable<Service>> ServicesByRegion(int RegionId);
     }
 }

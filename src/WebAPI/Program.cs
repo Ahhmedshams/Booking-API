@@ -67,11 +67,7 @@ namespace WebAPI
         }
     });
             });
-
-            
-
             builder.Services.AddInfrastructureServices(builder.Configuration);
-
             builder.Services.AddScoped<IMailService, MailService>();
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
@@ -85,6 +81,7 @@ namespace WebAPI
             builder.Services.AddSingleton(e => e.GetRequiredService<BlobServiceClient>().GetBlobContainerClient(builder.Configuration["AzureStorage:ImageContainer"]));
             builder.Services.AddSingleton<UploadImage>();
             #endregion
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
             {

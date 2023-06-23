@@ -58,6 +58,9 @@ namespace Infrastructure
             services.AddScoped<IServiceRepo, ServiceRepository>();
             services.AddScoped<IAccountRepository,AccountRepository>();
             services.AddScoped<IResourceReviewRepo, ResourceReviewRepository>();
+            services.AddScoped<IRegionRepository, RegionRepository>();
+            services.AddScoped<IFAQRepo, FAQRepository>();
+            services.AddScoped<IFAQCategoryRepo, FAQCategoryRepository>();
             services.AddScoped<IResourceSpecialCharacteristicsRepo, ResourceSpecialCharacteristicsRepository>();
             services.AddCors();
             services.AddScoped<IServiceRepo, ServiceRepository>();
