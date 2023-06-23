@@ -7,6 +7,7 @@ using Infrastructure.Persistence.Specification;
 using WebAPI.DTO;
 using Application.Common.Interfaces.Services;
 using Infrastructure.Factories;
+using Domain.Enums;
 
 namespace WebAPI.Controllers
 {
@@ -93,6 +94,23 @@ namespace WebAPI.Controllers
         [HttpPost("CreateNewBooking")]
         public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO,[FromQuery] string paymentType)
         {
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+           
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
             var result = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
