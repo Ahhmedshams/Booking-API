@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
             if(resourceSpecialCharacteristicsDTO.ScheduleID != null)
             {
                 var scheduleItemID = _scheduleItemRepo.IsExistWithId(resourceSpecialCharacteristicsDTO?.ScheduleID);
-                if (scheduleItemID)
+                if (!scheduleItemID)
                     return StatusCode((int)HttpStatusCode.NotFound, $"No schedule item id is Available With id {resourceSpecialCharacteristicsDTO.ScheduleID}");
             }
 
