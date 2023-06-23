@@ -2,6 +2,7 @@
 using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -30,14 +31,14 @@ namespace WebAPI.Controllers
             }
 
             var regions = await _regionRepo.GetAllAsync();
-            var regionDtos = _mapper.Map<IEnumerable<RegionDTO>>(regions);
+            var regionDtos = _mapper.Map<IEnumerable<RegionGetDTO>>(regions);
 
             if (regionDtos == null || !regionDtos.Any())
             {
                 return NotFound("No regions found.");
             }
 
-            return Ok(regionDtos);
+            return CustomResult(regionDtos);
         }
 
 
@@ -57,14 +58,14 @@ namespace WebAPI.Controllers
                 return NotFound($"Region with ID {id} not found.");
             }
 
-            var regionDto = _mapper.Map<RegionDTO>(region);
-            return Ok(regionDto);
+            var regionDto = _mapper.Map<RegionGetDTO>(region);
+            return CustomResult(regionDto);
         }
 
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(RegionDTO regionDto)
+        public async Task<IActionResult> Create(RegionAddDTO regionDto)
         {
             if (!ModelState.IsValid)
             {
@@ -74,8 +75,8 @@ namespace WebAPI.Controllers
             var region = _mapper.Map<Region>(regionDto);
             await _regionRepo.AddAsync(region);
 
-            var createdRegionDto = _mapper.Map<RegionDTO>(region);
-            return Ok(createdRegionDto);
+            var createdRegionDto = _mapper.Map<RegionGetDTO>(region);
+            return CustomResult(createdRegionDto);
         }
 
 
@@ -90,13 +91,13 @@ namespace WebAPI.Controllers
                 return NotFound($"Region with ID {id} not found.");
             }
 
-            var regionDto = _mapper.Map<RegionDTO>(deletedRegion);
-            return Ok(regionDto);
+            var regionDto = _mapper.Map<RegionGetDTO>(deletedRegion);
+            return CustomResult(regionDto);
         }
 
         [HttpPut("{id}")]
 
-        public async Task<IActionResult> Update(int id, RegionDTO regionDto)
+        public async Task<IActionResult> Update(int id, RegionAddDTO regionDto)
         {
             if (!ModelState.IsValid)
             {
@@ -113,7 +114,7 @@ namespace WebAPI.Controllers
             var region = _mapper.Map<Region>(regionDto);
 
             await _regionRepo.EditAsync( id , region, r => r.Id);
-            return Ok(region);
+            return CustomResult(region);
         }
 
 

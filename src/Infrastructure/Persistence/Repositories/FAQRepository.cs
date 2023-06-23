@@ -8,8 +8,12 @@ namespace Infrastructure.Persistence.Repositories
         public FAQRepository(ApplicationDbContext context) : base(context)
         {}
         public async Task<FAQ>FindByQuestion(string question)
-        {
-             return await _context.FAQ.FirstOrDefaultAsync(x => x.Question == question.Trim());
-        }
+         => await _context.FAQ.FirstOrDefaultAsync(x => x.Question == question.Trim());
+        
+        public async Task<bool> CategoryExits(int categoryId)
+        => await _context.Set<FAQCategory>().AnyAsync(e=>e.Id==categoryId);
+        
+        
+        
     }
 }

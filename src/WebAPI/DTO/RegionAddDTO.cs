@@ -1,8 +1,7 @@
 ﻿namespace WebAPI.DTO
 {
-    public class RegionGetDTO
+    public class RegionAddDTO
     {
-        public int Id { get; set; }
         public string Name { get; set; }
 
     }

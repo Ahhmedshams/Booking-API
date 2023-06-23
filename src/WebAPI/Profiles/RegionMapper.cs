@@ -6,8 +6,8 @@ namespace WebAPI.Profiles
         public RegionMapper()
         {
            
-            CreateMap<RegionDTO, Region>().ReverseMap();
-            CreateMap<Region, RegionDTO>().ReverseMap();
+            CreateMap<RegionAddDTO, Region>().ReverseMap();
+            CreateMap<Region, RegionGetDTO>().ReverseMap();
 
         }
     }

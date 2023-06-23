@@ -3,6 +3,7 @@ using AutoMapper;
 using CoreApiResponse;
 using Infrastructure.Persistence.Specification.ServiceSpec;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -72,6 +73,14 @@ namespace WebAPI.Controllers
                 return CustomResult($"No Service Found For This Id {id}", HttpStatusCode.NotFound);
             await serviceRepo.DeleteSoft(id);
             return CustomResult(HttpStatusCode.NoContent);
+        }
+
+        [HttpGet("region/{RegionId:int}")]
+        public async Task<IActionResult> GetServicesByRegion(int RegionId)
+        {
+            var service = await serviceRepo.ServicesByRegion(RegionId);
+            return CustomResult(mapper.Map<List<ServiceRegionDTO>>(service));
+
         }
 
     }

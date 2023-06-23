@@ -18,6 +18,7 @@ namespace Infrastructure.Persistence
         public DbSet<ScheduleItem> ScheduleItem { get; set; }
         public DbSet<ResourceReview> ResourceReview { get; set; }
         public DbSet<FAQ> FAQ { get; set; }
+        public DbSet<FAQCategory> FAQCategory { get; set; }
 
         public DbSet<PaymentTransaction> paymentTransactions { get; set; }
 

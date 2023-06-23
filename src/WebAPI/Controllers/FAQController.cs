@@ -51,13 +51,15 @@ namespace WebAPI.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Add(FAQDTO faq)
+        public async Task<IActionResult> Add(FAQAddDTO faq)
         {
             try
             {
-                if (!ModelState.IsValid) return CustomResult(ModelState, HttpStatusCode.BadRequest); ;
+                if (!ModelState.IsValid) return CustomResult(ModelState, HttpStatusCode.BadRequest);
                 var faqExists = await _faqRepo.FindByQuestion(faq.Question);
-                if (faqExists.Id!=0) return BadRequest("This Question Already Exists");
+                if (faqExists!=null) return BadRequest("This Question Already Exists");
+                var categoryExists = await _faqRepo.CategoryExits(faq.FAQCategoryId);
+                if(!categoryExists) return BadRequest("This Category Doesn't Exists");
                 var result = await _faqRepo.AddAsync(_mapper.Map<FAQ>(faq));
                 return CustomResult(result);
             }
@@ -82,7 +84,7 @@ namespace WebAPI.Controllers
             }
         }
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id,FAQDTO faq)
+        public async Task<IActionResult> Update(int id,FAQAddDTO faq)
         {
             if (id == 0) return BadRequest();
             if (!ModelState.IsValid) return CustomResult(ModelState, HttpStatusCode.BadRequest);

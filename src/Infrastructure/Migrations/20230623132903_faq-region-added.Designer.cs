@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230621000223_faq")]
-    partial class faq
+    [Migration("20230623132903_faq-region-added")]
+    partial class faqregionadded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,10 +128,17 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("FAQCategoryId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -142,7 +149,35 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FAQCategoryId");
+
                     b.ToTable("FAQ");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FAQCategory");
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
@@ -219,6 +254,32 @@ namespace Infrastructure.Migrations
                     b.ToTable("paymentTransactions");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Region", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Regions");
+                });
+
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
                     b.Property<int>("Id")
@@ -247,10 +308,15 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<int?>("RegionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ResourceTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RegionId");
 
                     b.HasIndex("ResourceTypeId");
 
@@ -825,6 +891,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.FAQ", b =>
+                {
+                    b.HasOne("Domain.Entities.FAQCategory", "FAQCategory")
+                        .WithMany("FAQS")
+                        .HasForeignKey("FAQCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FAQCategory");
+                });
+
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -854,11 +931,17 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
+                    b.HasOne("Domain.Entities.Region", "Region")
+                        .WithMany("Resources")
+                        .HasForeignKey("RegionId");
+
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
                         .WithMany()
                         .HasForeignKey("ResourceTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Region");
 
                     b.Navigation("ResourceType");
                 });
@@ -1010,6 +1093,16 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("paymentTransaction")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
+                {
+                    b.Navigation("FAQS");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Region", b =>
+                {
+                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using WebAPI.DTO;
 
 namespace WebAPI.Profiles
 {
@@ -6,7 +7,8 @@ namespace WebAPI.Profiles
     {
         public FAQMapper()
         {
-            CreateMap<FAQ, FAQDTO>().ReverseMap();
+            CreateMap<FAQ, FAQAddDTO>().ReverseMap();
+            CreateMap<FAQ, FAQGetDTO>().ReverseMap();
         }
     }
 }
