@@ -21,10 +21,6 @@ namespace Infrastructure.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(e => e.ResourceTypeId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasOne(r => r.ResourceRegion)
-                .WithOne(r => r.Resource)
-                .HasForeignKey<ResourceRegion>(r => r.ResourceId);
             
             builder.Property(e => e.Price).HasColumnType("decimal(5,2)");
             builder.HasQueryFilter(r => r.IsDeleted == false);

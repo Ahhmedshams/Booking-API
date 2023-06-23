@@ -13,7 +13,6 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int ResourceRegionId { get; set; }
-        public ICollection<ResourceRegion> ResourceRegions { get; set; }
+        public List<Resource> Resources { get; set; }
     }
 }

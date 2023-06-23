@@ -272,9 +272,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ResourceRegionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Regions");
@@ -315,6 +312,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RegionId");
 
                     b.HasIndex("ResourceTypeId");
 
@@ -390,24 +389,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ResourceTypeId");
 
                     b.ToTable("ResourceMetadata");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ResourceRegion", b =>
-                {
-                    b.Property<int>("ResourceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RegionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ResourceId", "RegionId");
-
-                    b.HasIndex("RegionId");
-
-                    b.HasIndex("ResourceId")
-                        .IsUnique();
-
-                    b.ToTable("ResourceRegion");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceReview", b =>
@@ -957,6 +938,8 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.Navigation("Region");
+
                     b.Navigation("ResourceType");
                 });
 
@@ -988,25 +971,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ResourceType");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ResourceRegion", b =>
-                {
-                    b.HasOne("Domain.Entities.Region", "Region")
-                        .WithMany("ResourceRegions")
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Resource", "Resource")
-                        .WithOne("ResourceRegion")
-                        .HasForeignKey("Domain.Entities.ResourceRegion", "ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Region");
-
-                    b.Navigation("Resource");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceReview", b =>
@@ -1135,13 +1099,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Region", b =>
                 {
-                    b.Navigation("ResourceRegions");
+                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
-                    b.Navigation("ResourceRegion");
-
                     b.Navigation("Schedules");
                 });
 
