@@ -31,7 +31,7 @@ namespace WebAPI.Controllers
         {
 
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
-            var paymentUrl = service.MakePayment(bookingItemRepo, 400, 2);
+            var paymentUrl = service.MakePayment(bookingItemRepo, 400, 1);
 
             return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
         }
