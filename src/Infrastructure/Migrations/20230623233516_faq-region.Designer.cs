@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230623220932_faq-region")]
+    [Migration("20230623233516_faq-region")]
     partial class faqregion
     {
         /// <inheritdoc />
@@ -1050,8 +1050,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
-                    b.HasOne("Domain.Entities.Region", "Region")
-                        .WithMany("Resources")
+                    b.HasOne("Domain.Entities.Region", null)
+                        .WithMany()
                         .HasForeignKey("RegionId");
 
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
@@ -1059,8 +1059,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ResourceTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Region");
 
                     b.Navigation("ResourceType");
                 });
@@ -1255,11 +1253,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
                 {
                     b.Navigation("FAQS");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Region", b =>
-                {
-                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
