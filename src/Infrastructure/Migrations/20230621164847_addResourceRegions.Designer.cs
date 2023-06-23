@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230621164847_addResourceRegions")]
+    partial class addResourceRegions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,17 +128,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<int>("FAQCategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -146,35 +142,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FAQCategoryId");
-
                     b.ToTable("FAQ");
-                });
-
-            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FAQCategory");
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
@@ -308,7 +276,7 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(5,2)");
 
-                    b.Property<int?>("RegionId")
+                    b.Property<int?>("ResourceRegionId")
                         .HasColumnType("int");
 
                     b.Property<int>("ResourceTypeId")
@@ -907,17 +875,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FAQ", b =>
-                {
-                    b.HasOne("Domain.Entities.FAQCategory", "FAQCategory")
-                        .WithMany("FAQS")
-                        .HasForeignKey("FAQCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FAQCategory");
-                });
-
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -947,10 +904,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
-                    b.HasOne("Domain.Entities.Region", "Region")
-                        .WithMany("Resources")
-                        .HasForeignKey("RegionId");
-
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
                         .WithMany()
                         .HasForeignKey("ResourceTypeId")
@@ -1126,11 +1079,6 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("paymentTransaction")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
-                {
-                    b.Navigation("FAQS");
                 });
 
             modelBuilder.Entity("Domain.Entities.Region", b =>

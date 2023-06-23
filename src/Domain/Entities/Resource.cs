@@ -16,10 +16,9 @@ namespace Domain.Entities
         public ResourceType ResourceType { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }
 
-        [ForeignKey("Region")]
-        public int? RegionId { get; set; }
+        public int? ResourceRegionId { set; get; }
+        public ResourceRegion? ResourceRegion { get; set; }
 
-        public Region? Region { get; set; }
 
     }
 }
