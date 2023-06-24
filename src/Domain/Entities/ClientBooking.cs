@@ -10,7 +10,8 @@ namespace Domain.Entities
         Confirmed,
         Cancelled,
         Pending,
-        Completed
+        Completed,
+        InProcess
     }
 
     public class ClientBooking: BaseEntity

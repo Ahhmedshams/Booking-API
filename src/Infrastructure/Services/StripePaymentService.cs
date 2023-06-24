@@ -23,8 +23,13 @@ namespace Infrastructure.Services
             this.configuration=configuration;
         }
 
+        //public Task<bool> CancelPayment(string paymentID)
+        //{
+        //    return Task.FromResult(false);
 
-        public Task<bool> CancelPayment(string paymentID)
+        //}
+
+        public Task<bool> RefundPayment(string paymentID)
         {
 
             var paymentIntentService = new PaymentIntentService();

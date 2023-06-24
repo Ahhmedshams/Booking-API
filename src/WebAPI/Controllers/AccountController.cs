@@ -182,7 +182,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpGet("{Id:Guid}")]
+        [HttpGet("{id:Guid}")]
         public async Task<IActionResult> GetById(string? id)
         {
             if (id == null)

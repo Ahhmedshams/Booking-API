@@ -19,14 +19,16 @@ namespace WebAPI.Controllers
         private readonly IConfiguration configuration;
         private readonly IPayemntTransactionRepository payemntTransactionRepository;
         private readonly IBookingFlowRepo bookingFlowRepo;
+        private readonly IClientBookingRepo clientBookingRepo;
 
         public WebhookController(IConfiguration configuration,
             IPayemntTransactionRepository payemntTransactionRepository,
-            IBookingFlowRepo bookingFlowRepo)
+            IBookingFlowRepo bookingFlowRepo, IClientBookingRepo clientBookingRepo)
         {
             this.configuration=configuration;
             this.payemntTransactionRepository=payemntTransactionRepository;
             this.bookingFlowRepo=bookingFlowRepo;
+            this.clientBookingRepo=clientBookingRepo;
         }
 
 
@@ -42,13 +44,14 @@ namespace WebAPI.Controllers
             {
                 var stripeEvent = EventUtility.ConstructEvent(json,
                     Request.Headers["Stripe-Signature"], configuration["Stripe:WebhookSigningKey"], throwOnApiVersionMismatch: false);
+                var session = (Session)stripeEvent.Data.Object;
+                var metadata = session.Metadata;
+                int bookingid = int.Parse(metadata["bookingID"]);
 
                 switch (stripeEvent.Type)
                 {
                     case Events.CheckoutSessionCompleted:
-                        var session = (Session)stripeEvent.Data.Object;
-                        var metadata = session.Metadata;
-                        int bookingid = int.Parse(metadata["bookingID"]);
+                       
 
                         var payementTransaction = new PaymentTransaction()
                         {
@@ -69,6 +72,10 @@ namespace WebAPI.Controllers
 
                         break;
                     case Events.CheckoutSessionExpired:
+                        await clientBookingRepo.CancelBooking(bookingid);
+                        Console.BackgroundColor = ConsoleColor.Blue;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\n\nCheckoutSessionExpired: cancelled booking.\n\n");
                         break;
 
                     case Events.RefundCreated: break;
@@ -154,13 +161,47 @@ namespace WebAPI.Controllers
 
             var payment = new Payment() { id = PaymentId };
 
-            
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
             try
             {
                 Payment executedPayment = executedPayment = payment.Execute(paypalApi, paymentExecution);
                 if (executedPayment.state == "approved")
                 {
-                    return Redirect(configuration["Paypal:SuccessUrl"]);
+                    //TODO: execute many times when fails
+
+                    var payementTransaction = new PaymentTransaction()
+                    {
+                        ClientBookingId = bookingID,
+                        Amount = decimal.Parse(executedPayment.transactions.First().amount.total),
+                        UserId = booking.UserId,
+                        TransactionId = PaymentId,
+                        PaymentMethodId = (int) PaymentMethodType.Paypal
+                        ,
+                        Status = PaymentStatus.Successful
+                    };
+
+                    await payemntTransactionRepository.AddAsync(payementTransaction);
+
+                    bookingFlowRepo.ChangeStatusToConfirmed(bookingID);
+
+                    return Redirect(configuration["Paypal:SuccessUrlClient"]);
+
+                }else if (executedPayment.state == "fails")
+                {
+                    var payementTransaction = new PaymentTransaction()
+                    {
+                        ClientBookingId = bookingID,
+                        Amount = decimal.Parse(executedPayment.transactions.First().amount.total),
+                        UserId = booking.UserId,
+                        TransactionId = PaymentId,
+                        PaymentMethodId = (int)PaymentMethodType.Paypal
+                        ,
+                        Status = PaymentStatus.Failed
+                    };
+
+                    await payemntTransactionRepository.AddAsync(payementTransaction);
+
+                    //TODO:  should i cancel the booking or redirect the user the another paypal payment.
                 }
 
             }
@@ -169,7 +210,7 @@ namespace WebAPI.Controllers
                 // "Transaction is declined due to compliance violation."
             }
 
-            return CustomResult("failed");
+            return CustomResult("failed", HttpStatusCode.BadRequest);
         }
         
 
