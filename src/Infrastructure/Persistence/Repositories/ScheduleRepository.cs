@@ -69,7 +69,7 @@ namespace Infrastructure.Persistence.Repositories
             }
             return null;
         }
-        public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime, SieveModel sieveModel)
+        public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime, SieveModel sieveModel, int? regionId = null)
         {
            
                 var day = _day;
@@ -78,11 +78,12 @@ namespace Infrastructure.Persistence.Repositories
                 int serviceId = _serviceId;
 
                 var results = _context.Resource
-                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4",
+                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4,@RegionId",
                         new SqlParameter("@param1", day),
                         new SqlParameter("@param2", serviceId),
                         new SqlParameter("@param3", startTime),
-                        new SqlParameter("@param4", endTime)
+                        new SqlParameter("@param4", endTime),
+                        new SqlParameter("@RegionId", regionId)
                         )
                       .IgnoreQueryFilters()
                       .ToList();
@@ -92,7 +93,7 @@ namespace Infrastructure.Persistence.Repositories
             }
             else
             {
-                return null;
+                return new List<Resource>();
             }
         }
 

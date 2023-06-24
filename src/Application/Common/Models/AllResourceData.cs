@@ -10,6 +10,7 @@
         public string ResourceTypeName { get; set; }
         public double AverageRating { get; set; }
         public int NumRatings { get; set; }
+        public ICollection<ResourceImage> Images { get; set; }
 
         public List<Attribute> Attributes { get; set; } = new List<Attribute>();
     }

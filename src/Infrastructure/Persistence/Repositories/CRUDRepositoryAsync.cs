@@ -31,6 +31,7 @@ namespace Infrastructure.Persistence.Repositories
             }
             if (withNoTracking == true) 
                 query.AsNoTracking();
+            query = query.Where(x => !x.IsDeleted);
 
             return await query.ToListAsync();
         }

@@ -1,4 +1,5 @@
-﻿using Stripe.BillingPortal;
+﻿using PayPal.Api;
+using Stripe.BillingPortal;
 using Stripe.Checkout;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,20 @@ namespace Infrastructure.Utility.Extensions
             }
 
             return sessionLineItemOptions;
+        }
+
+        public static ItemList ToPaypalItemsList(this List<BookingItem> bookingItems)
+        {
+            List<Item> items = new List<Item>();
+
+            foreach(var bookingItem in bookingItems)
+            {
+                var item = new Item() { currency = "USD", name = bookingItem.Resource.Name, price = bookingItem.Price.ToString(), quantity = "1"};
+
+                items.Add(item);
+            }
+
+            return new ItemList() { items = items};
         }
     }
 }

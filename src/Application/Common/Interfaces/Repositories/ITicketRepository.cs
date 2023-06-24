@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Common.Interfaces.Repositories
 {
-    public interface IPayemntTransactionRepository: IAsyncRepository<PaymentTransaction>
+    public class ITicketRepository 
     {
-        Task Refund(int paymentTransactionID);
+        public ITicketRepository() { }
+
     }
 }

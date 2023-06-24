@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230624030930_TicketsCreate")]
+    partial class TicketsCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("BookingItems", (string)null);
+                    b.ToTable("BookingItems");
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
@@ -109,72 +112,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ClientBookings", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.FAQ", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Answer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<int>("FAQCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FAQCategoryId");
-
-                    b.ToTable("FAQ", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FAQCategory", (string)null);
+                    b.ToTable("ClientBookings");
                 });
 
             modelBuilder.Entity("Domain.Entities.ImageEntity", b =>
@@ -204,7 +142,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("ImageEntity");
 
@@ -225,7 +163,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods", (string)null);
+                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
@@ -282,33 +220,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("paymentTransactions", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Region", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("paymentTransactions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
@@ -339,19 +251,14 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(5,2)");
 
-                    b.Property<int?>("RegionId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ResourceTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RegionId");
-
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource", (string)null);
+                    b.ToTable("Resource");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -383,7 +290,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData", (string)null);
+                    b.ToTable("ResourceData");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -422,7 +329,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata", (string)null);
+                    b.ToTable("ResourceMetadata");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceReview", b =>
@@ -467,7 +374,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ResourceReview", (string)null);
+                    b.ToTable("ResourceReview");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
@@ -508,7 +415,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ScheduleID] IS NOT NULL");
 
-                    b.ToTable("ResourceSpecialCharacteristics", (string)null);
+                    b.ToTable("ResourceSpecialCharacteristics");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -545,7 +452,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes", (string)null);
+                    b.ToTable("ResourceTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -578,7 +485,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("Schedule", (string)null);
+                    b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
@@ -626,7 +533,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("ScheduleItem", (string)null);
+                    b.ToTable("ScheduleItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
@@ -656,7 +563,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -666,10 +573,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -700,7 +604,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ServiceMetadata", (string)null);
+                    b.ToTable("ServiceMetadata");
                 });
 
             modelBuilder.Entity("Domain.Entities.Ticket", b =>
@@ -1040,17 +944,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FAQ", b =>
-                {
-                    b.HasOne("Domain.Entities.FAQCategory", "FAQCategory")
-                        .WithMany("FAQS")
-                        .HasForeignKey("FAQCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FAQCategory");
-                });
-
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -1080,10 +973,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
-                    b.HasOne("Domain.Entities.Region", null)
-                        .WithMany()
-                        .HasForeignKey("RegionId");
-
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
                         .WithMany()
                         .HasForeignKey("ResourceTypeId")
@@ -1287,11 +1176,6 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("paymentTransaction")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
-                {
-                    b.Navigation("FAQS");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
