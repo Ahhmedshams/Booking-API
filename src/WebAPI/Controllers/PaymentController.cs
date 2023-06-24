@@ -1,11 +1,13 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Services;
 using CoreApiResponse;
+using Domain.Enums;
 using Infrastructure.Factories;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Specification.BookingItemSpec;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace WebAPI.Controllers
 {
@@ -27,17 +29,41 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Checkout(string paymentType)
+        [HttpPost("checkout/{bookingID:int}")]
+        public async Task<IActionResult> Checkout(string paymentType, int bookingID)
         {
 
-            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
-            var paymentUrl = service.MakePayment(bookingItemRepo, 400, 1);
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
 
-            return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking == null)
+                return CustomResult("No booking with this id", HttpStatusCode.NotFound);
+
+
+            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
+
+            var paymentUrl = service.MakePayment(bookingItemRepo, booking.TotalCost, bookingID);
+
+            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
         }
 
-        [HttpPost("refund")]
+        [HttpPost("refund/{bookingID:int}")]
         public async Task<IActionResult> Refund(int bookingID)
         {
             var booking = await clientBookingRepo.GetBookingById(bookingID);

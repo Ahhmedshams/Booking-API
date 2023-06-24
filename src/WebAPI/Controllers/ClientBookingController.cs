@@ -91,6 +91,8 @@ namespace WebAPI.Controllers
             await clientBookingRepo.DeleteAsync(id);
             return CustomResult(HttpStatusCode.NoContent);
         }
+
+
         [HttpPost("CreateNewBooking")]
         public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO,[FromQuery] string paymentType)
         {
@@ -132,7 +134,7 @@ namespace WebAPI.Controllers
             var paymentUrl = await service.MakePayment(bookingItemRepo, booking.TotalCost, result);
 
 
-            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
+            return CustomResult("Payment session successfully created.", new { Result = paymentUrl }, HttpStatusCode.Created);
 
 
         }
