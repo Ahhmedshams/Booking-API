@@ -52,9 +52,11 @@ namespace Infrastructure.Persistence.Repositories
         }
         public async Task<IEnumerable<Service>> ServicesByRegion(int RegionId)
         {
-            return await _context.Set<Service>()
+            var result =  _context.Set<Service>()
                     .FromSqlRaw("EXEC FindMatchingServiceId @RegionId",
-                        new SqlParameter("@RegionId", RegionId)).ToListAsync();
+                    new SqlParameter("@RegionId", RegionId)).IgnoreQueryFilters().ToList();
+
+            return result;
             
         }
     }

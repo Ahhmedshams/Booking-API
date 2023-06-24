@@ -22,6 +22,9 @@ using Microsoft.OpenApi.Models;
 using Sieve.Models;
 using Sieve.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Newtonsoft.Json.Converters;
 
 namespace WebAPI
 {
@@ -34,7 +37,11 @@ namespace WebAPI
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
            
             builder.Services.AddRazorPages();
             builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
@@ -67,6 +74,15 @@ namespace WebAPI
         }
     });
             });
+
+
+
+            
+
+
+
+
+  
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddScoped<IMailService, MailService>();
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));

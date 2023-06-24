@@ -26,6 +26,9 @@ namespace Infrastructure.Persistence
         public DbSet<ServiceImage> ServiceImages { get; set; }
         public DbSet<ResourceTypeImage> ResourceTypeImages { get; set; }
         public DbSet<ResourceImage> ResourceImages { get; set; }
+
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }    
+        public DbSet<Ticket> Tickets { get; set; }       
         public DbSet<PaymentMethod> PaymentMethods { get; set; }          
         public DbSet<Region> Regions { get; set; }
         DbSet<Service> Services { get; set; }
