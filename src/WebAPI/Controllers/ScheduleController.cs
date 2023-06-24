@@ -86,9 +86,13 @@ namespace WebAPI.Controllers
                 //    Name = r.Name,
                 //    Images = r.Images,
                 //}).ToList();
-                //var responseAvailableResources = mapper.Map<List<AllResourceData>>(availableResources);               
+                //var responseAvailableResources = mapper.Map<List<AllResourceData>>(availableResources);
                 IQueryable<Resource>? FilteredAvailableResources = _sieveProcessor.Apply<Resource>(sieveModel, availableResources.AsQueryable());
-                return CustomResult(FilteredAvailableResources);
+
+                var availableRess = mapper.Map<List<ResourceRespDTO>>(FilteredAvailableResources);
+                
+                
+                return CustomResult(availableRess);
             }
         }
      
