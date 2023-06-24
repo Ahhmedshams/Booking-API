@@ -42,8 +42,8 @@ namespace WebAPI.Controllers
                 return Ok(Enumerable.Empty<ResourceSpecialCharacteristics>());
             }
             List<ResourceSpecialCharacteristics> resourceSpecialCharacteristics1 = _mapper.Map<List<ResourceSpecialCharacteristics>>(resourceSpecialCharacteristics);
-
-            return Ok(resourceSpecialCharacteristics1);
+            return CustomResult(resourceSpecialCharacteristics1);
+           
         }
 
         [HttpGet("{id:int}")]
@@ -55,7 +55,7 @@ namespace WebAPI.Controllers
                 return StatusCode((int)HttpStatusCode.NotFound, $"No Resource Type Are Available With id {id}");
             }
 
-            return Ok(resourceSpecialCharacteristics);
+            return CustomResult(resourceSpecialCharacteristics);
         }
 
         [HttpPost]
@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
             if(resourceSpecialCharacteristicsDTO.ScheduleID != null)
             {
                 var scheduleItemID = _scheduleItemRepo.IsExistWithId(resourceSpecialCharacteristicsDTO?.ScheduleID);
-                if (scheduleItemID)
+                if (!scheduleItemID)
                     return StatusCode((int)HttpStatusCode.NotFound, $"No schedule item id is Available With id {resourceSpecialCharacteristicsDTO.ScheduleID}");
             }
 
@@ -97,5 +97,16 @@ namespace WebAPI.Controllers
             }
             return BadRequest("All Data Required");
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] int id)
+        {
+            var result =  _resourceSpecialCharacteristicsRepository.GetById(id);
+            if (result == null)
+                return CustomResult($"No RSC Found For This Id {id}", HttpStatusCode.NotFound);
+            await _resourceSpecialCharacteristicsRepository.DeleteSoft(id);
+            return CustomResult(HttpStatusCode.NoContent);
+        }
+
     }
 }

@@ -19,10 +19,10 @@ namespace Domain.Entities
 
         [Sieve(CanFilter = true, CanSort = true)]
         public Decimal Price { get; set; }
-
         public ResourceType ResourceType { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }
-
+        public int? RegionId { set; get; }
+        public Region? Region { get; set; }
         public ICollection<ResourceImage> Images { get; set; }
         public ResourceSpecialCharacteristics? ResourceSpecialCharacteristics { get; set; }
     }

@@ -15,6 +15,7 @@ namespace Infrastructure.Persistence.Specification
             {
                 foreach(var criteria in spec.Criteria)
                 {
+                    query = query.Where(x => x.IsDeleted == false);
                     query = query.Where(criteria);
                 }
             }

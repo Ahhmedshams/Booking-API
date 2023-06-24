@@ -50,7 +50,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("BookingItems");
+                    b.ToTable("BookingItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
@@ -109,7 +109,72 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ClientBookings");
+                    b.ToTable("ClientBookings", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.FAQ", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("FAQCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FAQCategoryId");
+
+                    b.ToTable("FAQ", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FAQCategory", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ImageEntity", b =>
@@ -139,7 +204,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("ImageEntity");
 
@@ -160,7 +225,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
@@ -217,7 +282,33 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("paymentTransactions");
+                    b.ToTable("paymentTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Region", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Regions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
@@ -248,14 +339,19 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<int?>("RegionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ResourceTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RegionId");
+
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource");
+                    b.ToTable("Resource", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -287,7 +383,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData");
+                    b.ToTable("ResourceData", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -326,7 +422,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata");
+                    b.ToTable("ResourceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceReview", b =>
@@ -371,7 +467,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ResourceReview");
+                    b.ToTable("ResourceReview", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
@@ -412,7 +508,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ScheduleID] IS NOT NULL");
 
-                    b.ToTable("ResourceSpecialCharacteristics");
+                    b.ToTable("ResourceSpecialCharacteristics", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -449,7 +545,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ResourceTypes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -482,7 +578,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("Schedule");
+                    b.ToTable("Schedule", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
@@ -530,7 +626,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("ScheduleItem");
+                    b.ToTable("ScheduleItem", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
@@ -560,7 +656,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -570,7 +666,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Services");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -601,7 +700,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ServiceMetadata");
+                    b.ToTable("ServiceMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Ticket", b =>
@@ -941,6 +1040,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.FAQ", b =>
+                {
+                    b.HasOne("Domain.Entities.FAQCategory", "FAQCategory")
+                        .WithMany("FAQS")
+                        .HasForeignKey("FAQCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FAQCategory");
+                });
+
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -970,6 +1080,10 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
+                    b.HasOne("Domain.Entities.Region", null)
+                        .WithMany()
+                        .HasForeignKey("RegionId");
+
                     b.HasOne("Domain.Entities.ResourceType", "ResourceType")
                         .WithMany()
                         .HasForeignKey("ResourceTypeId")
@@ -1173,6 +1287,11 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("paymentTransaction")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
+                {
+                    b.Navigation("FAQS");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>

@@ -20,7 +20,6 @@ namespace Infrastructure.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(e => e.ResourceId);
 
-            builder.HasQueryFilter(r => r.IsDeleted == false);
 
         }
     }

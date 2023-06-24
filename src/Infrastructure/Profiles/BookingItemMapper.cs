@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PayPal.Api;
 using Stripe.Checkout;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,14 @@ namespace Infrastructure.Profiles
                 new SessionLineItemPriceDataOptions 
                 { Currency = "egp", UnitAmountDecimal = src.Price, ProductData = new() { Name = "Name" } }))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => 1));
-                 //.ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
-                 //.ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.CourseName))
-                 //.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
-                 //.ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Du
+
+
+            CreateMap<BookingItem, Transaction>()
+                //.ForMember(dest => dest.amount, opt => opt.MapFrom(src => new Amount() { total = src.Price.ToString(), currency = "USD"}))
+                //.ForMember(dest => dest.amount, opt => opt.MapFrom(src => new Amount() { total = src.Price.ToString(), currency = "USD"}))
+
+                .ForMember(dest => dest.description, opt => opt.MapFrom(src => src.Resource.Name));
+
         }
     }
 }

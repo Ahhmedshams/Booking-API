@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Sieve.Models;
 using Sieve.Services;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
 using WebAPI.DTO;
 
 namespace WebAPI.Controllers
@@ -24,11 +25,10 @@ namespace WebAPI.Controllers
         private readonly UploadImage _uploadImage;
         private readonly ISieveProcessor _sieveProcessor;
         private readonly SieveOptions _sieveOptions;
+        private readonly IRegionRepository _regionRepo;
 
-      
-       
 
-        public ResourceController(IMapper mapper, IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo, IResourceDataRepo resourceDataRepo, IResourceMetadataRepo resourceMetadataRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions, UploadImage uploadImage)
+        public ResourceController(IMapper mapper, IResourceRepo resourceRepo, IResourceTypeRepo resourceTypeRepo, IResourceDataRepo resourceDataRepo, IResourceMetadataRepo resourceMetadataRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions, UploadImage uploadImage, IRegionRepository regionRepo)
         {
             _mapper = mapper;
             _resourceRepo = resourceRepo;
@@ -40,12 +40,13 @@ namespace WebAPI.Controllers
             _sieveOptions = sieveOptions?.Value; // Access the value of SieveOptions from IOptions<T>
 
             _uploadImage = uploadImage;
+            _regionRepo = regionRepo;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
-            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync();
+            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region);
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
@@ -59,19 +60,21 @@ namespace WebAPI.Controllers
         [HttpGet("ResourceType/{id:int}")]
         public async Task<IActionResult> GetAllByResourceType(int id, [FromQuery] SieveModel sieveModel)
         {
+
+            // Include Region
             IEnumerable<Resource> resource =  _resourceRepo.Find(e=>e.ResourceTypeId==id);
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
-            var FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
+            var FilteredSchedules = _sieveProcessor.Apply(sieveModel, resourceDTO.AsQueryable());
             return CustomResult(FilteredSchedules);
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            Resource resource = await _resourceRepo.GetByIdAsync(id);
+            Resource resource = await _resourceRepo.GetByIdAsync(id,e=>e.Region);
             if (resource == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
@@ -85,6 +88,12 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
+
+            if (resourceDTO.RegionId!=null)
+            {
+                var RegionExists = await CheckRegionExists(resourceDTO.RegionId ?? default(int));
+                if (!RegionExists) return CustomResult("Region Doesn't Exists",HttpStatusCode.NotFound);
+            }
 
             var ResoureceType = await _resourceTypeRepo.IsExistAsync(resourceDTO.ResourceTypeId);
             if (!ResoureceType)
@@ -118,6 +127,12 @@ namespace WebAPI.Controllers
             if (!ResoureceType)
                 return CustomResult($"No Resource Type Are Available With id {ResourceWithDataDTO.ResourceTypeId}", HttpStatusCode.BadRequest);
 
+            if (ResourceWithDataDTO.RegionId != null)
+            {
+                var RegionExists = await CheckRegionExists(ResourceWithDataDTO.RegionId ?? default(int));
+                if (!RegionExists) return CustomResult("Region Doesn't Exists", HttpStatusCode.NotFound);
+            }
+
 
             var resource = _mapper.Map<Resource>(ResourceWithDataDTO);
             var result = await _resourceRepo.AddAsync(resource);
@@ -138,8 +153,9 @@ namespace WebAPI.Controllers
 
 
         [HttpPut("{id:int}")]
-        public IActionResult Edit(int id,[FromBody] Decimal price)
+        public IActionResult Edit(int id,[FromBody] Decimal price,int? RegionId)
         {
+            // Where the rest of the edit?
             if (price <= 0)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
@@ -233,6 +249,13 @@ namespace WebAPI.Controllers
             }
 
             return null;
+        }
+        private async Task<bool> CheckRegionExists(int RegionId)
+        {
+            if (RegionId == 0) return false;
+            var result = await _regionRepo.GetByIdAsync(RegionId);
+            if (result == null) return false;
+            return true;
         }
     }
 }
