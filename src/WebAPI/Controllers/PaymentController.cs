@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Services;
 using CoreApiResponse;
 using Infrastructure.Factories;
+using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Specification.BookingItemSpec;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +14,15 @@ namespace WebAPI.Controllers
     public class PaymentController : BaseController
     {
         private readonly PaymentFactory paymentFactory;
-        private readonly IPaymentService paymentService;
         private readonly IPayemntTransactionRepository payemntTransactionRepository;
+        private readonly IClientBookingRepo clientBookingRepo;
         private readonly IBookingItemRepo bookingItemRepo;
 
-        public PaymentController(PaymentFactory paymentFactory,IPaymentService paymentService, IPayemntTransactionRepository payemntTransactionRepository, IBookingItemRepo bookingItemRepo)
+        public PaymentController(PaymentFactory paymentFactory, IPayemntTransactionRepository payemntTransactionRepository, IClientBookingRepo clientBookingRepo ,IBookingItemRepo bookingItemRepo)
         {
             this.paymentFactory=paymentFactory;
-            this.paymentService=paymentService;
             this.payemntTransactionRepository=payemntTransactionRepository;
+            this.clientBookingRepo=clientBookingRepo;
             this.bookingItemRepo=bookingItemRepo;
         }
 
@@ -39,18 +40,27 @@ namespace WebAPI.Controllers
         [HttpPost("refund")]
         public async Task<IActionResult> Refund(int bookingID)
         {
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking.Status != BookingStatus.Confirmed)
+                return CustomResult("Booking is not paid.", System.Net.HttpStatusCode.BadRequest);
 
             var payments = await payemntTransactionRepository.FindAsync(p => p.ClientBookingId == bookingID);
+            var paymentTransaction = payments.FirstOrDefault();
 
-            //TODO: check if pyament is confirmed and paid
-            
-            string paymentID = payments.FirstOrDefault()?.TransactionId;
+            IPaymentService service = paymentFactory.CreatePaymentService("card");
+            var refund = await service.RefundPayment(paymentTransaction.TransactionId);
 
-            var refund = paymentService.CancelPayment(paymentID);
+            // TODO: handle all tranactions atomic execution.
+            if (refund)
+            {
+                await payemntTransactionRepository.Refund(paymentTransaction.Id);
+                return CustomResult("Booking successfully refunded", refund, System.Net.HttpStatusCode.Created);
 
-            // TODO: change payment transaction status to refunded
+            }
 
-            return CustomResult("created", refund, System.Net.HttpStatusCode.Created);
+            return CustomResult("failed to refund", refund, System.Net.HttpStatusCode.BadRequest);
+
         }
     }
 }

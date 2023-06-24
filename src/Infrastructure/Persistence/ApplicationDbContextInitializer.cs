@@ -48,7 +48,7 @@ namespace Infrastructure.Persistence
                 await Seeds.UsersSeeders.SeedAdminUserAsync(userManager, roleManager);
 
                 //await Seeds.ReourcesTypesSeeder.SeedResoucesTypesSchudaulShownAsync(applicationDbContext);
-                // await Seeds.ReourcesSeeder.SeedResourcesAsync(applicationDbContext);
+                 // await Seeds.ReourcesSeeder.SeedResourcesAsync(applicationDbContext);
 
 
                 await applicationDbContext.SaveChangesAsync();

@@ -39,7 +39,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task< AllResourceData> GetAllReourceData(int id )
         {
-            var Resource = await _context.Resource.Include(res=> res.ResourceType) .FirstOrDefaultAsync(res => res.Id == id) ;
+            var Resource = await _context.Resource.Include(res=> res.ResourceType).Include(res=>res.Images).FirstOrDefaultAsync(res => res.Id == id) ;
 
             if (Resource == null)
                 return null ;
@@ -59,7 +59,8 @@ namespace Infrastructure.Persistence.Repositories
                 ResourceTypeId = Resource.ResourceTypeId ,
                 ResourceTypeName = Resource.ResourceType.Name ,
                 AverageRating = Review?.AverageRating ?? 5,
-                NumRatings = Review?.NumRatings ?? 0
+                NumRatings = Review?.NumRatings ?? 0,
+                Images= Resource.Images
             };
 
 

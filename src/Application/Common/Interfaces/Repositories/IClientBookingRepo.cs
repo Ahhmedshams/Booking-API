@@ -14,6 +14,10 @@ namespace Application.Common.Interfaces.Repositories
         Task<bool> IsUserExist(string UserId);
         Task DeleteSoft(int id);
         Task<int> CreateNewBooking(string userID, string date, int serviceID, string location, string startTime, string endTime,List<int> resourceID);
+
+        Task CancelBooking(int bookingID);
+
+
         //Task<ClientBooking> FillBookingItem(int bookingId, List<int> resourceID);
 
     }
