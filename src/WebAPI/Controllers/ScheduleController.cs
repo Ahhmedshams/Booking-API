@@ -73,7 +73,7 @@ namespace WebAPI.Controllers
         {
             var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel,RegionId);
 
-            if (availableResources == null)
+            if (availableResources.Count==0)
             {
                 return CustomResult(new List<Resource>());
             }
