@@ -55,7 +55,9 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<ServiceMetadata> DeleteOne(int serviceId, int resId)
         {
             var foundEntity = await _context.Set<ServiceMetadata>()
-                    .FindAsync(serviceId, resId);
+                    .FirstOrDefaultAsync(s=>s.ServiceId == serviceId &&
+                                        s.ResourceTypeId == resId && 
+                                        s.IsDeleted == false);
 
             if (foundEntity == null)
                 return null;
@@ -84,7 +86,8 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<ServiceMetadata>> GetByResourceId(int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
         {
             var servicesMetadata = await _context.Set<ServiceMetadata>()
-                                    .Where(s => s.ResourceTypeId == resId)
+                                    .Where(s => s.ResourceTypeId == resId&&
+                                           s.IsDeleted == false)
                                     .ToListAsync();
             if (servicesMetadata.Count() == 0)
                 return null;
@@ -94,7 +97,8 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<ServiceMetadata>> GetByServiceId(int serviceId, params Expression<Func<ServiceMetadata, object>>[] includes)
         {
             var servicesMetadata  = await _context.Set<ServiceMetadata>()
-                                    .Where(s => s.ServiceId == serviceId)
+                                    .Where(s => s.ServiceId == serviceId &&
+										   s.IsDeleted == false)
                                     .ToListAsync();
             if (servicesMetadata.Count() == 0)
                 return null;
@@ -103,19 +107,21 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<ServiceMetadata> GetById(int serviceId, int resId, params Expression<Func<ServiceMetadata, object>>[] includes)
         {
-            var query = _context.Set<ServiceMetadata>().AsQueryable();
+            var query = _context.Set<ServiceMetadata>().Where(s => s.IsDeleted==false).AsQueryable();
             if (includes.Length > 0)
             {
                 foreach (var include in includes)
                     query = query.Include(include);
 
             }
-            return await _context.Set<ServiceMetadata>().FindAsync(serviceId, resId);
+            return await _context.Set<ServiceMetadata>().FirstOrDefaultAsync(s=> s.ServiceId == serviceId &&
+																			 s.ResourceTypeId == resId &&
+																			 s.IsDeleted == false);
         }
 
         public async Task<bool> IsResTypeExist(int resTypeId)
         {
-            var resourceExist = await _context.Set<ResourceType>().FindAsync(resTypeId);
+            var resourceExist = await _context.Set<ResourceType>().FirstOrDefaultAsync(s => s.Id == resTypeId && s.IsDeleted == false);
             if (resourceExist == null)
                 return false;
             return true;
@@ -123,7 +129,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<bool> IsServiceExis(int serviceId)
         {
-            var serviceExist = await _context.Set<Service>().FindAsync(serviceId);
+            var serviceExist = await _context.Set<Service>().FirstOrDefaultAsync(s => s.Id == serviceId && s.IsDeleted == false);
             if (serviceExist == null)
                 return false;
             return true;

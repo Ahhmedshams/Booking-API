@@ -9,5 +9,6 @@ namespace Application.Common.Interfaces.Repositories
     public interface IResourceSpecialCharacteristicsRepo : IAsyncRepository<ResourceSpecialCharacteristics>, IRepository<ResourceSpecialCharacteristics>
     {
         Task<bool> IsExistAsync(int id);
+        Task DeleteSoft(int id);
     }
 }

@@ -100,7 +100,6 @@ CREATE TABLE #TempInVisibleResourceTypeIDsHasSchedule (
 END";
             migrationBuilder.Sql(proc2);
 
-
             migrationBuilder.Sql(@"create proc proc3 @serviceID int			--shown 0 and schedule 0
 with encryption 
 as
@@ -141,14 +140,13 @@ CREATE TABLE #TempInVisibleResourceTypeIDsNoSchedule (
 	
 			return @output; -- Return the output value
 END");
-
-            migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time
+			migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time ,@RegionId int = null
 as
 BEGIN try --1
 IF EXISTS (
-	SELECT [ServiceId]
-	FROM [dbo].[ServiceMetadata]
-	WHERE [ServiceId] = @serviceID
+    SELECT [ServiceId]
+    FROM [dbo].[ServiceMetadata]
+    WHERE [ServiceId] = @serviceID
 )
 BEGIN ---2
 set nocount on ;
@@ -160,9 +158,9 @@ EXEC @resProc2= proc2 @serviceID ;
 EXEC @resProc3= proc3 @serviceID ;
 
 
-CREATE TABLE #TempResourceTypeID (
-	ResourceTypeId INT,
-	NoOfResourcesRequired INT
+create TABLE #TempResourceTypeID (
+    ResourceTypeId INT,
+    NoOfResourcesRequired INT
 );
 	INSERT INTO #TempResourceTypeID (ResourceTypeId, NoOfResourcesRequired)
 	SELECT [ResourceTypeId], NoOfResources
@@ -173,9 +171,9 @@ CREATE TABLE #TempResourceTypeID (
 		--type1  has schedule and shown 
 		--type2  has schedule and invisible 
 		--type3  has Noschedule and invisible 
-	IF 
-	(@resProc1 =1 and @resProc2 =1 and @resProc3 =1)  --case if service has all types  first ,second ,third
-	BEGIN  --3
+    IF 
+    (@resProc1 =1 and @resProc2 =1 and @resProc3 =1)  --case if service has all types  first ,second ,third
+    BEGIN  --3
 		IF EXISTS			
 				(--case1 shown 1 schedule 1
 				SELECT 1
@@ -186,6 +184,7 @@ CREATE TABLE #TempResourceTypeID (
 				AND [HasSchedual]=1
 				)
 				BEGIN  --4
+
 						IF EXISTS 
 						(--case 2  shown 0 schedule 1
 						SELECT 1 
@@ -212,6 +211,7 @@ CREATE TABLE #TempResourceTypeID (
 							 and SI.[IsDeleted]=0
 						 )
 						 BEGIN --5
+
 							IF EXISTS 
 							(--case 3   shown 0 schedule 0
 							 SELECT 1 
@@ -224,39 +224,66 @@ CREATE TABLE #TempResourceTypeID (
 							 AND [HasSchedual]=0
 							 AND NoOfResourcesRequired<=[AvailableCapacity])
 							 BEGIN  --6
-								select R.*
-								from scheduleitem  as SI , 
-								Schedule as S,
-								[dbo].[Resource] R,
-								#TempResourceTypeID,
-								[dbo].[ResourceTypes] RT
-								where 
-								S.[ResourceId]=R.[Id]
-								and  SI.scheduleId= S.scheduleId
-								AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
-								AND R.[ResourceTypeId]=RT.[Id]
-								AND SI.[Day]=@DATE
-								AND SI.[StartTime]= @startTime 
-								AND SI.[EndTime]= @endTime
-								and available= 1 
-								and S.[IsDeleted]=0
-								and SI.[IsDeleted]=0
-								AND [Shown]=1
-								AND [HasSchedual]=1
-								AND @date BETWEEN S.[FromDate] AND S.[ToDate]
-
+							 IF @RegionId IS NOT NULL
+								 BEGIN
+									select R.*
+									from scheduleitem  as SI , 
+									Schedule as S,
+									[dbo].[Resource] R,
+									#TempResourceTypeID,
+									[dbo].[ResourceTypes] RT
+									where 
+									S.[ResourceId]=R.[Id]
+									and  SI.scheduleId= S.scheduleId
+									AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
+									AND R.[ResourceTypeId]=RT.[Id]
+									AND SI.[Day]=@DATE
+									AND SI.[StartTime]= @startTime 
+									AND SI.[EndTime]= @endTime
+									and SI.available= 1 
+									and S.[IsDeleted]=0
+									and SI.[IsDeleted]=0
+									AND [Shown]=1
+									AND [HasSchedual]=1
+									AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+									AND RegionId = @regionId
+								END
+							ELSE
+								BEGIN
+									select R.*
+									from scheduleitem  as SI , 
+									Schedule as S,
+									[dbo].[Resource] R,
+									#TempResourceTypeID,
+									[dbo].[ResourceTypes] RT
+									where 
+									S.[ResourceId]=R.[Id]
+									and  SI.scheduleId= S.scheduleId
+									AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
+									AND R.[ResourceTypeId]=RT.[Id]
+									AND SI.[Day]=@DATE
+									AND SI.[StartTime]= @startTime 
+									AND SI.[EndTime]= @endTime
+									and SI.available= 1 
+									and S.[IsDeleted]=0
+									and SI.[IsDeleted]=0
+									AND [Shown]=1
+									AND [HasSchedual]=1
+									AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+								END
 						 END --6
 				  END --5
 
-			END --4
+		    END --4
 				
-	 END --3
+     END --3
 			 
 		--type1  has schedule and shown 
 		--type2  has schedule and invisible 
 	
 	ELSE IF (@resProc1 =1 and @resProc2 =1 and @resProc3=0 )--case if service has 2 types  first ,second 
 	begin  --7
+
 				IF EXISTS			
 				(--case1 shown 1 schedule 1
 				SELECT 1
@@ -267,6 +294,7 @@ CREATE TABLE #TempResourceTypeID (
 				AND [HasSchedual]=1
 				)
 				BEGIN --8
+
 						IF EXISTS 
 						(--case 2  shown 0 schedule 1
 						SELECT 1 
@@ -296,27 +324,54 @@ CREATE TABLE #TempResourceTypeID (
 						 )
 						 
 							 BEGIN --9
-								select R.*
-								from scheduleitem  as SI , 
-								Schedule as S,
-								[dbo].[Resource] R,
-								#TempResourceTypeID,
-								[dbo].[ResourceTypes] RT
-								where 
-								S.[ResourceId]=R.[Id]
-								and  SI.scheduleId= S.scheduleId
-								AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
-								AND R.[ResourceTypeId]=RT.[Id]
-								AND SI.[Day]=@date
-								AND SI.[StartTime]= @startTime 
-								AND SI.[EndTime]= @endTime
-								and available= 1 
-								and S.[IsDeleted]=0
-								and SI.[IsDeleted]=0
-								AND [Shown]=1
-								AND [HasSchedual]=1
-								AND @date BETWEEN S.[FromDate] AND S.[ToDate]
-							 END --9
+							 IF @RegionId IS NOT NULL
+								BEGIN
+									select R.*
+									from scheduleitem  as SI , 
+									Schedule as S,
+									[dbo].[Resource] R,
+									#TempResourceTypeID,
+									[dbo].[ResourceTypes] RT
+									where 
+									S.[ResourceId]=R.[Id]
+									and  SI.scheduleId= S.scheduleId
+									AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
+									AND R.[ResourceTypeId]=RT.[Id]
+									AND SI.[Day]=@date
+									AND SI.[StartTime]= @startTime 
+									AND SI.[EndTime]= @endTime
+									and available= 1 
+									and S.[IsDeleted]=0
+									and SI.[IsDeleted]=0
+									AND [Shown]=1
+									AND [HasSchedual]=1
+									AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+									AND RegionId = @regionId
+								END
+							ELSE
+								BEGIN
+									select R.*
+									from scheduleitem  as SI , 
+									Schedule as S,
+									[dbo].[Resource] R,
+									#TempResourceTypeID,
+									[dbo].[ResourceTypes] RT
+									where 
+									S.[ResourceId]=R.[Id]
+									and  SI.scheduleId= S.scheduleId
+									AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
+									AND R.[ResourceTypeId]=RT.[Id]
+									AND SI.[Day]=@date
+									AND SI.[StartTime]= @startTime 
+									AND SI.[EndTime]= @endTime
+									and available= 1 
+									and S.[IsDeleted]=0
+									and SI.[IsDeleted]=0
+									AND [Shown]=1
+									AND [HasSchedual]=1
+									AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+								END
+							END --9
 				END  --8
 		END--7
 
@@ -354,7 +409,7 @@ CREATE TABLE #TempResourceTypeID (
 								[dbo].[ResourceTypes] RT
 								where 
 								S.[ResourceId]=R.[Id]
-								and  SI.scheduleId= S.scheduleId
+							    and  SI.scheduleId= S.scheduleId
 								AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
 								AND R.[ResourceTypeId]=RT.[Id]
 								AND SI.[Day]=@DATE
@@ -370,7 +425,7 @@ CREATE TABLE #TempResourceTypeID (
 						END --11
 				END --10
 			ELSE IF (@resProc1 =1and @resProc2=0  and @resProc3=0)--case if service has one type  first type
-			begin  --13
+	        begin  --13
 				IF EXISTS			
 				(--case1 shown 1 schedule 1
 				SELECT 1
@@ -381,36 +436,60 @@ CREATE TABLE #TempResourceTypeID (
 				AND [HasSchedual]=1
 				)
 				BEGIN --14
-							
-						select R.*
-						from scheduleitem  as SI , 
-						Schedule as S,
-						[dbo].[Resource] R,
-						#TempResourceTypeID,
-						[dbo].[ResourceTypes] RT
-						where 
-						S.[ResourceId]=R.[Id]
-						and  SI.scheduleId= S.scheduleId
-						AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
-						AND R.[ResourceTypeId]=RT.[Id]
-						AND SI.[Day] =@date
-						AND SI.[StartTime]= @startTime 
-						AND SI.[EndTime]= @endTime
-						and available= 1 
-						and S.[IsDeleted]=0
-						and SI.[IsDeleted]=0
-						AND [Shown]=1
-						AND [HasSchedual]=1
-						AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+						IF @RegionId IS NOT NULL
+						BEGIN
+							select R.*
+							from scheduleitem  as SI , 
+							Schedule as S,
+							[dbo].[Resource] R,
+							#TempResourceTypeID,
+							[dbo].[ResourceTypes] RT
+							where 
+							S.[ResourceId]=R.[Id]
+							and  SI.scheduleId= S.scheduleId
+							AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
+							AND R.[ResourceTypeId]=RT.[Id]
+							AND SI.[Day] =@date
+							AND SI.[StartTime]= @startTime 
+							AND SI.[EndTime]= @endTime
+							and available= 1 
+							and S.[IsDeleted]=0
+							and SI.[IsDeleted]=0
+							AND [Shown]=1
+							AND [HasSchedual]=1
+							AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+							AND RegionId = @regionId
+						END
+						ELSE
+						BEGIN
+							select R.*
+							from scheduleitem  as SI , 
+							Schedule as S,
+							[dbo].[Resource] R,
+							#TempResourceTypeID,
+							[dbo].[ResourceTypes] RT
+							where 
+							S.[ResourceId]=R.[Id]
+							and  SI.scheduleId= S.scheduleId
+							AND #TempResourceTypeID.[ResourceTypeId]=RT.[Id]
+							AND R.[ResourceTypeId]=RT.[Id]
+							AND SI.[Day] =@date
+							AND SI.[StartTime]= @startTime 
+							AND SI.[EndTime]= @endTime
+							and available= 1 
+							and S.[IsDeleted]=0
+							and SI.[IsDeleted]=0
+							AND [Shown]=1
+							AND [HasSchedual]=1
+							AND @date BETWEEN S.[FromDate] AND S.[ToDate]
+						END
 				END --14 
 			END --13
 		END  ---2
-	END try-----1
+    END try-----1
 	begin catch 
 			select 0
 	end catch");
-
-
 
             // Fill Client Booking Table
             migrationBuilder.Sql(@" Create proc FillClientBookingTable
@@ -666,11 +745,6 @@ BEGIN CATCH
 	set @output = 0; -- Set the output variable value
 	return @output;
 END CATCH");
-
-
-
-
-
             migrationBuilder.Sql(@"create PROCEDURE CheckServerTypeInBookingItem
 	@serviceID INT,
 	@OUTPUT INT OUTPUT
@@ -717,7 +791,6 @@ BEGIN
 	END;
 END;");
 
-
             // Change booking status
             migrationBuilder.Sql(@"Create proc SetBookingStatusConfiremed @bookingID int
 with encryption 
@@ -750,7 +823,6 @@ END TRY
 BEGIN CATCH 
 	RETURN 0
 END CATCH");
-
 
             // total cost
             migrationBuilder.Sql(@"CREATE proc CalculateTotalCost @bookingID int
@@ -947,7 +1019,35 @@ CREATE TABLE #TempResourceNoScheduleInvisible (
 		select 0
 	end catch");
 
+			// AvailableServicesByRegion
+            migrationBuilder.Sql(@"create PROCEDURE FindMatchingServiceId @RegionId INT
+with encryption
+AS
+BEGIN
+declare @TempTable table (Id int,Name nvarchar(max) , ResourceTypeId int ,WantedCount int, Status varchar(max),AvailableCount int,IsDeleted bit,CreatedOn datetime,LastUpdatedOn datetime,Description nvarchar(max))
+Insert into @TempTable
+Select *
+FROM (
+    SELECT S.Id,S.Name, SM.ResourceTypeId, SM.NoOfResources AS WantedCount, Status,ISNULL(R.Count, 0) AS AvailableCount , S.IsDeleted,S.CreatedOn,S.LastUpdatedOn,S.Description
+    FROM ServiceMetadata SM
+    INNER JOIN Services S ON SM.ServiceId = S.Id and S.Status = 'Active'
+    LEFT JOIN (
+        SELECT ResourceTypeId, COUNT(*) AS Count
+        FROM Resource
+        WHERE RegionId = @RegionId
+        GROUP BY ResourceTypeId
+    ) R ON SM.ResourceTypeId = R.ResourceTypeId
+) as temp
 
+SELECT distinct(id),Name, IsDeleted,CreatedOn,LastUpdatedOn,Description,Status
+from @TempTable
+WHERE Name NOT IN (
+    SELECT Name
+    FROM @TempTable
+    WHERE AvailableCount=0 or AvailableCount<WantedCount
+);
+END
+go");
         }
 
         /// <inheritdoc />
@@ -971,6 +1071,7 @@ CREATE TABLE #TempResourceNoScheduleInvisible (
             migrationBuilder.Sql("DROP CalculateTotalCost");
 
             migrationBuilder.Sql("DROP CancelPendingBooking");
+            migrationBuilder.Sql("DROP PROC FindMatchingServiceId");
 
         }
     }
