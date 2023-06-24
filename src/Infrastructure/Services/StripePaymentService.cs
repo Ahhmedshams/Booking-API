@@ -85,6 +85,8 @@ namespace Infrastructure.Services
             metadata.Add("bookingID", bookingID.ToString());
 
             string clientReferenceId = bookingItems[0].ClientBooking.UserId;
+            //DateTime futureTime = DateTime.UtcNow.AddMinutes(5); // Add 5 minutes to the current UTC time
+            //long unixTimestamp = ((DateTimeOffset)futureTime).ToUnixTimeSeconds();
 
             var options = new SessionCreateOptions
             {
@@ -92,7 +94,7 @@ namespace Infrastructure.Services
                 CancelUrl = configuration["Stripe:SuccessUrl"],
                 LineItems = sessionLineItemOptions,
                 Mode = "payment",
-                ExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                //ExpiresAt =  DateTime.Now.AddMinutes(30),
                 ClientReferenceId = clientReferenceId,
                // PaymentIntentData = new() { ReceiptEmail = bookingItems[0].ClientBooking.User.Email },
 
