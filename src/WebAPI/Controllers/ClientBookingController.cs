@@ -162,4 +162,24 @@ namespace WebAPI.Controllers
 
 
         }
+
+
+        [HttpPut("CancelBooking/{bookingID:int}")]
+        public async Task<IActionResult> CancelBooking(int bookingID)
+        {
+
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking == null)
+                return NotFound("There no booking with that id");
+
+            if (booking.Status != BookingStatus.Pending)
+                return BadRequest("can't process this request");
+
+            await clientBookingRepo.CancelBooking(bookingID);
+
+
+            return CustomResult("Succefully cancel booking");
+        }
+
     } }
