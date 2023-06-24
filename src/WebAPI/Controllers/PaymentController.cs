@@ -54,6 +54,7 @@ namespace WebAPI.Controllers
                 return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
 
 
+
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
 
 
@@ -62,7 +63,7 @@ namespace WebAPI.Controllers
             return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
         }
 
-        [HttpPost("refund")]
+        [HttpPost("refund/{bookingID:int}")]
         public async Task<IActionResult> Refund(int bookingID)
         {
             var booking = await clientBookingRepo.GetBookingById(bookingID);
