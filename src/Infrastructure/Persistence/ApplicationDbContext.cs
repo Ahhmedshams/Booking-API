@@ -9,7 +9,7 @@ namespace Infrastructure.Persistence
 {
     public class ApplicationDbContext:IdentityDbContext<ApplicationUser>
     {
-      
+
         public ApplicationDbContext() { }
         public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<ResourceType>  ResourceTypes { get; set; }
@@ -37,12 +37,15 @@ namespace Infrastructure.Persistence
          
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
+            var excludedTypes = new[]
+            {
+                typeof(ServiceImage),
+                typeof(PaymentMethod),
+                typeof(ImageEntity)
+            };
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
-                if (typeof(ServiceImage).IsAssignableFrom(entityType.ClrType) || 
-                    typeof(PaymentMethod).IsAssignableFrom(entityType.ClrType)||
-                    typeof(ImageEntity).IsAssignableFrom(entityType.ClrType)
-                    ) continue;
+                if(excludedTypes.Any(t => t.IsAssignableFrom(entityType.ClrType))) continue;
                 if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
                 {
                     var parameter = Expression.Parameter(entityType.ClrType, "e");
@@ -55,8 +58,6 @@ namespace Infrastructure.Persistence
                 }
             }
         }
-
-
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var Now = DateTime.UtcNow;
@@ -75,5 +76,6 @@ namespace Infrastructure.Persistence
             }
             return base.SaveChangesAsync(cancellationToken);
         }
+
     }
 }
