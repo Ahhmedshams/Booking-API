@@ -18,6 +18,11 @@ namespace Infrastructure.Persistence.Repositories
         {
             return await _context.Resource.AnyAsync(res => res.Id == id);
         }
-
+        public async Task DeleteSoft(int id)
+        {
+            var RSC = await GetByIdAsync(id);
+            RSC.IsDeleted = true;
+            await _context.SaveChangesAsync();
+        }
     }
 }

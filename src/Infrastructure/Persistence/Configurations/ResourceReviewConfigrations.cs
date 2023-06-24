@@ -29,8 +29,6 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.Property(e => e.Rating)
                 .HasPrecision(1, 5);
-
-            builder.HasQueryFilter(r => r.IsDeleted == false);
         }
     }
 }

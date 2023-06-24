@@ -2,6 +2,7 @@
 using Infrastructure.Persistence.Specification;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Net;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -14,7 +15,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<BookingItem> GetBookByComplexIdsAsync(int bookId, int resId, params Expression<Func<BookingItem, object>>[] includes)
         {
-            var query = _context.Set<BookingItem>().AsQueryable();
+            var query = _context.Set<BookingItem>().Where(b => b.IsDeleted == false).AsQueryable();
             if (includes.Length > 0)
             {
                 foreach (var include in includes)
@@ -22,7 +23,9 @@ namespace Infrastructure.Persistence.Repositories
                     query = query.Include(include);
                 }
             }
-            return await _context.Set<BookingItem>().FindAsync(bookId, resId);
+            return await _context.Set<BookingItem>().FirstOrDefaultAsync(b=> b.BookingId==bookId&&
+                                                                          b.ResourceId==resId && 
+                                                                          b.IsDeleted == false);
         }
 
 
@@ -65,7 +68,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<BookingItem>> GetBookItemByIdAsync(int bookId, params Expression<Func<BookingItem, object>>[] includes)
         {
             var bookingItems = await _context.Set<BookingItem>()
-                                    .Where(b => b.BookingId == bookId)
+                                    .Where(b => b.BookingId == bookId && b.IsDeleted == false)
                                     .ToListAsync();
             if (bookingItems.Count() == 0)
                 return null;
@@ -89,16 +92,16 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<bool> IsClientBookExis(int bookId)
         {
-            var clientBookExist = await _context.Set<ClientBooking>().FindAsync(bookId);
+            var clientBookExist = await _context.Set<ClientBooking>().FirstOrDefaultAsync(b=> b.Id== bookId && b.IsDeleted == false);
             if (clientBookExist == null)
                 return false;
             return true;
         }
 
         public async Task<bool> IsResourecExist(int resId)
-        {
-            var resourceExist = await _context.Set<Resource>().FindAsync(resId);
-            if (resourceExist == null)
+		{
+            var resourceExist = await _context.Set<Resource>().FirstOrDefaultAsync(b => b.ResourceTypeId == resId && b.IsDeleted == false);
+			if (resourceExist == null)
                 return false;
             return true;
         }
@@ -177,7 +180,8 @@ namespace Infrastructure.Persistence.Repositories
 
         public List<BookingItem> GetAllBooksItemsByBookingId(int bookingID)
         {
-            return  _context.Set<BookingItem>().Where(b => b.BookingId == bookingID)
+            return  _context.Set<BookingItem>()
+                .Where(b => b.BookingId == bookingID && b.IsDeleted == false)
                 .Include(b => b.Resource).Include(b => b.ClientBooking)
                 .ToListAsync().Result;
         }

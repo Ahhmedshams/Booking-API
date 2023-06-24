@@ -7,6 +7,7 @@ namespace WebAPI.Profiles
         public ServiceMapper() 
         {
             CreateMap<ServiceDTO, Service>().ReverseMap();
+            CreateMap<Service,ServiceRegionDTO>().ReverseMap(); 
 
             //CreateMap<Service, ServiceResDTO>()
             //    .ForMember(dest => dest.ResoureceTypes, 
