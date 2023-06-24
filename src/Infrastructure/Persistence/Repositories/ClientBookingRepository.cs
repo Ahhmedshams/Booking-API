@@ -296,12 +296,7 @@ namespace Infrastructure.Persistence.Repositories
             }
         }
 
-        public async Task CancelBooking(int bookingID)
-        { 
-                  await _context.Database.ExecuteSqlRawAsync(
-                         "EXEC CancelPendingBooking @param1",
-                         new SqlParameter("@param1", bookingID));
-        }
+       
         //public async Task<IEnumerable<ClientBooking>> GetUserBooking(string id)
         //{
         //    return await _context.ClientBookings
@@ -335,6 +330,12 @@ namespace Infrastructure.Persistence.Repositories
                 .ThenInclude(e => e.Resource)
                 .ThenInclude(e => e.ResourceType)
                 .FirstOrDefaultAsync();
+        }
+        public async Task CancelBooking(int bookingID)
+        { 
+                  await _context.Database.ExecuteSqlRawAsync(
+                         "EXEC CancelPendingBooking @param1",
+                         new SqlParameter("@param1", bookingID));
         }
     }
 
