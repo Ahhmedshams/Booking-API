@@ -5,7 +5,6 @@
         public ServiceSpecification(ServiceSpecParams specParams) :
         base(s => s.IsDeleted == false)
         {
-            AddIncludes(s => s.Images);
             ApplyPagging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
 
             if (!string.IsNullOrEmpty(specParams.Sort))
