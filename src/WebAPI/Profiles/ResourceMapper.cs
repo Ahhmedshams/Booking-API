@@ -6,8 +6,8 @@ namespace WebAPI.Profiles
     {
         public ResourceMapper()
         {
-            CreateMap<Resource, ResourceRespDTO>().ReverseMap();
-            CreateMap<Resource, ResourceReqDTO>().ReverseMap(); 
+            CreateMap<Resource, ResourceRespDTO>();
+            CreateMap<ResourceReqDTO,Resource>().ReverseMap(); 
             CreateMap<Resource, ResourceWithDataDTO>().ReverseMap(); 
         }
     }
