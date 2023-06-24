@@ -25,7 +25,6 @@ namespace Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.NoAction);
             
             builder.Property(e => e.Price).HasColumnType("decimal(5,2)");
-            builder.HasQueryFilter(r => r.IsDeleted == false);
 
 
             // builder.HasMany<Schedule>().WithOne().HasForeignKey(e=>e.ScheduleID);
