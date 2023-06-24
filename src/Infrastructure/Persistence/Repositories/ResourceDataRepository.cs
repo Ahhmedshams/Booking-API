@@ -44,12 +44,12 @@ namespace Infrastructure.Persistence.Repositories
             if (Resource == null)
                 return null ;
 
-            var Review = _context.ResourceReview.Where(rr => rr.ResourceId == id)
+            var Review = await _context.ResourceReview.Where(rr => rr.ResourceId == id)
                 .GroupBy(rr => rr.ResourceId)
                 .Select(Result => new {
                     AverageRating = Result.Average(rr => rr.Rating),
                     NumRatings = Result.Count()
-                }).FirstOrDefault();
+                }).FirstOrDefaultAsync();
 
 
 

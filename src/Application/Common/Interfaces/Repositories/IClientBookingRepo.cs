@@ -20,5 +20,9 @@ namespace Application.Common.Interfaces.Repositories
 
         //Task<ClientBooking> FillBookingItem(int bookingId, List<int> resourceID);
 
+
+        Task<IEnumerable<ClientBooking>> GetUserBooking(string id);
+        Task<ClientBooking> GetUserBooking(string id,int bookingId);
+
     }
 }

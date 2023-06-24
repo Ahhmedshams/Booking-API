@@ -3,9 +3,8 @@ using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Infrastructure.Persistence.Specification.ClientBookingSpec;
-using Infrastructure.Persistence.Specification;
-using WebAPI.DTO;
 using Application.Common.Interfaces.Services;
+using WebAPI.Utility;
 using Infrastructure.Factories;
 using Domain.Enums;
 
@@ -26,8 +25,10 @@ namespace WebAPI.Controllers
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
-            this.paymentFactory=paymentFactory;
-            this.bookingItemRepo=bookingItemRepo;
+            this.bookingItemRepo = bookingItemRepo;
+            this.paymentFactory = paymentFactory;
+            this.paymentFactory = paymentFactory;
+            this.bookingItemRepo = bookingItemRepo;
         }
 
         [HttpGet]
@@ -35,12 +36,35 @@ namespace WebAPI.Controllers
         {
             var spec = new ClientBookingSpecification(specParams);
             var clientBooks = await clientBookingRepo.GetAllBookingsWithSpec(spec);
-            
+
             var clientBooksDTO = mapper.Map<IEnumerable<ClientBooking>, IEnumerable<ClientBookingDTO>>(clientBooks);
             return CustomResult(clientBooksDTO);
         }
 
-        [HttpPost] 
+
+        [HttpGet("user/{id:Guid}")]
+        public async Task<IActionResult> GetUserBooking(string id, [FromQuery] int? bookingId)
+        {
+            if (bookingId == null)
+            {
+                var result = await clientBookingRepo.GetUserBooking(id);
+                if (result == null)
+                    return CustomResult($"No Client's Book found for this Id [ {id} ]", HttpStatusCode.NotFound);
+
+                return CustomResult(result.ToClientBooking());
+            }
+            else
+            {
+                var result = await clientBookingRepo.GetUserBooking(id, (int)bookingId);
+                if (result == null)
+                    return CustomResult($"No Client's Book found for this Id [ {bookingId} ]", HttpStatusCode.NotFound);
+
+                return CustomResult(result.ToClientBookingWithDetails());
+            }
+
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Add(ClientBookingDTO clientBookDTO)
         {
             clientBookDTO.Id = 0;
@@ -91,8 +115,10 @@ namespace WebAPI.Controllers
             await clientBookingRepo.DeleteAsync(id);
             return CustomResult(HttpStatusCode.NoContent);
         }
+
+
         [HttpPost("CreateNewBooking")]
-        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO,[FromQuery] string paymentType)
+        public async Task<IActionResult> CreateNewBooking([FromBody] ClientBooking2DTO clientBooking2DTO, [FromQuery] string paymentType)
         {
             bool isValidPaymentType = false;
             if (paymentType != null)
@@ -106,7 +132,7 @@ namespace WebAPI.Controllers
                     }
                 }
             }
-           
+
 
             if (!isValidPaymentType)
                 return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
@@ -119,8 +145,8 @@ namespace WebAPI.Controllers
                 clientBooking2DTO.StartTime,
                 clientBooking2DTO.EndTime,
                 clientBooking2DTO.ResourceIDs);
-            
-            if (result==-1)
+
+            if (result == -1)
             {
                 return BadRequest("Invalid data entered");
             }
@@ -136,23 +162,4 @@ namespace WebAPI.Controllers
 
 
         }
-
-        [HttpPut("CancelBooking/{bookingID:int}")]
-        public async Task<IActionResult> CancelBooking(int bookingID)
-        {
-
-            var booking = await clientBookingRepo.GetBookingById(bookingID);
-
-            if (booking == null)
-                return NotFound("There no booking with that id");
-
-            if (booking.Status != BookingStatus.Pending)
-                return BadRequest("can't process this request");
-             
-            await clientBookingRepo.CancelBooking(bookingID);
-
-
-            return CustomResult("Succefully cancel booking");
-        }
-    }
-}
+    } }
