@@ -132,7 +132,7 @@ namespace WebAPI.Controllers
             var paymentUrl = await service.MakePayment(bookingItemRepo, booking.TotalCost, result);
 
 
-            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
+            return CustomResult("Payment session created successfully.", new { Result = paymentUrl }, HttpStatusCode.Created);
 
 
         }
