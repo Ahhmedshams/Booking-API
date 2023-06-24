@@ -21,10 +21,7 @@ namespace Infrastructure.Services
             this.configuration=configuration;
             this.mapper=mapper;
         }
-        public Task<bool> CancelPayment(string paymentID)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public async Task<string> MakePayment(IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
         {
@@ -53,15 +50,16 @@ namespace Infrastructure.Services
                     transactions = new List<Transaction>() {
                         new Transaction() {
                             amount = new() { currency = "USD", total = bookingItems.Sum(b => b.Price).ToString() },
-                            item_list =  bookingItems.ToPaypalItemsList(),
+                            item_list =  bookingItems.ToPaypalItemsList()
                         } 
                     },
                     
                     redirect_urls = new RedirectUrls()
                     {
                         cancel_url = configuration["Paypal:CancelUrl"],
-                        return_url = $"{configuration["Paypal:SuccessUrl"]}?bookingID={bookingID}"
+                        return_url = $"{configuration["Paypal:SuccessUrl"]}?bookingID={bookingID}&userID={bookingItems[0].ClientBooking.UserId}"
                     }
+                  
                 };
 
                 createdPayment =  payment.Create(paypalApi);
@@ -84,6 +82,11 @@ namespace Infrastructure.Services
            
 
             throw new Exception("cannot create payapal session");
+        }
+
+        public Task<bool> RefundPayment(string paymentID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

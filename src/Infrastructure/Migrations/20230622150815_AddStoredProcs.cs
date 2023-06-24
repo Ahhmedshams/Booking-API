@@ -804,7 +804,7 @@ as
 	begin 
 
 		update [dbo].[ClientBookings]
-		set [Status]= 'Confiremed '
+		set [Status]= 'Confirmed'
 		where [Id]=@bookingID
 	end 
 	else 
@@ -995,12 +995,12 @@ CREATE TABLE #TempResourceNoScheduleInvisible (
 
 		begin try 
 		BEGIN TRANSACTION;
-			update  [dbo].[BookingItems]
-			set [IsDeleted]=1
-			where [BookingId]=@BookingID
+			--update  [dbo].[BookingItems]
+			--set [IsDeleted]=1
+			--where [BookingId]=@BookingID
 
 			update [dbo].[ClientBookings]
-			set [IsDeleted]=1
+			set [Status]= 'Cancelled'
 			where [Id] =@BookingID 
 			commit;
 		end try
@@ -1065,13 +1065,13 @@ go");
             migrationBuilder.Sql("DROP PROC proc3");
             migrationBuilder.Sql("DROP PROC GetAvailableResourceForService");
 
-            migrationBuilder.Sql("DROP SetBookingStatusConfiremed");
-            migrationBuilder.Sql("DROP SetBookingStatuscompleted");
+            migrationBuilder.Sql("DROP PROC SetBookingStatusConfiremed");
+            migrationBuilder.Sql("DROP PROC SetBookingStatuscompleted");
 
-            migrationBuilder.Sql("DROP CalculateTotalCost");
+            migrationBuilder.Sql("DROP PROC CalculateTotalCost");
 
-            migrationBuilder.Sql("DROP CancelPendingBooking");
             migrationBuilder.Sql("DROP PROC FindMatchingServiceId");
+            migrationBuilder.Sql("DROP PROC CancelPendingBooking");
 
         }
     }

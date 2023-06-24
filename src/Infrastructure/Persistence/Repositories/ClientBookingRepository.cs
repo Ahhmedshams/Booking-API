@@ -300,6 +300,12 @@ namespace Infrastructure.Persistence.Repositories
             }
         }
 
+        public async Task CancelBooking(int bookingID)
+        { 
+                  await _context.Database.ExecuteSqlRawAsync(
+                         "EXEC CancelPendingBooking @param1",
+                         new SqlParameter("@param1", bookingID));
+        }
     }
 
 }

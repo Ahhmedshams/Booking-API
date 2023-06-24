@@ -27,18 +27,16 @@ namespace Infrastructure.Factories
                 switch (paymentType.ToLower())
                 {
                     case "card":
-                        return (IPaymentService)scope.ServiceProvider.GetRequiredService<StripePaymentService>();
+                        return scope.ServiceProvider.GetRequiredService<StripePaymentService>();
                     case "paypal":
-                        return (IPaymentService)scope.ServiceProvider.GetRequiredService<PaypalPaymentService>();                       
+                        return scope.ServiceProvider.GetRequiredService<PaypalPaymentService>();                       
                     default:
                         throw new ArgumentException("Invalid payment type");
                         
                 }
 
             }
-
    
-            return null;
         }
     }
 }
