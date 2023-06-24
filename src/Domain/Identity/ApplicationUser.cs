@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Identity
@@ -19,5 +20,9 @@ namespace Domain.Identity
         public DateTime CreatedOn { get; set; }
         public string? LastUpdatedById { get; set; }
         public DateTime? LastUpdatedOn { get; set; }
+
+        ////Relation to  Ticket
+        //public ICollection<Ticket> Ticket { get; set; }
+        //public ICollection<TicketReviewed> TicketReviewed { get; set; }
     }
 }

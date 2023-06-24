@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230624000659_Tickets2")]
+    partial class Tickets2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -612,20 +615,12 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("AdminRecivedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("ApplicationUserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("ContactDoneAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RecivedAdminId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TicketDescription")
                         .HasColumnType("nvarchar(max)");
@@ -635,6 +630,36 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Tickets");
+                });
+
+            modelBuilder.Entity("Domain.Entities.TicketReviewed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("RecievedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("TicketRevieweds");
                 });
 
             modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
@@ -1089,10 +1114,31 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Ticket", b =>
                 {
                     b.HasOne("Domain.Identity.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
+                        .WithMany("Ticket")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Domain.Entities.TicketReviewed", b =>
+                {
+                    b.HasOne("Domain.Identity.ApplicationUser", "ApplicationUser")
+                        .WithMany("TicketReviewed")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Ticket", "Ticket")
+                        .WithMany("TicketReviewed")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1206,6 +1252,18 @@ namespace Infrastructure.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Metadata");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Ticket", b =>
+                {
+                    b.Navigation("TicketReviewed");
+                });
+
+            modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("Ticket");
+
+                    b.Navigation("TicketReviewed");
                 });
 #pragma warning restore 612, 618
         }
