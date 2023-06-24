@@ -1,11 +1,9 @@
-﻿using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Services;
+﻿using Application.Common.Interfaces.Services;
 using CoreApiResponse;
+using Domain.Enums;
 using Infrastructure.Factories;
-using Infrastructure.Persistence.Repositories;
-using Infrastructure.Persistence.Specification.BookingItemSpec;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace WebAPI.Controllers
 {
@@ -27,12 +25,39 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Checkout(string paymentType)
+        [HttpPost("checkout/{bookingID:int}")]
+        public async Task<IActionResult> Checkout(string paymentType, int bookingID)
         {
+            // TODO: check if a user already has a payment session to this booking.
+
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking == null)
+                return CustomResult("There is no booking with this id", System.Net.HttpStatusCode.NotFound);
+
+
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
 
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
-            var paymentUrl = service.MakePayment(bookingItemRepo, 400, 1);
+
+
+            var paymentUrl = service.MakePayment(bookingItemRepo, booking.TotalCost, bookingID);
 
             return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
         }

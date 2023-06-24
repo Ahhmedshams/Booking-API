@@ -94,7 +94,7 @@ namespace Infrastructure.Services
                 CancelUrl = configuration["Stripe:SuccessUrl"],
                 LineItems = sessionLineItemOptions,
                 Mode = "payment",
-                //ExpiresAt =  DateTime.Now.AddMinutes(30),
+                ExpiresAt =  DateTime.Now.AddMinutes(30),
                 ClientReferenceId = clientReferenceId,
                // PaymentIntentData = new() { ReceiptEmail = bookingItems[0].ClientBooking.User.Email },
 
