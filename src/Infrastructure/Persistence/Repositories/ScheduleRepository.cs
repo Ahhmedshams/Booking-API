@@ -93,7 +93,7 @@ namespace Infrastructure.Persistence.Repositories
             }
             else
             {
-                return null;
+                return new List<Resource>();
             }
         }
 
