@@ -6,6 +6,8 @@ using Infrastructure.Persistence.Specification.ClientBookingSpec;
 using Infrastructure.Persistence.Specification;
 using WebAPI.DTO;
 using Application.Common.Interfaces.Services;
+using Infrastructure.Factories;
+using Domain.Enums;
 
 namespace WebAPI.Controllers
 {
@@ -15,16 +17,16 @@ namespace WebAPI.Controllers
     {
         private readonly IClientBookingRepo clientBookingRepo;
         private readonly IMapper mapper;
-        private readonly IPaymentService paymentService;
+        private readonly PaymentFactory paymentFactory;
         private readonly IBookingItemRepo bookingItemRepo;
 
 
         public ClientBookingController(IClientBookingRepo _clientBookingRepo,
-                                        IMapper _mapper, IPaymentService paymentService, IBookingItemRepo bookingItemRepo)
+                                        IMapper _mapper, PaymentFactory paymentFactory, IBookingItemRepo bookingItemRepo)
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
-            this.paymentService=paymentService;
+            this.paymentFactory=paymentFactory;
             this.bookingItemRepo=bookingItemRepo;
         }
 
@@ -90,8 +92,25 @@ namespace WebAPI.Controllers
             return CustomResult(HttpStatusCode.NoContent);
         }
         [HttpPost("CreateNewBooking")]
-        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO)
+        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO,[FromQuery] string paymentType)
         {
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+           
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
             var result = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
@@ -108,7 +127,10 @@ namespace WebAPI.Controllers
 
             var booking = await clientBookingRepo.GetByIdAsync(result);
 
-            var paymentUrl = paymentService.MakePayment(bookingItemRepo, booking?.TotalCost ?? 0, result);
+
+            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
+            var paymentUrl = service.MakePayment(bookingItemRepo, booking.TotalCost, result);
+
 
             return CustomResult("created", paymentUrl, HttpStatusCode.Created);
 
