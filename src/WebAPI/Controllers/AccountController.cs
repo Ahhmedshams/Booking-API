@@ -4,20 +4,13 @@ using CoreApiResponse;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Eventing.Reader;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Security.Claims;
 using System.Text;
-using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -182,7 +175,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpGet("{Id:Guid}")]
+        [HttpGet("GetUser/{id:Guid}")]
         public async Task<IActionResult> GetById(string? id)
         {
             if (id == null)

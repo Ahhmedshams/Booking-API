@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Add(ResourceTypeDTO resTypeDto)
+        public async Task<IActionResult> Add([FromForm]ResourceTypeDTO resTypeDto)
         {
             if (!ModelState.IsValid) 
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);

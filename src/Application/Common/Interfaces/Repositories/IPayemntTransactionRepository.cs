@@ -8,6 +8,6 @@ namespace Application.Common.Interfaces.Repositories
 {
     public interface IPayemntTransactionRepository: IAsyncRepository<PaymentTransaction>
     {
-
+        Task Refund(int paymentTransactionID);
     }
 }

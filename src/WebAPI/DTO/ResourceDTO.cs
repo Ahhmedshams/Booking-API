@@ -20,6 +20,7 @@ namespace WebAPI.DTO
         public Decimal Price { get; set; }
         public string Name { get; set; }
         public ICollection<IFormFile>? UploadedImages { get; set; }
+        public int? RegionId { get; set; }
 
     }
 
@@ -28,11 +29,11 @@ namespace WebAPI.DTO
         public int ResourceTypeId { get; set; }
         public Decimal Price { get; set; }
         public string Name { get; set; }
-
+        public int? RegionId { get; set; }
         public List<ResourceDataRespIDValueDTO> ResourceAttributes { get; set; }
 
     }
 
-   
+
 
 }

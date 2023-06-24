@@ -44,6 +44,13 @@ namespace WebAPI.Controllers
 
             List<ApplicationUserDTO> userDTOs = mapper.Map<List<ApplicationUserDTO>>(users);
 
+            foreach(var userDto in  userDTOs)
+            {
+                var user = await userManager.FindByEmailAsync(userDto.Email);
+
+                userDto.Roles = (List<string>) userManager.GetRolesAsync(user).Result;
+            }
+
             return CustomResult(userDTOs);
         }
 
@@ -91,6 +98,7 @@ namespace WebAPI.Controllers
 
             return CustomResult("Roles assign Successfully", System.Net.HttpStatusCode.Created);
         }
+       
 
 
     }

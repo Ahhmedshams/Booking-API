@@ -1,5 +1,6 @@
 ﻿using Application.Common.Helpers;
 using Infrastructure.Persistence.Specification;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -48,6 +49,15 @@ namespace Infrastructure.Persistence.Repositories
         {
             var query = _context.Set<Service>().Include(s => s.Metadata).ThenInclude(s=>s.ResourceType);
             return SpecificationEvaluator<Service>.GetQuery(query, spec);
+        }
+        public async Task<IEnumerable<Service>> ServicesByRegion(int RegionId)
+        {
+            var result =  _context.Set<Service>()
+                    .FromSqlRaw("EXEC FindMatchingServiceId @RegionId",
+                    new SqlParameter("@RegionId", RegionId)).IgnoreQueryFilters().ToList();
+
+            return result;
+            
         }
     }
 }

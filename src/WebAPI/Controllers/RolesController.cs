@@ -114,7 +114,7 @@ namespace WebAPI.Controllers
                     await roleManager.AddClaimAsync(role, new System.Security.Claims.Claim("Permission", permission.PermissionName));
             }
 
-            return CustomResult("Permissions Successfully updated", System.Net.HttpStatusCode.NoContent);
+            return CustomResult("Permissions Successfully updated");
         }
     }
 }

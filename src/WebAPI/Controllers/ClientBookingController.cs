@@ -6,6 +6,9 @@ using Infrastructure.Persistence.Specification.ClientBookingSpec;
 using Infrastructure.Persistence.Specification;
 using WebAPI.DTO;
 using Application.Common.Interfaces.Services;
+using WebAPI.Utility;
+using Infrastructure.Factories;
+using Domain.Enums;
 
 namespace WebAPI.Controllers
 {
@@ -15,16 +18,18 @@ namespace WebAPI.Controllers
     {
         private readonly IClientBookingRepo clientBookingRepo;
         private readonly IMapper mapper;
-        private readonly IPaymentService paymentService;
+        private readonly PaymentFactory paymentFactory;
         private readonly IBookingItemRepo bookingItemRepo;
 
 
         public ClientBookingController(IClientBookingRepo _clientBookingRepo,
-                                        IMapper _mapper, IPaymentService paymentService, IBookingItemRepo bookingItemRepo)
+                                        IMapper _mapper, PaymentFactory paymentFactory, IBookingItemRepo bookingItemRepo)
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
-            this.paymentService=paymentService;
+            this.paymentService = paymentService;
+            this.bookingItemRepo = bookingItemRepo;
+            this.paymentFactory=paymentFactory;
             this.bookingItemRepo=bookingItemRepo;
         }
 
@@ -33,9 +38,32 @@ namespace WebAPI.Controllers
         {
             var spec = new ClientBookingSpecification(specParams);
             var clientBooks = await clientBookingRepo.GetAllBookingsWithSpec(spec);
-            
+
             var clientBooksDTO = mapper.Map<IEnumerable<ClientBooking>, IEnumerable<ClientBookingDTO>>(clientBooks);
             return CustomResult(clientBooksDTO);
+        }
+
+
+        [HttpGet("user/{id:Guid}")]
+        public async Task<IActionResult> GetUserBooking(string id, [FromQuery] int? bookingId)
+        {
+            if(bookingId == null)
+            {
+                var result = await clientBookingRepo.GetUserBooking(id);
+                if (result == null)
+                    return CustomResult($"No Client's Book found for this Id [ {id} ]", HttpStatusCode.NotFound);
+
+                return CustomResult(result.ToClientBooking());
+            }
+            else
+            {
+                var result = await clientBookingRepo.GetUserBooking(id, (int) bookingId);
+                if (result == null)
+                    return CustomResult($"No Client's Book found for this Id [ {bookingId} ]", HttpStatusCode.NotFound);
+
+                return CustomResult(result.ToClientBookingWithDetails());
+            }
+            
         }
 
         [HttpPost] 
@@ -90,8 +118,25 @@ namespace WebAPI.Controllers
             return CustomResult(HttpStatusCode.NoContent);
         }
         [HttpPost("CreateNewBooking")]
-        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO)
+        public async Task<IActionResult> CreateNewBooking ([FromBody]ClientBooking2DTO clientBooking2DTO,[FromQuery] string paymentType)
         {
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+           
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
             var result = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
@@ -108,11 +153,32 @@ namespace WebAPI.Controllers
 
             var booking = await clientBookingRepo.GetByIdAsync(result);
 
-            var paymentUrl = paymentService.MakePayment(bookingItemRepo, booking?.TotalCost ?? 0, result);
+
+            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
+            var paymentUrl = await service.MakePayment(bookingItemRepo, booking.TotalCost, result);
+
 
             return CustomResult("created", paymentUrl, HttpStatusCode.Created);
 
 
+        }
+
+        [HttpPut("CancelBooking/{bookingID:int}")]
+        public async Task<IActionResult> CancelBooking(int bookingID)
+        {
+
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking == null)
+                return NotFound("There no booking with that id");
+
+            if (booking.Status != BookingStatus.Pending)
+                return BadRequest("can't process this request");
+             
+            await clientBookingRepo.CancelBooking(bookingID);
+
+
+            return CustomResult("Succefully cancel booking");
         }
     }
 }

@@ -134,7 +134,7 @@ namespace WebAPI.Controllers
 
             var result = await action.Invoke();
             var ResourceTypes = serviceMetadataDTOs.Select(s => s.ResourceTypeId);
-            return CustomResult(new {ServiceId = serviceId, ResourceTypes });
+            return CustomResult(new {ServiceId = serviceId, serviceMetadataDTOs });
         }
         private async Task<List<ServiceMDReqDTO>> GetInvalidResourceTypeIds(ServiceMDReqDTO[] serviceMetadataDTOs)
         {
@@ -174,6 +174,7 @@ namespace WebAPI.Controllers
 				ServiceMetadata serviceMD = new ServiceMetadata(); // Create a new instance for each object
 				serviceMD.ServiceId = serviceId;
 				serviceMD.ResourceTypeId = dto.ResourceTypeId;
+                serviceMD.NoOfResources = dto.NoOfResources;
 				serviceMetadata.Add(serviceMD);
 			}
 
