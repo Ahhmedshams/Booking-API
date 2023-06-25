@@ -49,10 +49,10 @@ namespace Infrastructure.Persistence.Repositories
                     $"<p>Dear {userFromDb.UserName},</p>\r\n    " +
                     "<p>We received a request to confirm your email. Please use the following token to confirm:</p>\r\n    " +
                     $"<p>{token}</p>" +
-                    "<p>Click the link below to reset your password</p>\r\n" +
+                    "<p>Click the link below to Confirm your Email</p>\r\n" +
                     $"<a " +
                     $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
-                    $" href={config["Server:Client"]}/resetPassword>Reset Password</a>\r\n    " +
+                    $" href={config["Server:Client"]}/resetPassword>Confirm Email</a>\r\n    " +
                     "<p>If you did not request a password reset, please ignore this email.</p>\r\n    " +
                     "<p>Best regards,</p>\r" +
                     "<p>Sona</p>\r\n  " +
@@ -187,7 +187,7 @@ namespace Infrastructure.Persistence.Repositories
                         using (var client = new SmtpClient())
                         {
                             // Connect to the SMTP server
-                            client.Connect(config["MailSettings:Server"], int.Parse(config["MailSettings:Port"]), SecureSocketOptions.StartTls);
+                            client.Connect(config["MailSettings:Server"], int.Parse(config["MailSettings:Port"]), SecureSocketOptions.SslOnConnect);
 
                             // Authenticate if required
                             client.Authenticate(config["MailSettings:UserName"], config["MailSettings:Password"]);
