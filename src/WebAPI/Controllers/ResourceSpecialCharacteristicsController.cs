@@ -7,6 +7,9 @@ using Application.Common.Interfaces.Repositories;
 using CoreApiResponse;
 using Domain.Entities;
 using Org.BouncyCastle.Asn1.Cmp;
+using System.Linq.Expressions;
+using System.Security.Cryptography;
+using WebAPI.Profiles;
 
 namespace WebAPI.Controllers
 {
@@ -36,16 +39,27 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<ResourceSpecialCharacteristics> resourceSpecialCharacteristics =
-                await _resourceSpecialCharacteristicsRepository.GetAllAsync();
+                await _resourceSpecialCharacteristicsRepository.GetAllAsync(
+                    includes: new Expression<Func<ResourceSpecialCharacteristics, object>>[]
+                    {
+                        r => r.ScheduleItem,
+                        r => r.Resource
+                    }
+                );
 
-            //if (!resourceSpecialCharacteristics.Any())
-            //{
-            //    return CustomResult(Enumerable.Empty<ResourceSpecialCharacteristics>());
-            //}
+            if (!resourceSpecialCharacteristics.Any())
+            {
+                return Ok(Enumerable.Empty<ResourceSpecialCharacteristics>());
+            }
 
-            List<ResourceSpecialCharacteristics> resourceSpecialCharacteristics1 = _mapper.Map<List<ResourceSpecialCharacteristics>>(resourceSpecialCharacteristics);
+            //List<ResourceSpecialCharacteristicsDTO> resourceSpecialCharacteristicsDTOs =
+            //resourceSpecialCharacteristics._mapper.Map<ResourceSpecialCharacteristicsDTO>;
+
+            List<ResourceSpecialCharacteristicsDTO> resourceSpecialCharacteristics1 =
+                _mapper.Map<List<ResourceSpecialCharacteristicsDTO>>(resourceSpecialCharacteristics);
+
+
             return CustomResult(resourceSpecialCharacteristics1);
-           
         }
 
         [HttpGet("{id:int}")]
