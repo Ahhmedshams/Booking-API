@@ -5,7 +5,7 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddStoredProcs : Migration
+    public partial class StoredProcedures : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -140,7 +140,7 @@ CREATE TABLE #TempInVisibleResourceTypeIDsNoSchedule (
 	
 			return @output; -- Return the output value
 END");
-			migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time ,@RegionId int = null
+            migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time ,@RegionId int = null
 as
 BEGIN try --1
 IF EXISTS (
@@ -1019,7 +1019,7 @@ CREATE TABLE #TempResourceNoScheduleInvisible (
 		select 0
 	end catch");
 
-			// AvailableServicesByRegion
+            // AvailableServicesByRegion
             migrationBuilder.Sql(@"create PROCEDURE FindMatchingServiceId @RegionId INT
 with encryption
 AS
@@ -1076,3 +1076,6 @@ go");
         }
     }
 }
+
+
+

@@ -59,6 +59,22 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FAQCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FAQCategory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PaymentMethods",
                 columns: table => new
                 {
@@ -69,6 +85,22 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PaymentMethods", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Regions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Regions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,7 +127,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Active"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
@@ -214,6 +246,53 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tickets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    TicketDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RecivedAdminId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminRecivedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ContactDoneAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tickets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tickets_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FAQ",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Question = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Answer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FAQCategoryId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FAQ", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FAQ_FAQCategory_FAQCategoryId",
+                        column: x => x.FAQCategoryId,
+                        principalTable: "FAQCategory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Resource",
                 columns: table => new
                 {
@@ -222,6 +301,7 @@ namespace Infrastructure.Migrations
                     ResourceTypeId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    RegionId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     LastUpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -229,6 +309,11 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Resource", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Resource_Regions_RegionId",
+                        column: x => x.RegionId,
+                        principalTable: "Regions",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Resource_ResourceTypes_ResourceTypeId",
                         column: x => x.ResourceTypeId,
@@ -624,6 +709,11 @@ namespace Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FAQ_FAQCategoryId",
+                table: "FAQ",
+                column: "FAQCategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Images_ResourceId",
                 table: "Images",
                 column: "ResourceId");
@@ -653,6 +743,11 @@ namespace Infrastructure.Migrations
                 name: "IX_paymentTransactions_UserId",
                 table: "paymentTransactions",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Resource_RegionId",
+                table: "Resource",
+                column: "RegionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Resource_ResourceTypeId",
@@ -706,6 +801,17 @@ namespace Infrastructure.Migrations
                 name: "IX_ServiceMetadata_ResourceTypeId",
                 table: "ServiceMetadata",
                 column: "ResourceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Services_Name",
+                table: "Services",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_ApplicationUserId",
+                table: "Tickets",
+                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -730,6 +836,9 @@ namespace Infrastructure.Migrations
                 name: "BookingItems");
 
             migrationBuilder.DropTable(
+                name: "FAQ");
+
+            migrationBuilder.DropTable(
                 name: "Images");
 
             migrationBuilder.DropTable(
@@ -748,7 +857,13 @@ namespace Infrastructure.Migrations
                 name: "ServiceMetadata");
 
             migrationBuilder.DropTable(
+                name: "Tickets");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "FAQCategory");
 
             migrationBuilder.DropTable(
                 name: "ClientBookings");
@@ -773,6 +888,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Resource");
+
+            migrationBuilder.DropTable(
+                name: "Regions");
 
             migrationBuilder.DropTable(
                 name: "ResourceTypes");
