@@ -164,7 +164,8 @@ namespace WebAPI.Controllers
             var booking = await clientBookingRepo.GetBookingById(bookingID);
             try
             {
-                Payment executedPayment = executedPayment = payment.Execute(paypalApi, paymentExecution);
+                Payment executedPayment  = payment.Execute(paypalApi, paymentExecution);
+
                 if (executedPayment.state == "approved")
                 {
                     //TODO: execute many times when fails

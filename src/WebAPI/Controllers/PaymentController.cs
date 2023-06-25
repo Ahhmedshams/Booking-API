@@ -54,37 +54,57 @@ namespace WebAPI.Controllers
                 return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
 
 
+
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
 
 
             var paymentUrl = service.MakePayment(bookingItemRepo, booking.TotalCost, bookingID);
 
-            return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
+            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
         }
 
-        [HttpPost("refund")]
-        public async Task<IActionResult> Refund(int bookingID)
+        [HttpPost("refund/{bookingID:int}")]
+        public async Task<IActionResult> Refund(string paymentType, int bookingID)
         {
+
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
+
             var booking = await clientBookingRepo.GetBookingById(bookingID);
 
             if (booking.Status != BookingStatus.Confirmed)
-                return CustomResult("Booking is not paid.", System.Net.HttpStatusCode.BadRequest);
+                return CustomResult("Booking is not paid.", HttpStatusCode.BadRequest);
 
             var payments = await payemntTransactionRepository.FindAsync(p => p.ClientBookingId == bookingID);
             var paymentTransaction = payments.FirstOrDefault();
 
-            IPaymentService service = paymentFactory.CreatePaymentService("card");
+            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
             var refund = await service.RefundPayment(paymentTransaction.TransactionId);
-
+             
             // TODO: handle all tranactions atomic execution.
             if (refund)
             {
                 await payemntTransactionRepository.Refund(paymentTransaction.Id);
-                return CustomResult("Booking successfully refunded", refund, System.Net.HttpStatusCode.Created);
+                return CustomResult("Booking successfully refunded", refund, HttpStatusCode.Created);
 
             }
 
-            return CustomResult("failed to refund", refund, System.Net.HttpStatusCode.BadRequest);
+            return CustomResult("failed to refund", refund, HttpStatusCode.BadRequest);
 
         }
     }
