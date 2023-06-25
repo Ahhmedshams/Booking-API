@@ -32,6 +32,7 @@ namespace WebAPI.Controllers
             this.bookingItemRepo = bookingItemRepo;
         }
 
+       
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] ClientBookingSpecParam specParams)
         {
@@ -65,28 +66,6 @@ namespace WebAPI.Controllers
 
         }
 
-
-        //[HttpPut]
-        //public async Task<IActionResult> Edit([FromQuery] int id, ClientBookingDTO clientBookDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return CustomResult(ModelState, HttpStatusCode.BadRequest);
-        //    var clientBook = mapper.Map<ClientBookingDTO, ClientBooking>(clientBookDTO);
-        //    await clientBookingRepo.EditAsync(id, clientBook, c => c.Id);
-        //    return CustomResult(clientBookDTO);
-        //}
-
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery] int id)
-        {
-            var service = await clientBookingRepo.GetBookingById(id);
-            if (service == null)
-                return CustomResult($"No Client's Book found for this Id {id}", HttpStatusCode.NotFound);
-            await clientBookingRepo.DeleteAsync(id);
-            return CustomResult(HttpStatusCode.NoContent);
-        }
-
-
         [HttpPost("CreateNewBooking")]
         public async Task<IActionResult> CreateNewBooking([FromBody] ClientBooking2DTO clientBooking2DTO, [FromQuery] string paymentType)
         {
@@ -118,7 +97,7 @@ namespace WebAPI.Controllers
 
             if (result == -1)
             {
-                return BadRequest("Invalid data entered");
+                return CustomResult("Invalid data entered", HttpStatusCode.BadRequest);
             }
 
             var booking = await clientBookingRepo.GetByIdAsync(result);
@@ -141,10 +120,10 @@ namespace WebAPI.Controllers
             var booking = await clientBookingRepo.GetBookingById(bookingID);
 
             if (booking == null)
-                return NotFound("There no booking with that id");
+                return CustomResult("There no booking with that id", HttpStatusCode.BadRequest);
 
             if (booking.Status != BookingStatus.Pending)
-                return BadRequest("can't process this request");
+                return CustomResult("can't process this request", HttpStatusCode.BadRequest);
 
             await clientBookingRepo.CancelBooking(bookingID);
 
@@ -152,4 +131,6 @@ namespace WebAPI.Controllers
             return CustomResult("Succefully cancel booking");
         }
 
-    } }
+    }
+
+}
