@@ -25,7 +25,7 @@ namespace Infrastructure.Identity.EmailSettings
 
                 EmailMessage.Subject = mailData.EmailSubject;
                 BodyBuilder emailBodyBuilder = new BodyBuilder();
-                emailBodyBuilder.TextBody = mailData.EmailBody;
+                emailBodyBuilder.HtmlBody = mailData.EmailBody;
                 EmailMessage.Body = emailBodyBuilder.ToMessageBody();
 
                 using (SmtpClient MailClient = new SmtpClient())

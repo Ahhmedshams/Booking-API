@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
-            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region);
+            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region,e=>e.Images);
             if (resource.Count() == 0)
                 return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
@@ -74,7 +74,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            Resource resource = await _resourceRepo.GetByIdAsync(id,e=>e.Region);
+            Resource resource = await _resourceRepo.GetByIdAsync(id,e=>e.Region,e=>e.Images);
             if (resource == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
