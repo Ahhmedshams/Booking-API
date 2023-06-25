@@ -33,7 +33,7 @@ namespace WebAPI.Controllers
             var booking = await clientBookingRepo.GetBookingById(bookingID);
 
             if (booking == null)
-                return CustomResult("There is no booking with this id", System.Net.HttpStatusCode.NotFound);
+                return CustomResult("There is no booking with this id", HttpStatusCode.NotFound);
 
 
             bool isValidPaymentType = false;

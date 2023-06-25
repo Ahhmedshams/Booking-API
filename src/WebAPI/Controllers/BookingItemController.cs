@@ -30,7 +30,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Edit([FromQuery] int bookingId, [FromQuery] int resourceId, BookingItemDTO bookingItemDTO)
+        public async Task<IActionResult> Update([FromQuery] int bookingId, [FromQuery] int resourceId, BookingItemDTO bookingItemDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);

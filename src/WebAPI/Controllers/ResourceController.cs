@@ -47,12 +47,9 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region);
-            if (resource.Count() == 0)
-                return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
             IQueryable<ResourceRespDTO>? FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
-
 
             return CustomResult(FilteredSchedules);
         }

@@ -67,7 +67,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("CreateNewBooking")]
-        public async Task<IActionResult> CreateNewBooking([FromBody] ClientBooking2DTO clientBooking2DTO, [FromQuery] string paymentType)
+        public async Task<IActionResult> Add([FromBody] ClientBooking2DTO clientBooking2DTO, [FromQuery] string paymentType)
         {
             bool isValidPaymentType = false;
             if (paymentType != null)
@@ -114,7 +114,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPut("CancelBooking/{bookingID:int}")]
-        public async Task<IActionResult> CancelBooking(int bookingID)
+        public async Task<IActionResult> Delete(int bookingID)
         {
 
             var booking = await clientBookingRepo.GetBookingById(bookingID);
