@@ -41,14 +41,14 @@ namespace WebAPI.Controllers
 
                 if (result is IdentityResult)
                 {
-                    return Ok("Created Successfully");
+                    return CustomResult("Created Successfully");
                 }
                 else if (result is IEnumerable<IdentityError> errorList)
                 {
-                    return BadRequest(errorList);
+                    return CustomResult(errorList, HttpStatusCode.BadRequest);
                 }
             }
-            return BadRequest(ModelState);
+            return CustomResult(ModelState, HttpStatusCode.BadRequest);
         }
 
         [HttpGet("confirm-email")]
@@ -56,24 +56,25 @@ namespace WebAPI.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
             {
-                return BadRequest("Invalid email confirmation link");
+                return CustomResult("Invalid email confirmation link", HttpStatusCode.BadRequest);
             }
 
             var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return BadRequest("Invalid email confirmation link");
-            }
+            //if (user == null)
+            //{
+            //    return CustomResult("Invalid email confirmation link", HttpStatusCode.BadRequest);
+            //}
+
             var DecodingResetToken = WebEncoders.Base64UrlDecode(token);
             var ValidToken = Encoding.UTF8.GetString(DecodingResetToken);
             var result = await userManager.ConfirmEmailAsync(user, ValidToken);
             if (result.Succeeded)
             {
-                return Ok("Email confirmed successfully");
+                return CustomResult("Email confirmed successfully");
             }
             else
             {
-                return BadRequest("Unable to confirm email");
+                return CustomResult("Unable to confirm email", HttpStatusCode.BadRequest);
             }
         }
 
@@ -93,14 +94,14 @@ namespace WebAPI.Controllers
                 {
                     JwtSecurityToken myToken = await accountRepo.Login(user);
 
-                    return Ok(new
+                    return CustomResult(new
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(myToken),
                         expiration = myToken.ValidTo
                     });
                 }
             }
-            return BadRequest(ModelState);
+            return CustomResult(ModelState, HttpStatusCode.BadRequest);
         }
 
         [HttpPost("Change/Email")]
@@ -111,13 +112,13 @@ namespace WebAPI.Controllers
                 var Result = await accountRepo.ChangeEmailAsync(ChangeEmailDto.OldEmail, ChangeEmailDto.NewEmail, ChangeEmailDto.Password);
                 if (Result.Succeeded)
                 {
-                    return Ok("Email has been changed successfully");
+                    return CustomResult("Email has been changed successfully");
                 }
-                return Unauthorized("Your email or password incorrect");
+                return CustomResult("Your email or password incorrect", HttpStatusCode.Unauthorized);
             }
             else
             {
-                return BadRequest("Email Is Invalid");
+                return CustomResult("Email Is Invalid", HttpStatusCode.BadRequest);
             }
         }
         [HttpPost("Change/Password")]
@@ -128,12 +129,12 @@ namespace WebAPI.Controllers
                 var Result = await accountRepo.ChangePasswordAsync(ChangePasswordDto.Email, ChangePasswordDto.CurrentPassword, ChangePasswordDto.NewPassword);
                 if (Result.Succeeded)
                 {
-                    return Ok("Password has been changed successfully");
+                    return CustomResult("Password has been changed successfully");
                 }
-                return Unauthorized("Your email or password incorrect");
+                return CustomResult("Your email or password incorrect", HttpStatusCode.Unauthorized);
             }
 
-            return BadRequest(ModelState.Values);
+            return CustomResult(ModelState.Values, HttpStatusCode.BadRequest);
         }
 
         [HttpPost]
@@ -141,7 +142,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> ForgetPasswordAsync([EmailAddress] string Email)
         {
             if (Email == null || !ModelState.IsValid)
-                return BadRequest("Check your email input");
+                return CustomResult("Check your email input", HttpStatusCode.BadRequest);
             var Result = await accountRepo.ForgetPasswordAsync(Email);
             if (Result)
                 return CustomResult("If your email matches one of our registerd account, we will send and email with resetting password steps");
@@ -160,18 +161,18 @@ namespace WebAPI.Controllers
                     var Result = await accountRepo.ResetPasswordAsync(ResetPasswordDto.Email, ResetPasswordDto.Token, ResetPasswordDto.Password);
                     if (Result.Succeeded)
                     {
-                        return Ok("Password Has Been Reset Successfully");
+                        return CustomResult("Password Has Been Reset Successfully");
                     }
                     string Errors = string.Empty;
                     foreach (var Error in Result.Errors)
                     {
                         Errors += Error.Description.Substring(0, Error.Description.Length - 1) + ", ";
                     }
-                    return BadRequest(Errors.Substring(0, Errors.Length - 2));
+                    return CustomResult(Errors.Substring(0, Errors.Length - 2), HttpStatusCode.BadRequest);
                 }
-                return BadRequest(ModelState.Values);
+                return CustomResult(ModelState.Values, HttpStatusCode.BadRequest);
             }
-            return BadRequest("All Fields Are Required");
+            return CustomResult("All Fields Are Required", HttpStatusCode.BadRequest);
         }
 
 
@@ -182,11 +183,10 @@ namespace WebAPI.Controllers
                 return CustomResult($"Need To provide Id {id}", HttpStatusCode.NotFound);
 
             var user = await accountRepo.GetByID(id);
-            if (user == null)
-                return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
+            //if (user == null)
+            //    return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
 
             var Result = mapper.Map<UserResponce>(user);
-
 
             return CustomResult(Result);
         }
@@ -199,12 +199,13 @@ namespace WebAPI.Controllers
             {
                 var AppUser = mapper.Map<ApplicationUser>(user);
                 await accountRepo.EditAsync(Id,AppUser);
-            }
+				return CustomResult(user);
+			}
             catch (Exception ex)
             {
                 return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.BadRequest);
             }
-            return CustomResult();
+            
 
         }
 
