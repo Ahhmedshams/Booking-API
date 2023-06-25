@@ -1,4 +1,9 @@
-﻿namespace WebAPI.Utility
+﻿using Domain.Entities;
+using Domain.Enums;
+using Stripe.Terminal;
+using static Infrastructure.Utility.Permissions;
+
+namespace WebAPI.Utility
 {
     public static class Extensions
     {
@@ -20,12 +25,98 @@
 
             return uniqueAttributes;
         }
+        public static IEnumerable<ClientBookingWithDetails> ToClientBookingWithDetails(this IEnumerable<ClientBooking> clientBooking)
+        {
+            var result = new List<ClientBookingWithDetails>();
+            foreach (var booking in clientBooking)
+            {
+                var entity = booking.ToClientBookingWithDetails();
+                result.Add(entity);
+            }
+            return result;
+        }
+        public static ClientBookingWithDetails ToClientBookingWithDetails(this ClientBooking clientBooking)
+        {
+
+            var result = new ClientBookingWithDetails()
+            {
+                Id = clientBooking.Id,
+                Date = clientBooking.Date,
+                StartTime = clientBooking.StartTime,
+                EndTime = clientBooking.EndTime,
+                Location = clientBooking.Location,
+                Status = clientBooking.Status,
+                ServiceName = clientBooking.Service.Name,
+                ServiceDescription = clientBooking.Service.Description,
+                UserId = clientBooking.UserId,
+                BookingItems = clientBooking.BookingItems.ToBookingItemWIthDetails(),
+                ServiceImages = clientBooking.Service.Images,
+               // PaymentMethodName = clientBooking?.paymentTransaction.PaymentMethod.Name,
+               // PaymentStatus = clientBooking?.paymentTransaction.Status,
+                TotalCost = clientBooking.TotalCost
+            };
 
 
+            return result;
+        }
+
+        public static IEnumerable<ClientBookingDTO> ToClientBooking(this IEnumerable<ClientBooking> clientBooking)
+        {
+            var result = new List<ClientBookingDTO>();
+            foreach (var booking in clientBooking)
+            {
+                var entity = booking.ToClientBooking();
+                result.Add(entity);
+            }
+            return result;
+        }
+        public static ClientBookingDTO ToClientBooking(this ClientBooking clientBooking)
+        {
+
+            var result = new ClientBookingDTO()
+            {
+                Id = clientBooking.Id,
+                Date = clientBooking.Date,
+                StartTime = clientBooking.StartTime,
+                EndTime = clientBooking.EndTime,
+                Location = clientBooking.Location,
+                Status = clientBooking.Status,
+                ServiceName = clientBooking.Service.Name,
+                TotalCost = clientBooking.TotalCost
+            };
+
+
+            return result;
+        }
+
+        public static IEnumerable<BookingItemWIthDetails> ToBookingItemWIthDetails(this IEnumerable<BookingItem> bookingItems)
+        {
+            List<BookingItemWIthDetails> result = new();
+            foreach (var bookingItem in bookingItems)
+            {
+                if (bookingItem.Resource.ResourceType.Shown == true)
+                {
+                    var entity = new BookingItemWIthDetails()
+                    {
+                        Price = bookingItem.Price,
+                        ResourceId = bookingItem.ResourceId,
+                        ResourceName = bookingItem.Resource.Name,
+                    };
+                    result.Add(entity);
+                }
+                
+            }
+
+            return result;
+
+
+        }
 
     }
 
-    
+   
+
+
     public class AttributeNameComparer : IEqualityComparer<ResourceAttribute>
     {
         public bool Equals(ResourceAttribute x, ResourceAttribute y)

@@ -68,28 +68,12 @@ namespace Infrastructure.Persistence.Specification.ClientBookingSpec
                 AddSearchBy(b => b.Status == specParams.Status);
             }
 
-            //if (specParams.ServiceId != null)
-            //{
-            //    AddSearchBy(b => b.ServiceId == specParams.ServiceId);
-            //}
-
-            //if (specParams.UserEmail != null)
-            //{
-            //    var user = GetUser(specParams.UserEmail);
-                
-            //    if(user != null)
-            //    {
-            //        AddSearchBy(b => b.UserId == user.Id.ToString());
-            //    }
-            //}
+            if(specParams.UserID != null)
+            {
+                AddSearchBy(b=> b.UserId == specParams.UserID);
+            }
 
         }
-
-        //private async Task<ApplicationUser> GetUser(string email)
-        //{
-        //    ApplicationUser user =await _userManager.FindByEmailAsync(email);
-        //    return user;
-        //}
        
     }
 }

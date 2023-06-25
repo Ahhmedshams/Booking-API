@@ -12,7 +12,8 @@ namespace WebAPI.DTO
 
         [Sieve(CanFilter = true, CanSort = true)]
         public Decimal Price { get; set; }
-    }
+		public List<string> ImageUrls { get; set; }
+	}
 
     public class ResourceReqDTO
     {
@@ -34,6 +35,6 @@ namespace WebAPI.DTO
 
     }
 
-   
+
 
 }

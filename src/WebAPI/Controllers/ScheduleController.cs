@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Model;
 using Application.Common.Models;
 using AutoMapper;
 using CoreApiResponse;
@@ -70,44 +71,30 @@ namespace WebAPI.Controllers
         [HttpGet("GetAvailableResources")]
         public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel, [FromQuery] int? RegionId)
         {
-            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel,
-                RegionId);
-            var FilteredAvailableResources = _sieveProcessor.Apply(sieveModel, availableResources.AsQueryable());
+            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel, RegionId);
 
-            if (availableResources == null)
+            if (availableResources.Count == 0)
             {
-                return Ok(new List<Resource>()); // Return an empty array
+                return CustomResult(new List<Resource>());
             }
             else
             {
-                return Ok(FilteredAvailableResources);
+                //var responseAvailableResources = availableResources.Select(r => new AllResourceData
+                //{
+                //    ResourceTypeId = r.ResourceTypeId,
+                //    Price = r.Price,
+                //    Name = r.Name,
+                //    Images = r.Images,
+                //}).ToList();
+                //var responseAvailableResources = mapper.Map<List<AllResourceData>>(availableResources);
+                IQueryable<Resource>? FilteredAvailableResources = _sieveProcessor.Apply<Resource>(sieveModel, availableResources.AsQueryable());
+
+                var availableRess = mapper.Map<List<ResourceRespDTO>>(FilteredAvailableResources);
+
+
+                return CustomResult(availableRess);
             }
         }
-        //[HttpGet("GetAvailableResources")]
-        //public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel)
-        //{
-        //    var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel);
-        //    var filteredAvailableResources = _sieveProcessor.Apply<Resource>(sieveModel, availableResources.AsQueryable());
-
-        //    if (filteredAvailableResources == null)
-        //    {
-        //        return Ok(new List<ResourceWithDataDTO>()); 
-        //    }
-        //    else
-        //    {
-        //        var resourceDTOs = filteredAvailableResources.Select(r => new ResourceWithDataDTO
-        //        {
-        //            ResourceTypeId = r.ResourceTypeId,
-        //            Price = r.Price,
-        //            Name = r.Name                   
-        //        }).ToList();
-
-        //        return Ok(resourceDTOs);
-        //    }
-        //}
-
-
-
 
         [HttpGet("{resourceId:int}")]
         public IActionResult GetByResourceId(int resourceId)

@@ -11,12 +11,14 @@ namespace Application.Common.Interfaces.Services
     {
         public Task<string> MakePayment(IBookingItemRepo bookingItemRepo,decimal amount, int bookingID);
 
-        public Task<bool> CancelPayment(string paymentID);
+        //public Task<bool> CancelPayment(string paymentID);
+
+        public Task<bool> RefundPayment(string paymentID);
 
 
      //   public Task SetCustomerInfo(string name, string email, string address);
 
 
-     //   public void SetCardInfo(string id, string expireDate, int ccv);
+        //   public void SetCardInfo(string id, string expireDate, int ccv);
     }
 }

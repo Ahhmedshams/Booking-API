@@ -47,8 +47,8 @@ namespace Infrastructure.Persistence.Repositories
 
         private IQueryable<Service> ApplySpecification(ISpecification<Service> spec)
         {
-            var query = _context.Set<Service>().Include(s => s.Metadata).ThenInclude(s=>s.ResourceType);
-            return SpecificationEvaluator<Service>.GetQuery(query, spec);
+            var query = _context.Set<Service>().Include(s => s.Images);
+			return SpecificationEvaluator<Service>.GetQuery(query, spec);
         }
         public async Task<IEnumerable<Service>> ServicesByRegion(int RegionId)
         {

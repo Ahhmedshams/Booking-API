@@ -17,5 +17,6 @@ namespace Infrastructure.Persistence.Specification.ClientBookingSpec
         public BookingStatus? Status { get; set; }
         //public int? ServiceId { get; set; }
         //public string? UserEmail { get; set; }
-    }
+		public string? UserID { get; set; }
+	}
 }

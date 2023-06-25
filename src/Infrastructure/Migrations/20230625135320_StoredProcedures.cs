@@ -5,7 +5,7 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddStoredProcs : Migration
+    public partial class StoredProcedures : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -140,7 +140,7 @@ CREATE TABLE #TempInVisibleResourceTypeIDsNoSchedule (
 	
 			return @output; -- Return the output value
 END");
-			migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time ,@RegionId int = null
+            migrationBuilder.Sql(@"create proc GetAvailableResourceForService  @date date,@serviceID int,@startTime time, @endTime time ,@RegionId int = null
 as
 BEGIN try --1
 IF EXISTS (
@@ -804,7 +804,7 @@ as
 	begin 
 
 		update [dbo].[ClientBookings]
-		set [Status]= 'Confiremed '
+		set [Status]= 'Confirmed'
 		where [Id]=@bookingID
 	end 
 	else 
@@ -995,12 +995,12 @@ CREATE TABLE #TempResourceNoScheduleInvisible (
 
 		begin try 
 		BEGIN TRANSACTION;
-			update  [dbo].[BookingItems]
-			set [IsDeleted]=1
-			where [BookingId]=@BookingID
+			--update  [dbo].[BookingItems]
+			--set [IsDeleted]=1
+			--where [BookingId]=@BookingID
 
 			update [dbo].[ClientBookings]
-			set [IsDeleted]=1
+			set [Status]= 'Cancelled'
 			where [Id] =@BookingID 
 			commit;
 		end try
@@ -1019,7 +1019,7 @@ CREATE TABLE #TempResourceNoScheduleInvisible (
 		select 0
 	end catch");
 
-			// AvailableServicesByRegion
+            // AvailableServicesByRegion
             migrationBuilder.Sql(@"create PROCEDURE FindMatchingServiceId @RegionId INT
 with encryption
 AS
@@ -1065,14 +1065,17 @@ go");
             migrationBuilder.Sql("DROP PROC proc3");
             migrationBuilder.Sql("DROP PROC GetAvailableResourceForService");
 
-            migrationBuilder.Sql("DROP SetBookingStatusConfiremed");
-            migrationBuilder.Sql("DROP SetBookingStatuscompleted");
+            migrationBuilder.Sql("DROP PROC SetBookingStatusConfiremed");
+            migrationBuilder.Sql("DROP PROC SetBookingStatuscompleted");
 
-            migrationBuilder.Sql("DROP CalculateTotalCost");
+            migrationBuilder.Sql("DROP PROC CalculateTotalCost");
 
-            migrationBuilder.Sql("DROP CancelPendingBooking");
             migrationBuilder.Sql("DROP PROC FindMatchingServiceId");
+            migrationBuilder.Sql("DROP PROC CancelPendingBooking");
 
         }
     }
 }
+
+
+
