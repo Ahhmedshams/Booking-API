@@ -10,8 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 
@@ -44,12 +42,27 @@ namespace Infrastructure.Persistence.Repositories
                     var EncodingConfirmToken = Encoding.UTF8.GetBytes(token);
                     var ValidEncodingConfirmToken = WebEncoders.Base64UrlEncode(EncodingConfirmToken);
 
+                    var bodybuilder = new BodyBuilder();
+                    bodybuilder.HtmlBody =
+                    "</head>\r\n<body>\r\n  " +
+                    "<div class=\"container\">\r\n    " +
+                    $"<p>Dear {userFromDb.UserName},</p>\r\n    " +
+                    "<p>We received a request to confirm your email. Please use the following token to confirm:</p>\r\n    " +
+                    $"<p>{token}</p>" +
+                    "<p>Click the link below to Confirm your Email</p>\r\n" +
+                    $"<a " +
+                    $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
+                    $" href={config["Server:Client"]}/resetPassword>Confirm Email</a>\r\n    " +
+                    "<p>If you did not request a password reset, please ignore this email.</p>\r\n    " +
+                    "<p>Best regards,</p>\r" +
+                    "<p>Sona</p>\r\n  " +
+                    "</div>\r\n</body>\r\n</html>";
                     var mailData = new MailData
                     {
                         EmailTo = userFromDb.Email,
                         EmailToName = userFromDb.UserName,
                         EmailSubject = "Confirm your email",
-                        EmailBody = $"Please confirm your email address by clicking this link:\n {config["Server:Client"]}/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}"
+                        EmailBody = bodybuilder.HtmlBody
                     };
                     mailService.SendMail(mailData);
                     
@@ -174,7 +187,7 @@ namespace Infrastructure.Persistence.Repositories
                         using (var client = new SmtpClient())
                         {
                             // Connect to the SMTP server
-                            client.Connect(config["MailSettings:Server"], int.Parse(config["MailSettings:Port"]), SecureSocketOptions.StartTls);
+                            client.Connect(config["MailSettings:Server"], int.Parse(config["MailSettings:Port"]), SecureSocketOptions.SslOnConnect);
 
                             // Authenticate if required
                             client.Authenticate(config["MailSettings:UserName"], config["MailSettings:Password"]);

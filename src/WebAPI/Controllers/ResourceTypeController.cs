@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
       //  [Authorize(Permissions.ResourceTypes.Index)]
         public async Task< IActionResult> GetAll()
         {
-            IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync();
+            IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync(true,r=>r.Images);
             if (resourceTypes.Count() == 0 ) 
                 return CustomResult("No Resource Type Are Available", HttpStatusCode.NotFound);
             
@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            ResourceType resourceType = await _resourceTypeRepo.GetByIdAsync(id);
+            ResourceType resourceType = await _resourceTypeRepo.GetByIdAsync(id, r => r.Images);
             if (resourceType == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 

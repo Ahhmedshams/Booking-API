@@ -1,7 +1,5 @@
 ﻿
 using Domain.Identity;
-using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
@@ -10,7 +8,8 @@ namespace Domain.Entities
         Confirmed,
         Cancelled,
         Pending,
-        Completed
+        Completed,
+        InProcess
     }
 
     public class ClientBooking: BaseEntity
