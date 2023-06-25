@@ -86,8 +86,8 @@ namespace Infrastructure.Persistence.Repositories
                         new SqlParameter("@param4", endTime),
                         new SqlParameter("@RegionId", regionId)
                         )
-                      .IgnoreQueryFilters()
-                      .ToList();
+					  .IgnoreQueryFilters()
+					  .ToList();
 
                 if (results.Count > 0)
                 {
