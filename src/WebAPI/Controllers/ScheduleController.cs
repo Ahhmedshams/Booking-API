@@ -71,9 +71,9 @@ namespace WebAPI.Controllers
         [HttpGet("GetAvailableResources")]
         public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel, [FromQuery] int? RegionId)
         {
-            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel,RegionId);
+            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel, RegionId);
 
-            if (availableResources.Count==0)
+            if (availableResources.Count == 0)
             {
                 return CustomResult(new List<Resource>());
             }
@@ -90,12 +90,11 @@ namespace WebAPI.Controllers
                 IQueryable<Resource>? FilteredAvailableResources = _sieveProcessor.Apply<Resource>(sieveModel, availableResources.AsQueryable());
 
                 var availableRess = mapper.Map<List<ResourceRespDTO>>(FilteredAvailableResources);
-                
-                
+
+
                 return CustomResult(availableRess);
             }
         }
-     
 
         [HttpGet("{resourceId:int}")]
         public IActionResult GetByResourceId(int resourceId)

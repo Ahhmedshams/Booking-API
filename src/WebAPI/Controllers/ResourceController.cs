@@ -53,7 +53,6 @@ namespace WebAPI.Controllers
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
             IQueryable<ResourceRespDTO>? FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
 
-
             return CustomResult(FilteredSchedules);
         }
 

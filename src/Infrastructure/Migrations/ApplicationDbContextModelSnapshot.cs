@@ -50,7 +50,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("BookingItems", (string)null);
+                    b.ToTable("BookingItems");
                 });
 
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
@@ -109,7 +109,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ClientBookings", (string)null);
+                    b.ToTable("ClientBookings");
                 });
 
             modelBuilder.Entity("Domain.Entities.FAQ", b =>
@@ -148,7 +148,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FAQCategoryId");
 
-                    b.ToTable("FAQ", (string)null);
+                    b.ToTable("FAQ");
                 });
 
             modelBuilder.Entity("Domain.Entities.FAQCategory", b =>
@@ -174,7 +174,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FAQCategory", (string)null);
+                    b.ToTable("FAQCategory");
                 });
 
             modelBuilder.Entity("Domain.Entities.ImageEntity", b =>
@@ -204,7 +204,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("ImageEntity");
 
@@ -225,7 +225,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods", (string)null);
+                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("Domain.Entities.PaymentTransaction", b =>
@@ -282,7 +282,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("paymentTransactions", (string)null);
+                    b.ToTable("paymentTransactions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Region", b =>
@@ -308,7 +308,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("Regions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
@@ -351,7 +351,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("Resource", (string)null);
+                    b.ToTable("Resource");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceData", b =>
@@ -383,7 +383,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("ResourceData", (string)null);
+                    b.ToTable("ResourceData");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceMetadata", b =>
@@ -422,7 +422,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ResourceMetadata", (string)null);
+                    b.ToTable("ResourceMetadata");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceReview", b =>
@@ -467,7 +467,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ResourceReview", (string)null);
+                    b.ToTable("ResourceReview");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceSpecialCharacteristics", b =>
@@ -508,7 +508,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ScheduleID] IS NOT NULL");
 
-                    b.ToTable("ResourceSpecialCharacteristics", (string)null);
+                    b.ToTable("ResourceSpecialCharacteristics");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResourceType", b =>
@@ -545,7 +545,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes", (string)null);
+                    b.ToTable("ResourceTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -578,7 +578,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceId");
 
-                    b.ToTable("Schedule", (string)null);
+                    b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("Domain.Entities.ScheduleItem", b =>
@@ -626,7 +626,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("ScheduleItem", (string)null);
+                    b.ToTable("ScheduleItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
@@ -669,7 +669,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Entities.ServiceMetadata", b =>
@@ -700,7 +700,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ResourceTypeId");
 
-                    b.ToTable("ServiceMetadata", (string)null);
+                    b.ToTable("ServiceMetadata");
                 });
 
             modelBuilder.Entity("Domain.Entities.Ticket", b =>
@@ -1080,7 +1080,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
-                    b.HasOne("Domain.Entities.Region", null)
+                    b.HasOne("Domain.Entities.Region", "Region")
                         .WithMany()
                         .HasForeignKey("RegionId");
 
@@ -1089,6 +1089,8 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ResourceTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Region");
 
                     b.Navigation("ResourceType");
                 });
