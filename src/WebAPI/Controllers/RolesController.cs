@@ -102,6 +102,8 @@ namespace WebAPI.Controllers
             if (role == null)
                 return CustomResult($"There is no Role with ID {rolePermissionsDTO.RoleID}", System.Net.HttpStatusCode.BadRequest);
 
+            await roleManager.SetRoleNameAsync(role, rolePermissionsDTO.Name);
+
             var allRoleclaims = await roleManager.GetClaimsAsync(role);
 
             foreach (var claim in allRoleclaims)
