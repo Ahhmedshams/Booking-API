@@ -33,7 +33,7 @@ namespace Infrastructure.Persistence
         DbSet<Service> Services { get; set; }
         DbSet<ServiceMetadata> ServiceMetadata { get; set; }
         DbSet<BookingItem> BookingItems { get; set; }
-        DbSet<ClientBooking> ClientBookings { get; set; }
+       public DbSet<ClientBooking> ClientBookings { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
          

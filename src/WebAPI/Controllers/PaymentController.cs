@@ -1,10 +1,9 @@
-﻿using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Services;
+﻿using Application.Common.Interfaces.Services;
 using CoreApiResponse;
+using Domain.Enums;
 using Infrastructure.Factories;
-using Infrastructure.Persistence.Specification.BookingItemSpec;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace WebAPI.Controllers
 {
@@ -13,44 +12,100 @@ namespace WebAPI.Controllers
     public class PaymentController : BaseController
     {
         private readonly PaymentFactory paymentFactory;
-        private readonly IPaymentService paymentService;
         private readonly IPayemntTransactionRepository payemntTransactionRepository;
+        private readonly IClientBookingRepo clientBookingRepo;
         private readonly IBookingItemRepo bookingItemRepo;
 
-        public PaymentController(PaymentFactory paymentFactory,IPaymentService paymentService, IPayemntTransactionRepository payemntTransactionRepository, IBookingItemRepo bookingItemRepo)
+        public PaymentController(PaymentFactory paymentFactory, IPayemntTransactionRepository payemntTransactionRepository, IClientBookingRepo clientBookingRepo ,IBookingItemRepo bookingItemRepo)
         {
             this.paymentFactory=paymentFactory;
-            this.paymentService=paymentService;
             this.payemntTransactionRepository=payemntTransactionRepository;
+            this.clientBookingRepo=clientBookingRepo;
             this.bookingItemRepo=bookingItemRepo;
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Checkout(string paymentType)
+        [HttpPost("checkout/{bookingID:int}")]
+        public async Task<IActionResult> Checkout(string paymentType, int bookingID)
         {
+            // TODO: check if a user already has a payment session to this booking.
+
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking == null)
+                return CustomResult("There is no booking with this id", System.Net.HttpStatusCode.NotFound);
+
+
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
+
 
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
-            var paymentUrl = service.MakePayment(bookingItemRepo, 400, 1);
 
-            return CustomResult("created", paymentUrl,System.Net.HttpStatusCode.Created);
+
+            var paymentUrl = service.MakePayment(bookingItemRepo, booking.TotalCost, bookingID);
+
+            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
         }
 
-        [HttpPost("refund")]
-        public async Task<IActionResult> Refund(int bookingID)
+        [HttpPost("refund/{bookingID:int}")]
+        public async Task<IActionResult> Refund(string paymentType, int bookingID)
         {
 
+            bool isValidPaymentType = false;
+            if (paymentType != null)
+            {
+                foreach (string method in Enum.GetNames(typeof(PaymentMethodType)))
+                {
+                    if (method.ToLower() == paymentType.ToLower())
+                    {
+                        isValidPaymentType = true;
+                        break;
+                    }
+                }
+            }
+
+
+            if (!isValidPaymentType)
+                return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
+
+
+            var booking = await clientBookingRepo.GetBookingById(bookingID);
+
+            if (booking.Status != BookingStatus.Confirmed)
+                return CustomResult("Booking is not paid.", HttpStatusCode.BadRequest);
+
             var payments = await payemntTransactionRepository.FindAsync(p => p.ClientBookingId == bookingID);
+            var paymentTransaction = payments.FirstOrDefault();
 
-            //TODO: check if pyament is confirmed and paid
-            
-            string paymentID = payments.FirstOrDefault()?.TransactionId;
+            IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
+            var refund = await service.RefundPayment(paymentTransaction.TransactionId);
+             
+            // TODO: handle all tranactions atomic execution.
+            if (refund)
+            {
+                await payemntTransactionRepository.Refund(paymentTransaction.Id);
+                return CustomResult("Booking successfully refunded", refund, HttpStatusCode.Created);
 
-            var refund = paymentService.CancelPayment(paymentID);
+            }
 
-            // TODO: change payment transaction status to refunded
+            return CustomResult("failed to refund", refund, HttpStatusCode.BadRequest);
 
-            return CustomResult("created", refund, System.Net.HttpStatusCode.Created);
         }
     }
 }

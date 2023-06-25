@@ -21,10 +21,7 @@ namespace Infrastructure.Services
             this.configuration=configuration;
             this.mapper=mapper;
         }
-        public Task<bool> CancelPayment(string paymentID)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public async Task<string> MakePayment(IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
         {
@@ -43,6 +40,8 @@ namespace Infrastructure.Services
 
             var bookingItems = bookingItemRepo.GetAllBooksItemsByBookingId(bookingID);
 
+
+
             Payment createdPayment = null;
             try
             {
@@ -53,15 +52,16 @@ namespace Infrastructure.Services
                     transactions = new List<Transaction>() {
                         new Transaction() {
                             amount = new() { currency = "USD", total = bookingItems.Sum(b => b.Price).ToString() },
-                            item_list =  bookingItems.ToPaypalItemsList(),
+                            item_list =  bookingItems.ToPaypalItemsList()
                         } 
                     },
                     
                     redirect_urls = new RedirectUrls()
                     {
                         cancel_url = configuration["Paypal:CancelUrl"],
-                        return_url = $"{configuration["Paypal:SuccessUrl"]}?bookingID={bookingID}"
+                        return_url = $"{configuration["Paypal:SuccessUrl"]}?bookingID={bookingID}&userID={bookingItems[0].ClientBooking.UserId}"
                     }
+                  
                 };
 
                 createdPayment =  payment.Create(paypalApi);
@@ -84,6 +84,28 @@ namespace Infrastructure.Services
            
 
             throw new Exception("cannot create payapal session");
+        }
+
+        public Task<bool> RefundPayment(string paymentID)
+        {
+            Dictionary<string, string> _config = new Dictionary<string, string>();
+            _config["mode"] = configuration["Paypal:Mode"];
+            _config["clientId"] = configuration["Paypal:PublicKey"];
+            _config["clientSecret"] = configuration["Paypal:SecretKey"];
+
+            var token = new OAuthTokenCredential(_config).GetAccessToken();
+
+
+            APIContext paypalApi = new APIContext(token) { Config = _config };
+
+
+           DetailedRefund detailedRefund =  Sale.Refund(paypalApi, paymentID, new RefundRequest() );
+
+            if (detailedRefund == null)
+                return Task.FromResult(false);
+
+            return Task.FromResult(true);
+
         }
     }
 }

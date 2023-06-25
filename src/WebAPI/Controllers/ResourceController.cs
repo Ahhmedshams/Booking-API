@@ -143,7 +143,7 @@ namespace WebAPI.Controllers
 
             var res = await _resourceDataRepo.AddRangeAsync(resourceData);
 
-            var resDTO = _mapper.Map<ResourceDataRespDTO>(res);
+            var resDTO = _mapper.Map<List<ResourceDataRespDTO>>(res);
 
             return CustomResult(resDTO);
         }
