@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebAPI.Controllers
 {
@@ -41,18 +42,23 @@ namespace WebAPI.Controllers
         [HttpGet("TicketById")]
         public async Task<IActionResult> GetTicketById(int id)
         {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            var userId = claimsIdentity.FindFirst("id")?.Value;
             var ticket = await _context.Tickets.FindAsync(id);
            
             if (ticket == null)
                 return NotFound("Ticket Not Found");
             //var ticket = _Mapper.Map<Ticket>(ticketCheck);
-            if(ticket.RecivedAdminId == null || ticket.AdminRecivedAt == null)
+            if(ticket.RecivedAdminId == null && ticket.AdminRecivedAt == null)
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user != null)
+
+                //var user = await _userManager.GetUserAsync(User);
+                if (userId == null)
                 {
-                    ticket.RecivedAdminId = await _userManager.GetUserIdAsync(user);
+
+                   return NotFound("Not Authorized");
                 }
+                ticket.RecivedAdminId = userId;
                 ticket.AdminRecivedAt = DateTime.Now;
 
                 _context.Tickets.Update(ticket);
@@ -78,7 +84,7 @@ namespace WebAPI.Controllers
         [HttpGet("NewTickets")]
         public async Task<IActionResult> GetNewTickets()
         {
-            var tickets =  _context.Tickets.Where(x => x.RecivedAdminId == null || x.AdminRecivedAt == null).ToList();
+            var tickets =  _context.Tickets.Where(x => x.RecivedAdminId == null && x.AdminRecivedAt == null).ToList();
             if (tickets == null)
                 return NotFound("Ticket Not Found");
             return Ok(tickets);

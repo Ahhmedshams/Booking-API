@@ -71,14 +71,15 @@ namespace Infrastructure.Persistence.Repositories
         }
         public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime, SieveModel sieveModel, int? regionId = null)
         {
-           
+            try
+            {
                 var day = _day;
                 var startTime = _startTime;
                 var endTime = _endTime;
                 int serviceId = _serviceId;
 
                 var results = _context.Resource
-					.FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4,@RegionId",
+                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4,@RegionId",
                         new SqlParameter("@param1", day),
                         new SqlParameter("@param2", serviceId),
                         new SqlParameter("@param3", startTime),
@@ -88,14 +89,22 @@ namespace Infrastructure.Persistence.Repositories
 					  .IgnoreQueryFilters()
 					  .ToList();
 
-            if (results.Count > 0)
-            {
-                return results;
+                if (results.Count > 0)
+                {
+                    return results;
+                }
+                else
+                {
+                    return new List<Resource>();
+                }
             }
-            else
+            catch (Exception ex) 
             {
                 return new List<Resource>();
             }
+                
+
+           
         }
 
         public bool IsExist(int id)

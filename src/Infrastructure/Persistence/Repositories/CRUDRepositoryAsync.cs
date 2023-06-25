@@ -36,6 +36,8 @@ namespace Infrastructure.Persistence.Repositories
             return await query.ToListAsync();
         }
 
+
+
         public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);

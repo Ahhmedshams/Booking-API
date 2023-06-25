@@ -13,7 +13,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<Service>> GetAllServices()
         {
-            var services = await _context.Set<Service>()
+            var services = await _context.Set<Service>().Include(s=>s.Images)
                                     .Where(s => s.IsDeleted == false)
                                     .ToListAsync();
             return services;
@@ -21,7 +21,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<Service> GetServiceById(int id)
         {
-            var service = await _context.Set<Service>()
+            var service = await _context.Set<Service>().Include(s => s.Images)
                                     .Where(s => s.IsDeleted == false & s.Id == id)
                                     .FirstOrDefaultAsync();
             return service;
@@ -53,7 +53,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<Service>> ServicesByRegion(int RegionId)
         {
             var result =  _context.Set<Service>()
-                    .FromSqlRaw("EXEC FindMatchingServiceId @RegionId",
+                .FromSqlRaw("EXEC FindMatchingServiceId @RegionId",
                     new SqlParameter("@RegionId", RegionId)).IgnoreQueryFilters().ToList();
 
             return result;
