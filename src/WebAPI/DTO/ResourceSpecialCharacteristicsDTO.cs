@@ -11,6 +11,8 @@ namespace WebAPI.DTO
 
         public int ?ScheduleID { get; set; }
 
+        public DateTime? Day { get; set; } 
+        public string ResourceName { get; set; }
         public int ResourceID { get; set; }
     }
 }
