@@ -40,6 +40,8 @@ namespace Infrastructure.Services
 
             var bookingItems = bookingItemRepo.GetAllBooksItemsByBookingId(bookingID);
 
+
+
             Payment createdPayment = null;
             try
             {
@@ -86,7 +88,24 @@ namespace Infrastructure.Services
 
         public Task<bool> RefundPayment(string paymentID)
         {
-            throw new NotImplementedException();
+            Dictionary<string, string> _config = new Dictionary<string, string>();
+            _config["mode"] = configuration["Paypal:Mode"];
+            _config["clientId"] = configuration["Paypal:PublicKey"];
+            _config["clientSecret"] = configuration["Paypal:SecretKey"];
+
+            var token = new OAuthTokenCredential(_config).GetAccessToken();
+
+
+            APIContext paypalApi = new APIContext(token) { Config = _config };
+
+
+           DetailedRefund detailedRefund =  Sale.Refund(paypalApi, paymentID, new RefundRequest() );
+
+            if (detailedRefund == null)
+                return Task.FromResult(false);
+
+            return Task.FromResult(true);
+
         }
     }
 }
