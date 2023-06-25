@@ -78,7 +78,7 @@ namespace Infrastructure.Persistence.Repositories
                 int serviceId = _serviceId;
 
                 var results = _context.Resource
-                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4,@RegionId",
+                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4, @regionId",
                         new SqlParameter("@param1", day),
                         new SqlParameter("@param2", serviceId),
                         new SqlParameter("@param3", startTime),

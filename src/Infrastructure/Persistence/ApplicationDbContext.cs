@@ -29,7 +29,7 @@ namespace Infrastructure.Persistence
 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }    
         public DbSet<Ticket> Tickets { get; set; }       
-        public DbSet<PaymentMethod> PaymentMethods { get; set; }          
+               
         public DbSet<Region> Regions { get; set; }
         DbSet<Service> Services { get; set; }
         DbSet<ServiceMetadata> ServiceMetadata { get; set; }
