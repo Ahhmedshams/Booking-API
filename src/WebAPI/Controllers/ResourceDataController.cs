@@ -37,22 +37,20 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Get([FromQuery] SieveModel sieveModel)
         {
             var Result = await _resourceDataRepo.GetAllData();
-            if (Result.Count() == 0)
-                return CustomResult("No Resource Data Are Available ", HttpStatusCode.NotFound);
+            //if (Result.Count() == 0)
+            //    return CustomResult("No Resource Data Are Available ", HttpStatusCode.NotFound);
 
             var FilteredResource = _sieveProcessor.Apply(sieveModel, Result.AsQueryable());
             return CustomResult(FilteredResource);
 
         }
        
-
         [HttpGet("Resource/{id:int}")]
         public async Task<IActionResult> FindResourceData(int id)
         {
             AllResourceData Result = await _resourceDataRepo.GetAllReourceData(id);
-            if (Result == null)
-                return CustomResult($"No Resource Are Available With ID {id} ", HttpStatusCode.NotFound);
-
+            //if (Result == null)
+            //    return CustomResult($"No Resource Are Available With ID {id} ", HttpStatusCode.NotFound);
 
             return CustomResult(Result);
         }
@@ -61,15 +59,12 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> AllDataByResourecTypeId(int id)
         {
             var Result = await _resourceDataRepo.GetAllDataByType(id);
-            if (Result == null)
-                return CustomResult($"No Resource Are Available ResourceType ID {id} ", HttpStatusCode.NotFound);
+            //if (Result == null)
+            //    return CustomResult($"No Resource Are Available ResourceType ID {id} ", HttpStatusCode.NotFound);
 
 
             return CustomResult(Result);
         }
-
-
-        
 
         [HttpPost("AddRange/{id:int}")]
         public async Task<IActionResult> AddRange(int id, ResourceDataRespIDValueDTO[] resourceDTO)
@@ -135,12 +130,6 @@ namespace WebAPI.Controllers
             return CustomResult(resourceDTO);
         }
 
-        
-
-       
-
-        
-
         private async Task<IActionResult> CheckResourceData(int ResID, ResourceDataRespIDValueDTO resourceDTO)
         {
             //Check If Resource Exist 
@@ -174,9 +163,6 @@ namespace WebAPI.Controllers
             return null;
             
         }
-
-
-
 
         private async Task<(IActionResult, List<ResourceData>)> CheckResourceData(int ResID, ResourceDataRespIDValueDTO[] resourceDTO )
         {
@@ -220,10 +206,6 @@ namespace WebAPI.Controllers
 
                 resourceDatas.Add(resourceData);
             }
-
-
-
-            
 
             return (null , resourceDatas);
 

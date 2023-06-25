@@ -60,8 +60,8 @@ namespace WebAPI.Controllers
 
             // Include Region
             IEnumerable<Resource> resource =  _resourceRepo.Find(e=>e.ResourceTypeId==id);
-            if (resource.Count() == 0)
-                return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
+            //if (resource.Count() == 0)
+            //    return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
             var FilteredSchedules = _sieveProcessor.Apply(sieveModel, resourceDTO.AsQueryable());
@@ -72,8 +72,8 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             Resource resource = await _resourceRepo.GetByIdAsync(id,e=>e.Region);
-            if (resource == null)
-                return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
+            //if (resource == null)
+            //    return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
             var resourceDTO = _mapper.Map<ResourceRespDTO>(resource);
 
@@ -145,10 +145,6 @@ namespace WebAPI.Controllers
             return CustomResult(resDTO);
         }
 
-
-
-
-
         [HttpPut("{id:int}")]
         public IActionResult Edit(int id,[FromBody] Decimal price,int? RegionId)
         {
@@ -161,8 +157,6 @@ namespace WebAPI.Controllers
             return CustomResult(result);
         }
 
-
-
         [HttpDelete("SoftDelete/{id:int}")]
         public async Task<IActionResult> SoftDelete(int id)
         {
@@ -173,8 +167,6 @@ namespace WebAPI.Controllers
 
             return CustomResult(HttpStatusCode.NoContent);
         }
-
-
 
         private async Task<(IActionResult, List<ResourceData>)> CheckResourceData(Resource resource, List<ResourceDataRespIDValueDTO> resourceDTO)
         {
@@ -247,6 +239,7 @@ namespace WebAPI.Controllers
 
             return null;
         }
+       
         private async Task<bool> CheckRegionExists(int RegionId)
         {
             if (RegionId == 0) return false;

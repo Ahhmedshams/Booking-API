@@ -30,8 +30,8 @@ namespace WebAPI.Controllers
         public async Task< IActionResult> GetAll()
         {
             IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync();
-            if (resourceTypes.Count() == 0 ) 
-                return CustomResult("No Resource Type Are Available", HttpStatusCode.NotFound);
+            //if (resourceTypes.Count() == 0 ) 
+            //    return CustomResult("No Resource Type Are Available", HttpStatusCode.NotFound);
             
             List<ResourceTypeDTO> resourceTypesDTO = _mapper.Map<List<ResourceTypeDTO>>(resourceTypes);
 
@@ -42,8 +42,8 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             ResourceType resourceType = await _resourceTypeRepo.GetByIdAsync(id);
-            if (resourceType == null)
-                return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
+            //if (resourceType == null)
+            //    return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
             ResourceTypeDTO resourceTypeDTO = _mapper.Map<ResourceTypeDTO>(resourceType);
 

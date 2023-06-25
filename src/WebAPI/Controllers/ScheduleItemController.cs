@@ -37,17 +37,13 @@ namespace WebAPI.Controllers
 
         //add (sp add from excel  validatae csv extension)
 
-
-
-
-
-
         [HttpGet("Get All")]
         public IActionResult GetAll()
         {
             IEnumerable<ScheduleItem> items = scheduleItemRepo.GetAll();
-            if (items.Count() == 0)
-                return CustomResult("No Schedule Are Available", HttpStatusCode.NotFound);
+            //if (items.Count() == 0)
+            //    return CustomResult("No Schedule Are Available", HttpStatusCode.NotFound);
+            
             var result = mapper.Map<IEnumerable<ScheduleItemDTO>>(items);
             return CustomResult(result);
         }

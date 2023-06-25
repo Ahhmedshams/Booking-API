@@ -31,16 +31,18 @@ namespace WebAPI.Controllers
             _scheduleItemRepo = scheduleItemRepo;
             _resourceSpecialCharacteristicsRepository = resourceSpecialCharacteristicsRepo;
         }
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<ResourceSpecialCharacteristics> resourceSpecialCharacteristics =
                 await _resourceSpecialCharacteristicsRepository.GetAllAsync();
 
-            if (!resourceSpecialCharacteristics.Any())
-            {
-                return Ok(Enumerable.Empty<ResourceSpecialCharacteristics>());
-            }
+            //if (!resourceSpecialCharacteristics.Any())
+            //{
+            //    return CustomResult(Enumerable.Empty<ResourceSpecialCharacteristics>());
+            //}
+
             List<ResourceSpecialCharacteristics> resourceSpecialCharacteristics1 = _mapper.Map<List<ResourceSpecialCharacteristics>>(resourceSpecialCharacteristics);
             return CustomResult(resourceSpecialCharacteristics1);
            
@@ -50,11 +52,10 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             ResourceSpecialCharacteristics resourceSpecialCharacteristics = await _resourceSpecialCharacteristicsRepository.GetByIdAsync(id);
-            if(resourceSpecialCharacteristics ==null)
-            {
-                return StatusCode((int)HttpStatusCode.NotFound, $"No Resource Type Are Available With id {id}");
-            }
-
+            //if(resourceSpecialCharacteristics ==null)
+            //{
+            //    return StatusCode((int)HttpStatusCode.NotFound, $"No Resource Type Are Available With id {id}");
+            //}
             return CustomResult(resourceSpecialCharacteristics);
         }
 
@@ -62,23 +63,25 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Add(ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             var ResourceID = _resourceRepo.IsExist(resourceSpecialCharacteristicsDTO.ResourceID);
             if (!ResourceID)
-                return StatusCode((int)HttpStatusCode.NotFound, $"No Resource id is Available With id {resourceSpecialCharacteristicsDTO.ResourceID}");
+                return CustomResult($"No Resource id is Available With id {resourceSpecialCharacteristicsDTO.ResourceID}", HttpStatusCode.NotFound);
+                //return StatusCode((int)HttpStatusCode.NotFound, $"No Resource id is Available With id {resourceSpecialCharacteristicsDTO.ResourceID}");
           
             if(resourceSpecialCharacteristicsDTO.ScheduleID != null)
             {
                 var scheduleItemID = _scheduleItemRepo.IsExistWithId(resourceSpecialCharacteristicsDTO?.ScheduleID);
                 if (!scheduleItemID)
-                    return StatusCode((int)HttpStatusCode.NotFound, $"No schedule item id is Available With id {resourceSpecialCharacteristicsDTO.ScheduleID}");
+                    return CustomResult($"No schedule item id is Available With id {resourceSpecialCharacteristicsDTO.ScheduleID}",HttpStatusCode.NotFound);
+                    //return StatusCode((int)HttpStatusCode.NotFound, $"No schedule item id is Available With id {resourceSpecialCharacteristicsDTO.ScheduleID}");
             }
 
             var resourceSpecialCharacteristics = _mapper.Map<ResourceSpecialCharacteristics>(resourceSpecialCharacteristicsDTO);
             var result = await _resourceSpecialCharacteristicsRepository.AddAsync(resourceSpecialCharacteristics);
 
-            return Ok();
+            return CustomResult(resourceSpecialCharacteristicsDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -92,10 +95,10 @@ namespace WebAPI.Controllers
                     ResourceSpecialCharacteristics resourceSpecialCharacteristics = _mapper.Map<ResourceSpecialCharacteristics>(resourceSpecialCharacteristicsDTO);
                     var result = await _resourceSpecialCharacteristicsRepository.EditAsync(id, resourceSpecialCharacteristics,rsc=>rsc.ID);
                     ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO1  = _mapper.Map<ResourceSpecialCharacteristicsDTO>(result);
-                    return Ok(resourceSpecialCharacteristicsDTO1);
+                    return CustomResult(resourceSpecialCharacteristicsDTO1);
                 }
             }
-            return BadRequest("All Data Required");
+            return CustomResult("All Data Required", HttpStatusCode.BadRequest);
         }
 
         [HttpDelete]
@@ -104,6 +107,7 @@ namespace WebAPI.Controllers
             var result =  _resourceSpecialCharacteristicsRepository.GetById(id);
             if (result == null)
                 return CustomResult($"No RSC Found For This Id {id}", HttpStatusCode.NotFound);
+            
             await _resourceSpecialCharacteristicsRepository.DeleteSoft(id);
             return CustomResult(HttpStatusCode.NoContent);
         }
