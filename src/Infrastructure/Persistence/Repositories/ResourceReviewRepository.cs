@@ -1,5 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,19 @@ namespace Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
             return FoundReview;
 
+        }
+
+        public Task SetRating(int id)
+        {
+                var resourceID = id;
+ 
+                var results = _context.Resource
+                    .FromSqlRaw("EXEC SetRating @param1",
+                        new SqlParameter("@param1", resourceID)
+                        )
+                      .ToList();
+
+               return Task.FromResult( results );
         }
     }
 }
