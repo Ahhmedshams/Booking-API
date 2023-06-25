@@ -58,9 +58,9 @@ namespace WebAPI.Controllers
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
 
 
-            var paymentUrl = service.MakePayment(bookingItemRepo, booking.TotalCost, bookingID);
+            var paymentUrl = await service.MakePayment(bookingItemRepo, booking.TotalCost, bookingID);
 
-            return CustomResult("created", paymentUrl, HttpStatusCode.Created);
+            return CustomResult("created", new { Result= paymentUrl }, HttpStatusCode.Created);
         }
 
         [HttpPost("refund/{bookingID:int}")]
