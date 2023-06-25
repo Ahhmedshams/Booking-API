@@ -69,7 +69,7 @@ namespace WebAPI.Controllers
             }
 
         }
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             if(id==0) return BadRequest();
@@ -84,7 +84,7 @@ namespace WebAPI.Controllers
             }
         }
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id,FAQAddDTO faq)
+        public async Task<IActionResult> Update([FromRoute]int id,FAQAddDTO faq)
         {
             if (id == 0) return BadRequest();
             if (!ModelState.IsValid) return CustomResult(ModelState, HttpStatusCode.BadRequest);
