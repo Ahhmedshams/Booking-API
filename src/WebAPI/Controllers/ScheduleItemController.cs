@@ -110,14 +110,20 @@ namespace WebAPI.Controllers
                     return CustomResult($"The day should be in the range of the schedule from {schedule.FromDate} to {schedule.ToDate}", HttpStatusCode.BadRequest);
 
                 // Check if the start time and end time are not already existed in the schedule item in the same day
-                var existingScheduleItem = await scheduleItemRepo.FindByDayAsync(scheduleItemDto.ScheduleId, scheduleItemDto.newDay);
-                if (existingScheduleItem != null)
+                var existingScheduleItems = await scheduleItemRepo.FindByDayAsync(scheduleItemDto.ScheduleId, scheduleItemDto.newDay);
+                if (existingScheduleItems != null)
                 {
-                    if ((scheduleItemDto.newStartTime >= existingScheduleItem.StartTime && scheduleItemDto.newStartTime < existingScheduleItem.EndTime) ||
-                        (scheduleItemDto.newEndTime > existingScheduleItem.StartTime && scheduleItemDto.newEndTime <= existingScheduleItem.EndTime))
-                        return CustomResult($"The start time and end time should not overlap with the existing schedule item for the same day", HttpStatusCode.BadRequest);
-                }
+                    foreach (var existingScheduleItem in existingScheduleItems)
+                    {
+                        if (existingScheduleItem.ID == data.ID)
+                            continue;
 
+                        if ((scheduleItemDto.newStartTime >= existingScheduleItem.StartTime && scheduleItemDto.newStartTime < existingScheduleItem.EndTime) ||
+                            (scheduleItemDto.newEndTime > existingScheduleItem.StartTime && scheduleItemDto.newEndTime <= existingScheduleItem.EndTime))
+                            return CustomResult($"The start time and end time should not overlap with the existing schedule item for the same day", HttpStatusCode.BadRequest);
+
+                    }
+                }
                 // Check if the available change is for a future day
                 //if (scheduleItemDto.Available && scheduleItemDto.newDay < DateTime.Now.Date)
                 //    return CustomResult($"The status can only be changed to Available for future days", HttpStatusCode.BadRequest);
