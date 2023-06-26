@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -24,13 +26,38 @@ namespace WebAPI.Controllers
         private readonly AccountRepository accountRepo;
         private readonly UploadImage _uploadImage;
 
-        public AccountController(UserManager<ApplicationUser> _userManager, IMapper _mapper, AccountRepository accountRepo, UploadImage uploadImage)
+        public AccountController(UserManager<ApplicationUser> _userManager,
+            IMapper _mapper, AccountRepository accountRepo, UploadImage uploadImage)
         {
             userManager = _userManager;
             mapper = _mapper;
             this.accountRepo = accountRepo;
             this._uploadImage = uploadImage;
         }
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            var users = await userManager.Users.Include(u=>u.Images).ToListAsync();
+            List < ApplicationUserDTO> usersDto= new List <ApplicationUserDTO>();
+            foreach (var user in users)
+            {
+                var userDto = new ApplicationUserDTO()
+                {
+                    Id=user.Id,
+                    Email=user.Email,
+                    FirstName=user.FirstName,
+                    LastName=user.LastName,
+                    UserName= user.UserName,
+                    ImageUrls=user.Images
+                };
+                usersDto.Add(userDto);
+            }
+             //List<ApplicationUserDTO> userDTOs = mapper.Map<List<ApplicationUserDTO>>(users);
+            return CustomResult(usersDto);
+        }
+
+
 
         [HttpPost("register")]
         /*  [ServiceFilter(typeof(ValidationFilterAttribute))]*/
@@ -39,22 +66,22 @@ namespace WebAPI.Controllers
             if (ModelState.IsValid)
             {
                 ApplicationUser user = mapper.Map<ApplicationUser>(_user);
+                if (_user.UploadedImages != null)
+                {
+                    var entityType = "UserImage";
+                    var images = await _uploadImage.UploadToCloud(_user.UploadedImages, entityType);
+
+                    if (images != null && images.Any())
+                    {
+                        var userImages = images.OfType<UserImage>().ToList();
+                        user.Images = userImages;
+                    }
+                }
 
                 object result = await accountRepo.Register(user, _user.Password);
 
                 if (result is IdentityResult)
                 {
-                    if (_user.UploadedImages != null)
-                    {
-                        var entityType = "UserImage";
-                        var images = await _uploadImage.UploadToCloud(_user.UploadedImages, entityType);
-
-                        if (images != null && images.Any())
-                        {
-                            var userImages = images.OfType<UserImage>().ToList();
-                            user.Images = userImages;
-                        }
-                    }
                     return CustomResult("Created Successfully");
                 }
                 else if (result is IEnumerable<IdentityError> errorList)
@@ -197,12 +224,21 @@ namespace WebAPI.Controllers
                 return CustomResult($"Need To provide Id {id}", HttpStatusCode.NotFound);
 
             var user = await accountRepo.GetByID(id);
-            //if (user == null)
-            //    return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
+            if (user == null)
+                return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
 
-            var Result = mapper.Map<UserResponce>(user);
+            // var Result = mapper.Map<UserResponce>(user);
+            var result = new UserRespDTO()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                ImageUrls = user.Images
+            };
 
-            return CustomResult(Result);
+            return CustomResult(result);
         }
 
         [HttpPatch("{Id:Guid}")]

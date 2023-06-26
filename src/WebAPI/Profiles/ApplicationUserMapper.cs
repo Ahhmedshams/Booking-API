@@ -10,7 +10,7 @@ namespace WebAPI.Profiles
             CreateMap<ApplicationUser, ApplicationUserDTO>()
             //    .ForMember(des => des.Roles , opt => opt.MapFrom(src => src.))
                 .ReverseMap();
-
+            CreateMap<ApplicationUser, RegisterUserDto>().ReverseMap();
 
         }
     }

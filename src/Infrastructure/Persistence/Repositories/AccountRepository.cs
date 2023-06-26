@@ -239,7 +239,13 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<ApplicationUser> GetByID(string ID)
         {
-            return await userManager.FindByIdAsync(ID);
+            var users = userManager.Users.Include(u=>u.Images);
+            foreach(var user in users)
+            {
+                if(user.Id== ID)
+                    return user;
+            }
+            return null;
         }
 
 
