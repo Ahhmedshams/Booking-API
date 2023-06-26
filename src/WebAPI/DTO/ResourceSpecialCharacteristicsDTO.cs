@@ -5,6 +5,8 @@ namespace WebAPI.DTO
 {
     public class ResourceSpecialCharacteristicsDTO
     {
+
+        public int ID { get; set; }
         public int TotalCapacity { get; set; }
 
         public int AvailableCapacity { get; set; }
@@ -14,5 +16,6 @@ namespace WebAPI.DTO
         public DateTime? Day { get; set; } 
         public string ResourceName { get; set; }
         public int ResourceID { get; set; }
+
     }
 }
