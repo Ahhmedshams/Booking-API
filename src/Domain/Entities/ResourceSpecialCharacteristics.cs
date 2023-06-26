@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class ResourceSpecialCharacteristics:BaseEntity
+    public class ResourceSpecialCharacteristics : BaseEntity
     {
         public int ID { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "TotalCapacity must be at least 1.")]
-        public  int TotalCapacity { get; set; }
+        public int TotalCapacity { get; set; }
 
         private int _availableCapacity;
         public int AvailableCapacity
@@ -33,8 +33,7 @@ namespace Domain.Entities
         [ForeignKey("Resource")]
         public int ResourceID { get; set; }
         public Resource Resource { get; set; }
-        public ScheduleItem scheduleItem { get; set; }
-
+        public ScheduleItem ScheduleItem { get; set; }
         public ResourceSpecialCharacteristics()
         {
             AvailableCapacity = TotalCapacity;

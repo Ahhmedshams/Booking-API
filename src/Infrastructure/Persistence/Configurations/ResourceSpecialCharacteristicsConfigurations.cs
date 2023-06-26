@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.Emit;
 
 namespace Infrastructure.Persistence.Configurations
 {
@@ -14,6 +15,16 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.HasKey(e => e.ID);
 
+        }
+
+    }
+    public class ScheduleItemConfigurations : IEntityTypeConfiguration<ScheduleItem>
+    {
+        public void Configure(EntityTypeBuilder<ScheduleItem> builder)
+        {
+            builder.HasOne(si => si.ResourceSpecialCharacteristics)
+                .WithOne(rs => rs.ScheduleItem)
+                .HasForeignKey<ResourceSpecialCharacteristics>(rs => rs.ScheduleID);
         }
     }
 }

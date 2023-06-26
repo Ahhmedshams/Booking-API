@@ -4,7 +4,7 @@
     {
         
         public string RoleID { get; set; }
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public List<CheckedPermissionsDTO> Permissions { get; set; } = new List<CheckedPermissionsDTO>();
 
     }

@@ -9,10 +9,12 @@ namespace Infrastructure.Persistence.Repositories
 {
     public class ScheduleRepository : CRUDRepository<Schedule>, IScheduleRepo
     {
-        public ScheduleRepository(ApplicationDbContext context) : base(context)
+		private readonly IResourceRepo _resourceRepo;
+
+		public ScheduleRepository(ApplicationDbContext context,IResourceRepo resourceRepo) : base(context)
         {
-           
-        }
+			_resourceRepo = resourceRepo;
+		}
 
         public Schedule GetByResourceId(int resourceId)
         {
@@ -69,16 +71,17 @@ namespace Infrastructure.Persistence.Repositories
             }
             return null;
         }
-        public List<Resource> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime, SieveModel sieveModel, int? regionId = null)
+        public async Task<List<Resource>> GetAvailableResources(string _day,int _serviceId ,string _startTime, string _endTime, SieveModel sieveModel, int? regionId = null)
         {
-           
+            try
+            {
                 var day = _day;
                 var startTime = _startTime;
                 var endTime = _endTime;
                 int serviceId = _serviceId;
 
                 var results = _context.Resource
-					.FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4,@RegionId",
+                    .FromSqlRaw("EXEC GetAvailableResourceForService @param1, @param2 ,@param3,@param4,@RegionId",
                         new SqlParameter("@param1", day),
                         new SqlParameter("@param2", serviceId),
                         new SqlParameter("@param3", startTime),
@@ -88,14 +91,29 @@ namespace Infrastructure.Persistence.Repositories
 					  .IgnoreQueryFilters()
 					  .ToList();
 
-            if (results.Count > 0)
-            {
-                return results;
+                if (results.Count > 0)
+                {
+                    List<Resource> resources = new List<Resource>();
+                    foreach(var res in results)
+                    {
+                        Resource resource = _resourceRepo.GetResById(res.Id);
+                        resources.Add(resource);
+					}
+
+                    return resources;
+                }
+                else
+                {
+                    return new List<Resource>();
+                }
             }
-            else
+            catch (Exception ex) 
             {
                 return new List<Resource>();
             }
+                
+
+           
         }
 
         public bool IsExist(int id)
