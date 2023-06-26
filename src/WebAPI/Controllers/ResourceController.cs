@@ -69,7 +69,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            Resource resource = await _resourceRepo.GetByIdAsync(id,e=>e.Region,e=>e.Images);
+            Resource resource = _resourceRepo.GetResById(id);
             if (resource == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 

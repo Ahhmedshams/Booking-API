@@ -10,7 +10,7 @@ namespace Application.Common.Interfaces
     public interface IResourceReviewRepo: IAsyncRepository<ResourceReview> ,IRepository<ResourceReview> 
     {
         Task<ResourceReview> Patch(int id ,ResourceReview resourceReview);
-        Task SetRating(int id);
+		Task SetRating(int id);
 
     }
 }

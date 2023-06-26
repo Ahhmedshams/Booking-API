@@ -68,9 +68,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAvailableResources")]
-        public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel, [FromQuery] int? RegionId)
+        public async Task<IActionResult> GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel, [FromQuery] int? RegionId)
         {
-            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel, RegionId);
+            var availableResources = await scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel, RegionId);
 
             if (availableResources.Count == 0)
             {
@@ -99,8 +99,8 @@ namespace WebAPI.Controllers
         public IActionResult GetByResourceId(int resourceId)
         {
             Schedule schedule = scheduleRepo.GetByResourceId(resourceId);
-            //if (schedule == null)
-            //    return CustomResult($"No Schedule Founded With Resource ID{resourceId}", HttpStatusCode.NotFound);
+            if (schedule == null)
+                return CustomResult($"No Schedule Founded With Resource ID{resourceId}", HttpStatusCode.NotFound);
             var result = mapper.Map<ScheduleDTO>(schedule);
             return CustomResult(result);
         }

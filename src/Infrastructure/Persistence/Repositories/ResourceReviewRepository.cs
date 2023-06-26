@@ -28,17 +28,31 @@ namespace Infrastructure.Persistence.Repositories
 
         }
 
-        public Task SetRating(int id)
-        {
-                var resourceID = id;
- 
-                var results = _context.Resource
-                    .FromSqlRaw("EXEC SetRating @param1",
-                        new SqlParameter("@param1", resourceID)
-                        )
-                      .ToList();
+        //public void SetRating(int id)
+        //{
+        //    var resourceID = id;
 
-               return Task.FromResult( results );
+        //    var results = _context.Resource
+        //        .FromSqlRaw("EXEC SetRating @param1",
+        //            new SqlParameter("@param1", resourceID)
+        //            )
+        //        .IgnoreQueryFilters()
+        //         .ToList();
+
+
+        //}
+
+        public async Task SetRating(int id)
+        {
+            var resourceID = id;
+            var sql = $"EXEC SetRating @resourceID";
+            var parameter = new SqlParameter("@resourceID", resourceID);
+
+            await _context.Database.ExecuteSqlRawAsync(sql, parameter);
+
+
+            await _context.SaveChangesAsync();
         }
+
     }
 }

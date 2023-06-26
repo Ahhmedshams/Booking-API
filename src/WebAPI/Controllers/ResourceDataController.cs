@@ -49,8 +49,8 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> FindResourceData(int id)
         {
             AllResourceData Result = await _resourceDataRepo.GetAllReourceData(id);
-            //if (Result == null)
-            //    return CustomResult($"No Resource Are Available With ID {id} ", HttpStatusCode.NotFound);
+            if (Result == null)
+                return CustomResult($"no resource are available with id {id} ", HttpStatusCode.NotFound);
 
             return CustomResult(Result);
         }
@@ -59,8 +59,8 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> AllDataByResourecTypeId(int id)
         {
             var Result = await _resourceDataRepo.GetAllDataByType(id);
-            //if (Result == null)
-            //    return CustomResult($"No Resource Are Available ResourceType ID {id} ", HttpStatusCode.NotFound);
+            if (Result == null)
+                return CustomResult($"No Resource Are Available ResourceType ID {id} ", HttpStatusCode.NotFound);
 
 
             return CustomResult(Result);
