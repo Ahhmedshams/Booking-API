@@ -25,6 +25,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Newtonsoft.Json.Converters;
+using Infrastructure.BackgroundTasks;
 
 namespace WebAPI
 {
@@ -146,6 +147,9 @@ namespace WebAPI
 
             /*            builder.Services.AddAuthentication();*/
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            builder.Services.AddHostedService<CheckProecessingBookingTask>();
+            builder.Services.AddHostedService<CheckCompletedBookingsTask>();
 
             StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
