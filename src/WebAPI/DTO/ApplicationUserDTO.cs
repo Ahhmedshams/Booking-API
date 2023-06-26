@@ -13,5 +13,7 @@
 
         public List<string> Roles { get; set; } = new List<string>();
 
+        public ICollection<UserImage> ImageUrls { get; set; }
+
     }
 }

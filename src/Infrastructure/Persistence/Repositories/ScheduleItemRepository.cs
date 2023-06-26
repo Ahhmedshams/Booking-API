@@ -20,6 +20,21 @@ namespace Infrastructure.Persistence.Repositories
             return entities;
         }
 
+        public async Task<IEnumerable<ScheduleItem>> GetAllScheduleItems()
+        {
+            var scheduleItems = await _context.Set<ScheduleItem>()
+                .Include(si => si.Schedule)
+                    .ThenInclude(s => s.Resource)
+                    .ThenInclude(r => r.Images)
+              /*  .Include(si => si.Schedule)
+                    .ThenInclude(s => s.Resource)
+                    .ThenInclude(r => r.Name)*/
+                 .Where(s => !s.IsDeleted)
+                 .ToListAsync();
+            return scheduleItems;
+
+        }
+
         public async Task<IEnumerable<ScheduleItem>> AddRangeAsync(IEnumerable<ScheduleItem> entities)
         {
             await _context.ScheduleItem.AddRangeAsync(entities);

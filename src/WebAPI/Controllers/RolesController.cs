@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using WebAPI.DTO;
 
 namespace WebAPI.Controllers
@@ -44,25 +45,24 @@ namespace WebAPI.Controllers
         {
 
             if (!ModelState.IsValid)
-                return  CustomResult(ModelState, System.Net.HttpStatusCode.BadRequest);
+                return  CustomResult(ModelState, HttpStatusCode.BadRequest);
 
             var roleExist = await roleManager.FindByNameAsync(roleDTO.Name);
 
             if (roleExist != null)
-                return CustomResult("Role is Already Exist.", System.Net.HttpStatusCode.BadRequest);
+                return CustomResult("Role is Already Exist.",HttpStatusCode.BadRequest);
 
            var result = await roleManager.CreateAsync(new IdentityRole() { Name = roleDTO.Name });
 
             if (result.Succeeded)
             {
                 var identityRole = await roleManager.FindByNameAsync(roleDTO.Name);
-                return CustomResult("Role Successfully Created", identityRole, System.Net.HttpStatusCode.Created);
+                return CustomResult("Role Successfully Created", identityRole, HttpStatusCode.Created);
             }
 
-            return CustomResult("Role Not Created", System.Net.HttpStatusCode.OK);
+            return CustomResult("Role Not Created");
 
         }
-
 
         [HttpGet("ManagePermissions/{id:Guid}")]
         public async Task<IActionResult> ManagePermissions(string id)

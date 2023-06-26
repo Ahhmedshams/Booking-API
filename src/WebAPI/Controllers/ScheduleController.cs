@@ -38,8 +38,8 @@ namespace WebAPI.Controllers
         public IActionResult GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<Schedule> resource = scheduleRepo.GetAll();
-            if (resource.Count() == 0)
-                return CustomResult("No Schedule Are Available", HttpStatusCode.NotFound);
+            //if (resource.Count() == 0)
+            //    return CustomResult("No Schedule Are Available", HttpStatusCode.NotFound);
 
             var FilteredSchedules = _sieveProcessor.Apply(sieveModel, resource.AsQueryable());
 
@@ -62,16 +62,15 @@ namespace WebAPI.Controllers
         {
             var schedules = scheduleRepo.GetSchedules(fromDate, toDate, sieveModel);
 
-            var FilteredSchedules = _sieveProcessor.Apply<Application.Common.Models.AvailableSchedule>(sieveModel, schedules.AsQueryable());
+            var FilteredSchedules = _sieveProcessor.Apply<AvailableSchedule>(sieveModel, schedules.AsQueryable());
 
             return CustomResult(FilteredSchedules);
         }
 
-
         [HttpGet("GetAvailableResources")]
-        public IActionResult GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel, [FromQuery] int? RegionId)
+        public async Task<IActionResult> GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] string _startTime, [FromQuery] string _endTime, [FromQuery] SieveModel sieveModel, [FromQuery] int? RegionId)
         {
-            var availableResources = scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel, RegionId);
+            var availableResources = await scheduleRepo.GetAvailableResources(_day, _serviceId, _startTime, _endTime, sieveModel, RegionId);
 
             if (availableResources.Count == 0)
             {
@@ -103,7 +102,7 @@ namespace WebAPI.Controllers
             if (schedule == null)
                 return CustomResult($"No Schedule Founded With Resource ID{resourceId}", HttpStatusCode.NotFound);
             var result = mapper.Map<ScheduleDTO>(schedule);
-            return Ok(result);
+            return CustomResult(result);
         }
 
         [HttpPut("Edit/{scheduleId:int}")]
@@ -121,12 +120,12 @@ namespace WebAPI.Controllers
                     }
 
             }
-            return BadRequest("All Data Required");
+            return CustomResult("All Data Required", HttpStatusCode.BadRequest);
 
         }
 
         [HttpDelete("SoftDelete/{id:int}")]
-        public async Task<IActionResult> SoftDelete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (id == 0)
                 return CustomResult($"No Schedule Founded With id {id}", HttpStatusCode.NotFound);

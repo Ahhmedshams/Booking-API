@@ -7,6 +7,7 @@ namespace WebAPI.Profiles
         public ScheduleItemMapper() 
         { 
             CreateMap<ScheduleItemDTO,ScheduleItem>().ReverseMap();
+            CreateMap<ScheduleItemGetDTO,ScheduleItem>().ReverseMap();
         }
     }
 }

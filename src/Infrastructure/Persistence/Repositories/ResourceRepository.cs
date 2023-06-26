@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,5 +62,11 @@ namespace Infrastructure.Persistence.Repositories
                 );
             }
         }
-    }
+
+		public Resource GetResById(int id)
+		{
+			Resource res = _context.Resource.Include(r => r.Images).Include(r=> r.Region).FirstOrDefault(r => r.Id == id);
+            return res;
+		}
+	}
 }
