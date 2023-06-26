@@ -88,8 +88,8 @@ namespace WebAPI.Controllers
 
 
         //update (in case reserved updata available with false)
-        [HttpPut("/Edit")]
-        public async Task<IActionResult> Edit([FromBody] ScheduleItemDTO scheduleItemDto)
+        [HttpPut("Edit")]
+        public async Task<IActionResult> Edit(ScheduleItemDTO scheduleItemDto)
         {
             if (ModelState.IsValid)
             {
