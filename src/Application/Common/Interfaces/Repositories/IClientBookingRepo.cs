@@ -22,6 +22,7 @@ namespace Application.Common.Interfaces.Repositories
 
 
         Task<IEnumerable<ClientBooking>> GetUserBooking(string id);
+
         Task<ClientBooking> GetUserBooking(string id,int bookingId);
 
     }

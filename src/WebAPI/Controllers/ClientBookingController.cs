@@ -50,16 +50,16 @@ namespace WebAPI.Controllers
             if (bookingId == null)
             {
                 var result = await clientBookingRepo.GetUserBooking(id);
-                //if (result == null)
-                //    return CustomResult($"No Client's Book found for this Id [ {id} ]", HttpStatusCode.NotFound);
+                if (result.Count() == 0)
+                    return CustomResult($"No Client's Book found for this Id [ {id} ]", HttpStatusCode.NotFound);
 
                 return CustomResult(result.ToClientBooking());
             }
             else
             {
                 var result = await clientBookingRepo.GetUserBooking(id, (int)bookingId);
-                //if (result == null)
-                //    return CustomResult($"No Client's Book found for this Id [ {bookingId} ]", HttpStatusCode.NotFound);
+                if (result == null)
+                    return CustomResult($"No Client's Book found for this Id [ {bookingId} ]", HttpStatusCode.NotFound);
 
                 return CustomResult(result.ToClientBookingWithDetails());
             }

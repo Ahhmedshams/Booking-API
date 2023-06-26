@@ -183,8 +183,8 @@ namespace WebAPI.Controllers
                 return CustomResult($"Need To provide Id {id}", HttpStatusCode.NotFound);
 
             var user = await accountRepo.GetByID(id);
-            //if (user == null)
-            //    return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
+            if (user == null)
+               return CustomResult($"No User Type  Available With id==> {id}", HttpStatusCode.NotFound);
 
             var Result = mapper.Map<UserResponce>(user);
 

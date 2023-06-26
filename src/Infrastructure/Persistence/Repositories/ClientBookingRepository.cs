@@ -322,10 +322,13 @@ namespace Infrastructure.Persistence.Repositories
         public Task<ClientBooking> GetUserBooking(string id, int bookingId)
         {
             return _context.ClientBookings
-                .Where(e => e.UserId == id && e.Id == bookingId)
+                .Where(e => e.UserId == id && e.Id == bookingId )
                 .Include(e => e.Service)
                 .ThenInclude(e=>e.Images)
                 .Include(e => e.paymentTransaction)
+                .Include(e => e.BookingItems)
+                .ThenInclude(e => e.Resource)
+                .ThenInclude(e => e.Images )
                 .Include(e => e.BookingItems)
                 .ThenInclude(e => e.Resource)
                 .ThenInclude(e => e.ResourceType)
