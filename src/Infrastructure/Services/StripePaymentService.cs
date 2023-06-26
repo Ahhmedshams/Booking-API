@@ -11,6 +11,9 @@ using Infrastructure.Persistence.Repositories;
 using AutoMapper;
 using Infrastructure.Utility.Extensions;
 using Stripe;
+using Application.Common.Interfaces.Repositories;
+using Domain.Enums;
+using Infrastructure.Factories;
 
 namespace Infrastructure.Services
 {
@@ -57,7 +60,7 @@ namespace Infrastructure.Services
 
         }
 
-        public async Task<string> MakePayment(IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
+        public async Task<string> MakePayment(IPayemntTransactionRepository paymentTransactionRepository, IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
         {
          
             // TODO: read all showable items, sum all material in one item, sum all items like cars in one item.
@@ -103,9 +106,39 @@ namespace Infrastructure.Services
                 Metadata = metadata,
 
             };
+
             var service = new SessionService();
             
             var session = service.Create(options);
+
+
+            var payementTransactions = await paymentTransactionRepository.FindAsync(e => e.ClientBookingId == bookingID);
+
+
+
+            var payementTransaction = payementTransactions.FirstOrDefault();
+
+            if (payementTransaction == null)
+            {
+                 payementTransaction = new PaymentTransaction()
+                {
+                    ClientBookingId = bookingID,
+                    Amount = clientBooking.TotalCost,
+                    UserId = clientBooking.UserId,
+                    PaymentMethodId = (int)PaymentMethodType.Card,
+                    Status = PaymentStatus.Pending,
+                    SessionId = session.Id
+                };
+
+                await paymentTransactionRepository.AddAsync(payementTransaction);
+            }
+            else
+            {
+                // TODO: expire old stripe session
+                payementTransaction.SessionId = session.Id;
+            }
+
+            
 
             return await Task.FromResult(session.Url);
         }
