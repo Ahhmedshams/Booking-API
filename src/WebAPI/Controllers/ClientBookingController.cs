@@ -114,7 +114,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPut("CancelBooking/{bookingID:int}")]
-        public async Task<IActionResult> Delete(int bookingID)
+        public async Task<IActionResult> CancelBooking(int bookingID)
         {
 
             var booking = await clientBookingRepo.GetBookingById(bookingID);

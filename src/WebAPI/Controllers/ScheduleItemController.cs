@@ -41,11 +41,6 @@ namespace WebAPI.Controllers
 
         //add (sp add from excel  validatae csv extension)
 
-
-
-
-
-
         [HttpGet("Get All")]
         public async Task<IActionResult> GetAll()
         {
