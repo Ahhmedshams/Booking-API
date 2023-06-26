@@ -15,4 +15,16 @@
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
     }
+
+    public class ScheduleItemGetDTO
+    {
+        public int ScheduleId { get; set; }
+        public DateTime Day { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
+        public bool Available { get; set; }
+        public bool Shift { get; set; }
+        public string Name { get; set; }
+        public ICollection<ResourceImage> ImageUrls { get; set; }
+    }
 }

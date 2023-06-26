@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Newtonsoft.Json;
+using WebAPI.Utility;
+
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -18,6 +20,8 @@ namespace WebAPI.Controllers
             this.mapper = mapper;
             this.scheduleItemRepo = scheduleItemRepo;
         }
+
+
 
         //addrange (to add array shedule item)
         [HttpPost("AddRange/{scheduleId:int}")]
@@ -43,14 +47,14 @@ namespace WebAPI.Controllers
 
 
         [HttpGet("Get All")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            IEnumerable<ScheduleItem> items = scheduleItemRepo.GetAll();
-            if (items.Count() == 0)
-                return CustomResult("No Schedule Are Available", HttpStatusCode.NotFound);
-            var result = mapper.Map<IEnumerable<ScheduleItemDTO>>(items);
-            return CustomResult(result);
+            IEnumerable<ScheduleItem> items =await scheduleItemRepo.GetAllScheduleItems();
+            
+            return CustomResult(items.ToScheduleItem());
         }
+
+
 
         [HttpPost("Add")]
         public IActionResult Add([FromBody]ScheduleItemDTO scheduleItemDto)
@@ -68,6 +72,8 @@ namespace WebAPI.Controllers
 
         }
 
+
+
         //delete (with the 4 pk values searach by them the delete it (make dto without avaliable column)with condition that
         // available is true )
 
@@ -82,29 +88,43 @@ namespace WebAPI.Controllers
 
         }
 
+
+
+
+
         //update (in case reserved updata available with false)
         [HttpPut("/Edit")]
         public async Task<IActionResult> Edit([FromBody] ScheduleItemDTO scheduleItemDto)
         {
-            var data = await scheduleItemRepo.FindAsync(scheduleItemDto.ScheduleId,scheduleItemDto.Day, scheduleItemDto.StartTime, scheduleItemDto.EndTime);
-            if (data == null)
-                return CustomResult($"No Schedule Item Found With Given Data", HttpStatusCode.NotFound);
-            /* var  scheduleCheck = CheckSchedule(sheduleId);
-             if (scheduleCheck != null)
-                 return CustomResult($"No Schedule Item Found With id {sheduleId}", HttpStatusCode.NotFound);*/
+            if (ModelState.IsValid)
+            {
+                var data = await scheduleItemRepo.FindAsync(scheduleItemDto.ScheduleId, scheduleItemDto.Day, scheduleItemDto.StartTime, scheduleItemDto.EndTime);
+                if (data == null)
+                    return CustomResult($"No Schedule Item Found With Given Data", HttpStatusCode.NotFound);
+                var scheduleCheck = CheckSchedule(scheduleItemDto.ScheduleId);
+                if (scheduleCheck != null)
+                    return CustomResult($"No Schedule Item Found With id {scheduleItemDto.ScheduleId}", HttpStatusCode.NotFound);
 
-            data.Available = scheduleItemDto.Available;
-            await scheduleItemRepo.SaveChangesAsync();
+                data.Available = scheduleItemDto.Available;
+                await scheduleItemRepo.SaveChangesAsync();
 
-            ScheduleItemDTO scheduleItem = mapper.Map<ScheduleItemDTO>(data);
+                ScheduleItemDTO scheduleItem = mapper.Map<ScheduleItemDTO>(data);
 
-            /* var result = await scheduleItemRepo.EditAsync(new {ScheduleId =scheduleItem.ScheduleId, Day=scheduleItem.Day,
-                 StartTime=scheduleItem.StartTime,EndTime=scheduleItem.EndTime},scheduleItem, s => s.ScheduleId);*/
+                /* var result = await scheduleItemRepo.EditAsync(new {ScheduleId =scheduleItem.ScheduleId, Day=scheduleItem.Day,
+                     StartTime=scheduleItem.StartTime,EndTime=scheduleItem.EndTime},scheduleItem, s => s.ScheduleId);*/
 
-            /*            var schedItemDTO = mapper.Map<ScheduleItemDTO>(result);
-            */
-            return CustomResult(scheduleItem);
+                /*            var schedItemDTO = mapper.Map<ScheduleItemDTO>(result);
+                */
+                return CustomResult(scheduleItem);
+
+            }
+            return CustomResult(ModelState, HttpStatusCode.BadRequest);
+            
         }
+
+
+
+
 
         private IActionResult CheckScheduleId(int sheduleId, ScheduleItemDTO[] scheduleItemDTO)
         {

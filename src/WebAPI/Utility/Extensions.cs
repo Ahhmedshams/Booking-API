@@ -89,6 +89,33 @@ namespace WebAPI.Utility
             return result;
         }
 
+        public static IEnumerable<ScheduleItemGetDTO> ToScheduleItem(this IEnumerable<ScheduleItem> scheduleItems) 
+        {
+            var result = new List<ScheduleItemGetDTO>();
+            foreach(var scheduleItem in scheduleItems)
+            {
+                var entity =scheduleItem.ToScheduleItem();
+                result.Add(entity);
+            }
+            return result;
+        }
+
+        public static ScheduleItemGetDTO ToScheduleItem(this  ScheduleItem scheduleItem)
+        {
+            var result = new ScheduleItemGetDTO()
+            {
+                ScheduleId = scheduleItem.ScheduleId,
+                Day = scheduleItem.Day,
+                StartTime = scheduleItem.StartTime,
+                EndTime = scheduleItem.EndTime,
+                Available = scheduleItem.Available,
+                Shift = scheduleItem.Shift,
+                Name = scheduleItem.Schedule.Resource.Name,
+                ImageUrls = scheduleItem.Schedule.Resource.Images
+            };
+            return result;
+        }
+
         public static IEnumerable<BookingItemWIthDetails> ToBookingItemWIthDetails(this IEnumerable<BookingItem> bookingItems)
         {
             List<BookingItemWIthDetails> result = new();
