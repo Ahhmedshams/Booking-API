@@ -9,6 +9,20 @@
         public bool Available { get; set; }
         public bool Shift { get; set; }
     }
+    public class EditScheduleItemDTO
+    {
+        public int ScheduleId { get; set; }
+
+        public DateTime oldDay { get; set; }
+        public TimeOnly oldStartTime { get; set; }
+        public TimeOnly oldEndTime { get; set; }
+        public DateTime newDay { get; set; }
+        public TimeOnly newStartTime { get; set; }
+        public TimeOnly newEndTime { get; set; }
+        public bool Available { get; set; }
+        public bool Shift { get; set; }
+
+    }
     public class SmallScheduleItemDTO
     {
         public DateTime Day { get; set; }
