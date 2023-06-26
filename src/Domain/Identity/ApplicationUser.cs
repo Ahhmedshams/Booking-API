@@ -8,6 +8,7 @@ namespace Domain.Identity
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public ICollection<UserImage>? Images { get; set; }
 
         [RegularExpression(@"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$", 
             ErrorMessage = "Invalid phone number format.")]

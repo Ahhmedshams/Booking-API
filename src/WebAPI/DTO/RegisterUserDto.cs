@@ -14,7 +14,7 @@ namespace WebAPI.DTO
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
-
+        public ICollection<IFormFile>? UploadedImages { get; set; }
     }
 
 
@@ -29,7 +29,8 @@ namespace WebAPI.DTO
         string? Address,
         string? CreditCardNumber,
         DateTime? LastUpdatedOn,
-        string? PhoneNumber
+        string? PhoneNumber,
+        List<string> ImageUrls
 
         );
 }

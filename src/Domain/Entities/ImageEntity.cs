@@ -13,9 +13,11 @@ namespace Domain.Entities
         public string Uri { get; set; }
     }
 
-    public class ServiceImage : ImageEntity{}
+    public class ServiceImage : ImageEntity { }
 
     public class ResourceTypeImage : ImageEntity { }
 
     public class ResourceImage : ImageEntity { }
+
+    public class UserImage :ImageEntity {}
 }

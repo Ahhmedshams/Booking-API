@@ -36,6 +36,9 @@ public class UploadImage
                     case "ResourceImage":
                         image = new ResourceImage { Uri = uri };
                         break;
+                    case "UserImage":
+                        image = new UserImage { Uri = uri };
+                        break;
                     default:
                         // Throw an exception or handle the error in some other way اتصررااف
                         throw new ArgumentException("Invalid entity type", nameof(entityType));

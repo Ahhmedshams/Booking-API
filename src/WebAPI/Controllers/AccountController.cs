@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -21,17 +22,19 @@ namespace WebAPI.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
         private readonly AccountRepository accountRepo;
+        private readonly UploadImage _uploadImage;
 
-        public AccountController(UserManager<ApplicationUser> _userManager, IMapper _mapper, AccountRepository accountRepo)
+        public AccountController(UserManager<ApplicationUser> _userManager, IMapper _mapper, AccountRepository accountRepo, UploadImage uploadImage)
         {
             userManager = _userManager;
             mapper = _mapper;
             this.accountRepo = accountRepo;
+            this._uploadImage = uploadImage;
         }
 
         [HttpPost("register")]
         /*  [ServiceFilter(typeof(ValidationFilterAttribute))]*/
-        public async Task<IActionResult> Register(RegisterUserDto _user)
+        public async Task<IActionResult> Register([FromForm] RegisterUserDto _user)
         {
             if (ModelState.IsValid)
             {
@@ -41,6 +44,17 @@ namespace WebAPI.Controllers
 
                 if (result is IdentityResult)
                 {
+                    if (_user.UploadedImages != null)
+                    {
+                        var entityType = "UserImage";
+                        var images = await _uploadImage.UploadToCloud(_user.UploadedImages, entityType);
+
+                        if (images != null && images.Any())
+                        {
+                            var userImages = images.OfType<UserImage>().ToList();
+                            user.Images = userImages;
+                        }
+                    }
                     return CustomResult("Created Successfully");
                 }
                 else if (result is IEnumerable<IdentityError> errorList)
