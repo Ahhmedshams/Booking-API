@@ -17,7 +17,9 @@ namespace Domain.Entities
 
         public int PaymentMethodId { get; set; }
 
-        public string TransactionId { get; set; }
+        public string? TransactionId { get; set; }
+
+        public string SessionId { get; set; }
 
         public PaymentStatus  Status { get; set; }
 

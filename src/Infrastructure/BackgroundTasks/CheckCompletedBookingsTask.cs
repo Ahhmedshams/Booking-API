@@ -24,6 +24,7 @@ namespace Infrastructure.BackgroundTasks
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var clientBookingRepo = scope.ServiceProvider.GetRequiredService<IClientBookingRepo>();
+                    var bookingItemsRepo = scope.ServiceProvider.GetRequiredService<IBookingItemRepo>();
 
                     var processingBookings = await clientBookingRepo.FindAsync(e => e.Status == BookingStatus.InProcess);
 
@@ -32,6 +33,8 @@ namespace Infrastructure.BackgroundTasks
                         if (booking.Date == DateTime.Now.Date && booking.EndTime <= DateTime.Now.TimeOfDay)
                         {
                             booking.Status = BookingStatus.Completed;
+                            // TODO: Free all resources related with booking after change status to COMPLETED. 
+                            // await clientBookingRepo.CancelBooking(booking.Id);
                             await clientBookingRepo.EditAsync(booking.Id, booking, e => e.Id);
                         }
                     }

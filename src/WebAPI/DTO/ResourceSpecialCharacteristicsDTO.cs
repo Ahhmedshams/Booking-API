@@ -18,4 +18,19 @@ namespace WebAPI.DTO
         public int ResourceID { get; set; }
 
     }
+
+
+    public class ResourceSpecialCharacteristicsEditDTO
+    {
+
+        public int ID { get; set; }
+        public int TotalCapacity { get; set; }
+
+        public int AvailableCapacity { get; set; }
+
+        public int? ScheduleID { get; set; }
+
+        public int ResourceID { get; set; }
+
+    }
 }
