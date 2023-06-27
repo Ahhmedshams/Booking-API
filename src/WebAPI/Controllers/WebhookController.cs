@@ -51,22 +51,17 @@ namespace WebAPI.Controllers
                 switch (stripeEvent.Type)
                 {
                     case Events.CheckoutSessionCompleted:
-                       
 
-                        var payementTransaction = new PaymentTransaction()
-                        {
-                            ClientBookingId = bookingid,
-                            Amount = (decimal)(session.AmountTotal/100.00),
-                            UserId = session.ClientReferenceId,
-                            TransactionId = session.PaymentIntentId
-,
-                            PaymentMethodId = 1
-                        ,
-                            Status = PaymentStatus.Successful
-                        };
+
+                        var payementTransactions = await payemntTransactionRepository.FindAsync(e => e.ClientBookingId == bookingid);
+
+                        var transaction = payementTransactions.FirstOrDefault();
+                        transaction.Status = PaymentStatus.Successful;
+                        transaction.TransactionId = session.PaymentIntentId;
 
                         // TODO: Retry many times if there are faliure in saving - unit of work
-                        await payemntTransactionRepository.AddAsync(payementTransaction);
+                        await payemntTransactionRepository.EditAsync(transaction.Id,transaction, e => e.Id);
+
                         bookingFlowRepo.ChangeStatusToConfirmed(bookingid);
 
 

@@ -23,7 +23,7 @@ namespace Infrastructure.Services
         }
         
 
-        public async Task<string> MakePayment(IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
+        public async Task<string> MakePayment(IPayemntTransactionRepository paymentTransactionRepository,IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
         {
 
 
