@@ -47,29 +47,36 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] ServiceDTO serviceDTO)
         {
-            if (!ModelState.IsValid)
-                return CustomResult(ModelState, HttpStatusCode.BadRequest);
-
-
-            if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
-                return CustomResult("Invalid value for ServiceStatus", HttpStatusCode.BadRequest);
-
-            var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
-
-            if (serviceDTO.UploadedImages != null && serviceDTO.UploadedImages.Any())
+            try
             {
-                var entityType = "ServiceImage";
-                var images = await _uploadImage.UploadToCloud(serviceDTO.UploadedImages, entityType);
+				if (!ModelState.IsValid)
+					return CustomResult(ModelState, HttpStatusCode.BadRequest);
 
-                if (images != null && images.Any())
-                {
-                    var serviceImages = images.OfType<ServiceImage>().ToList();
-                    service.Images = serviceImages;
-                }
-            }
 
-            await serviceRepo.AddAsync(service);
-            return CustomResult(serviceDTO);
+				if (!Enum.IsDefined(typeof(ServiceStatus), serviceDTO.Status))
+					return CustomResult("Invalid value for ServiceStatus", HttpStatusCode.BadRequest);
+
+				var service = mapper.Map<ServiceDTO, Service>(serviceDTO);
+
+				if (serviceDTO.UploadedImages != null && serviceDTO.UploadedImages.Any())
+				{
+					var entityType = "ServiceImage";
+					var images = await _uploadImage.UploadToCloud(serviceDTO.UploadedImages, entityType);
+
+					if (images != null && images.Any())
+					{
+						var serviceImages = images.OfType<ServiceImage>().ToList();
+						service.Images = serviceImages;
+					}
+				}
+
+				await serviceRepo.AddAsync(service);
+				return CustomResult(serviceDTO);
+			}
+			catch(Exception ex)
+            {
+				return CustomResult("Duplicate Service Name", HttpStatusCode.BadRequest);
+			}
         }
 
         [HttpPut]
