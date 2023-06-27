@@ -245,7 +245,10 @@ namespace WebAPI.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
-                ImageUrls = user.Images
+                ImageUrls = user.Images,
+                Address=user.Address,
+                CreditCardNumber =user.CreditCardNumber,
+                PhoneNumber = user.PhoneNumber
             };
 
             return CustomResult(result);

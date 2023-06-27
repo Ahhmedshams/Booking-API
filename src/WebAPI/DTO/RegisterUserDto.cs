@@ -27,6 +27,9 @@ namespace WebAPI.DTO
         public string LastName { get; set; }
         [Sieve(CanFilter = true, CanSort = true)]
         public string Email { get; set; }
+        public string Address { get; set; }
+        public string CreditCardNumber  { get; set; }
+        public string PhoneNumber { get; set; }
         public ICollection<UserImage> ImageUrls { get; set; }
 
     }
