@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
             if (ModelState.IsValid)
             {
                 ApplicationUser user = mapper.Map<ApplicationUser>(_user);
-                if (_user.UploadedImages != null && _user.UploadedImages.Count != 0)
+               /* if (_user.UploadedImages != null && _user.UploadedImages.Count != 0)
                 {
                     var entityType = "UserImage";
                     var images = await _uploadImage.UploadToCloud(_user.UploadedImages, entityType);
@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
                         var userImages = images.OfType<UserImage>().ToList();
                         user.Images = userImages;
                     }
-                }
+                }*/
 
                 object result = await accountRepo.Register(user, _user.Password);
 
