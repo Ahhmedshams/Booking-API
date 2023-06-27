@@ -51,22 +51,17 @@ namespace WebAPI.Controllers
                 switch (stripeEvent.Type)
                 {
                     case Events.CheckoutSessionCompleted:
-                       
 
-                        var payementTransaction = new PaymentTransaction()
-                        {
-                            ClientBookingId = bookingid,
-                            Amount = (decimal)(session.AmountTotal/100.00),
-                            UserId = session.ClientReferenceId,
-                            TransactionId = session.PaymentIntentId
-,
-                            PaymentMethodId = 1
-                        ,
-                            Status = PaymentStatus.Successful
-                        };
+
+                        var payementTransactions = await payemntTransactionRepository.FindAsync(e => e.ClientBookingId == bookingid);
+
+                        var transaction = payementTransactions.FirstOrDefault();
+                        transaction.Status = PaymentStatus.Successful;
+                        transaction.TransactionId = session.PaymentIntentId;
 
                         // TODO: Retry many times if there are faliure in saving - unit of work
-                        await payemntTransactionRepository.AddAsync(payementTransaction);
+                        await payemntTransactionRepository.EditAsync(transaction.Id,transaction, e => e.Id);
+
                         bookingFlowRepo.ChangeStatusToConfirmed(bookingid);
 
 
@@ -170,18 +165,13 @@ namespace WebAPI.Controllers
                 {
                     //TODO: execute many times when fails
 
-                    var payementTransaction = new PaymentTransaction()
-                    {
-                        ClientBookingId = bookingID,
-                        Amount = decimal.Parse(executedPayment.transactions.First().amount.total),
-                        UserId = booking.UserId,
-                        TransactionId = PaymentId,
-                        PaymentMethodId = (int) PaymentMethodType.Paypal
-                        ,
-                        Status = PaymentStatus.Successful
-                    };
+                    var transaction = booking.paymentTransaction;
 
-                    await payemntTransactionRepository.AddAsync(payementTransaction);
+                    transaction.Status = PaymentStatus.Successful;
+                    transaction.TransactionId = executedPayment.transactions[0].related_resources[0].sale.id;
+
+                    // TODO: Retry many times if there are faliure in saving - unit of work
+                    await payemntTransactionRepository.EditAsync(transaction.Id, transaction, e => e.Id);
 
                     bookingFlowRepo.ChangeStatusToConfirmed(bookingID);
 
@@ -189,18 +179,12 @@ namespace WebAPI.Controllers
 
                 }else if (executedPayment.state == "fails")
                 {
-                    var payementTransaction = new PaymentTransaction()
-                    {
-                        ClientBookingId = bookingID,
-                        Amount = decimal.Parse(executedPayment.transactions.First().amount.total),
-                        UserId = booking.UserId,
-                        TransactionId = PaymentId,
-                        PaymentMethodId = (int)PaymentMethodType.Paypal
-                        ,
-                        Status = PaymentStatus.Failed
-                    };
+                    var transaction = booking.paymentTransaction;
 
-                    await payemntTransactionRepository.AddAsync(payementTransaction);
+                    transaction.Status = PaymentStatus.Failed;
+                    transaction.TransactionId = PaymentId;
+
+                    await payemntTransactionRepository.EditAsync(transaction.Id, transaction, e => e.Id);
 
                     //TODO:  should i cancel the booking or redirect the user the another paypal payment.
                 }
@@ -209,6 +193,8 @@ namespace WebAPI.Controllers
             catch (Exception e)
             {
                 // "Transaction is declined due to compliance violation."
+                return CustomResult("failed", HttpStatusCode.BadRequest);
+
             }
 
             return CustomResult("failed", HttpStatusCode.BadRequest);

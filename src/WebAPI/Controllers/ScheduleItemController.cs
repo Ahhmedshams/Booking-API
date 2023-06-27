@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Newtonsoft.Json;
 using WebAPI.Utility;
+using Application.Common.Interfaces.Repositories;
 
 namespace WebAPI.Controllers
 {
@@ -14,11 +15,13 @@ namespace WebAPI.Controllers
     {
         private readonly IMapper mapper;
         private readonly IScheduleItemRepo scheduleItemRepo;
+        private readonly IScheduleRepo scheduleRepo;
 
-        public ScheduleItemController(IMapper mapper, IScheduleItemRepo scheduleItemRepo)
+        public ScheduleItemController(IMapper mapper, IScheduleItemRepo scheduleItemRepo,IScheduleRepo scheduleRepo)
         {
             this.mapper = mapper;
             this.scheduleItemRepo = scheduleItemRepo;
+            this.scheduleRepo = scheduleRepo;
         }
 
 
@@ -86,33 +89,64 @@ namespace WebAPI.Controllers
 
 
 
-
         //update (in case reserved updata available with false)
-        [HttpPut("/Edit")]
-        public async Task<IActionResult> Edit([FromBody] ScheduleItemDTO scheduleItemDto)
+        [HttpPut("Edit")]
+        public async Task<IActionResult> Edit(EditScheduleItemDTO scheduleItemDto)
         {
             if (ModelState.IsValid)
             {
-                var data = await scheduleItemRepo.FindAsync(scheduleItemDto.ScheduleId, scheduleItemDto.Day, scheduleItemDto.StartTime, scheduleItemDto.EndTime);
+                var data = await scheduleItemRepo.FindAsync(scheduleItemDto.ScheduleId, scheduleItemDto.oldDay, scheduleItemDto.oldStartTime, scheduleItemDto.oldEndTime);
                 if (data == null)
                     return CustomResult($"No Schedule Item Found With Given Data", HttpStatusCode.NotFound);
-                var scheduleCheck = CheckSchedule(scheduleItemDto.ScheduleId);
-                if (scheduleCheck != null)
-                    return CustomResult($"No Schedule Item Found With id {scheduleItemDto.ScheduleId}", HttpStatusCode.NotFound);
 
+                //var scheduleCheck = CheckSchedule(scheduleItemDto.ScheduleId);
+                //if (scheduleCheck != null)
+                //    return CustomResult($"No Schedule Item Found With id {scheduleItemDto.ScheduleId}", HttpStatusCode.NotFound);
+
+                var schedule = scheduleRepo.GetById(scheduleItemDto.ScheduleId);
+                if (schedule == null)
+                    return CustomResult($"No Schedule Found With id {scheduleItemDto.ScheduleId}", HttpStatusCode.NotFound);
+                if (scheduleItemDto.newDay < schedule.FromDate || scheduleItemDto.newDay > schedule.ToDate)
+                    return CustomResult($"The day should be in the range of the schedule from {schedule.FromDate} to {schedule.ToDate}", HttpStatusCode.BadRequest);
+
+                // Check if the start time and end time are not already existed in the schedule item in the same day
+                var existingScheduleItems = await scheduleItemRepo.FindByDayAsync(scheduleItemDto.ScheduleId, scheduleItemDto.newDay);
+                if (existingScheduleItems != null)
+                {
+                    foreach (var existingScheduleItem in existingScheduleItems)
+                    {
+                        if (existingScheduleItem.ID == data.ID)
+                            continue;
+
+                        if ((scheduleItemDto.newStartTime >= existingScheduleItem.StartTime && scheduleItemDto.newStartTime < existingScheduleItem.EndTime) ||
+                            (scheduleItemDto.newEndTime > existingScheduleItem.StartTime && scheduleItemDto.newEndTime <= existingScheduleItem.EndTime))
+                            return CustomResult($"The start time and end time should not overlap with the existing schedule item for the same day", HttpStatusCode.BadRequest);
+
+                    }
+                }
+                // Check if the available change is for a future day
+                //if (scheduleItemDto.Available && scheduleItemDto.newDay < DateTime.Now.Date)
+                //    return CustomResult($"The status can only be changed to Available for future days", HttpStatusCode.BadRequest);
+
+                // Update the schedule item
+                data.Day = scheduleItemDto.newDay;
+                data.StartTime = scheduleItemDto.newStartTime;
+                data.EndTime = scheduleItemDto.newEndTime;
                 data.Available = scheduleItemDto.Available;
+                data.Shift = scheduleItemDto.Shift;
+
                 await scheduleItemRepo.SaveChangesAsync();
 
-                ScheduleItemDTO scheduleItem = mapper.Map<ScheduleItemDTO>(data);
+                ScheduleItemDTO updatedScheduleItemDto = mapper.Map<ScheduleItemDTO>(data);
+
+                return CustomResult(updatedScheduleItemDto);
+            }
 
                 /* var result = await scheduleItemRepo.EditAsync(new {ScheduleId =scheduleItem.ScheduleId, Day=scheduleItem.Day,
                      StartTime=scheduleItem.StartTime,EndTime=scheduleItem.EndTime},scheduleItem, s => s.ScheduleId);*/
 
                 /*            var schedItemDTO = mapper.Map<ScheduleItemDTO>(result);
                 */
-                return CustomResult(scheduleItem);
-
-            }
             return CustomResult(ModelState, HttpStatusCode.BadRequest);
             
         }

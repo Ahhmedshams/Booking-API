@@ -51,8 +51,9 @@ namespace WebAPI.Utility
                 UserId = clientBooking.UserId,
                 BookingItems = clientBooking.BookingItems.ToBookingItemWIthDetails(),
                 ServiceImages = clientBooking.Service.Images,
-               // PaymentMethodName = clientBooking?.paymentTransaction.PaymentMethod.Name,
-               // PaymentStatus = clientBooking?.paymentTransaction.Status,
+
+                // PaymentMethodName = clientBooking?.paymentTransaction.PaymentMethod.Name,
+                // PaymentStatus = clientBooking?.paymentTransaction.Status,
                 TotalCost = clientBooking.TotalCost
             };
 
@@ -128,6 +129,7 @@ namespace WebAPI.Utility
                         Price = bookingItem.Price,
                         ResourceId = bookingItem.ResourceId,
                         ResourceName = bookingItem.Resource.Name,
+                        ResourceImages = bookingItem.Resource.Images,
                     };
                     result.Add(entity);
                 }

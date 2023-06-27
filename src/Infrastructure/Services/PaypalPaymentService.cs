@@ -1,5 +1,7 @@
 ﻿using Application.Common.Interfaces.Services;
 using AutoMapper;
+using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Utility.Extensions;
 using Microsoft.Extensions.Configuration;
 using PayPal.Api;
@@ -23,7 +25,7 @@ namespace Infrastructure.Services
         }
         
 
-        public async Task<string> MakePayment(IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
+        public async Task<string> MakePayment(IPayemntTransactionRepository paymentTransactionRepository,IBookingItemRepo bookingItemRepo, decimal amount, int bookingID)
         {
 
 
@@ -40,7 +42,7 @@ namespace Infrastructure.Services
 
             var bookingItems = bookingItemRepo.GetAllBooksItemsByBookingId(bookingID);
 
-
+            var clientBooking = bookingItems[0].ClientBooking;
 
             Payment createdPayment = null;
             try
@@ -77,6 +79,19 @@ namespace Infrastructure.Services
                 {
                     if (link.rel.Equals("approval_url"))
                     {
+                        var payementTransaction = new PaymentTransaction()
+                        {
+                            ClientBookingId = bookingID,
+                            Amount = clientBooking.TotalCost,
+                            UserId = clientBooking.UserId,
+                            PaymentMethodId = (int)PaymentMethodType.Paypal,
+                            Status = PaymentStatus.Pending,
+                            SessionId = ""
+                            
+                        };
+
+                        await paymentTransactionRepository.AddAsync(payementTransaction);
+
                         return link.href;
                     }
                 }

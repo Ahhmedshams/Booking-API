@@ -20,6 +20,7 @@ namespace WebAPI.DTO
         public string UserId { get; set; }
         public IEnumerable<BookingItemWIthDetails> BookingItems { get; set; }
         public ICollection<ServiceImage> ServiceImages { get; set; }
+
         public string PaymentMethodName { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public decimal TotalCost { get; set; }
@@ -32,9 +33,11 @@ namespace WebAPI.DTO
         public decimal Price { get; set; }
         public int ResourceId { get; set; }
         public string ResourceName { get; set; }
+        public ICollection<ResourceImage> ResourceImages { get; set; }
+
     }
 
-   
+
 
 
 

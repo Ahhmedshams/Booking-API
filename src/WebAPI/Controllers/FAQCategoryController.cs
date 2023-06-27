@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -11,22 +14,28 @@ namespace WebAPI.Controllers
     {
         private readonly IFAQCategoryRepo _faqCategoryRepo;
         private readonly IMapper _mapper;
-
-        public FAQCategoryController(IFAQCategoryRepo faqRepo, IMapper mapper)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+        public FAQCategoryController(IFAQCategoryRepo faqRepo, IMapper mapper, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             _faqCategoryRepo = faqRepo;
             _mapper = mapper;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(){
+        public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
+        {
             try
             {
 				IEnumerable<FAQCategory> faqsCategories = await _faqCategoryRepo.GetAllAsync(true, e => e.FAQS);
 				List<FAQCategoryGetDTO> result = new List<FAQCategoryGetDTO>();
 				foreach (var faqCategory in faqsCategories)
 					result.Add(new FAQCategoryGetDTO() { Id = faqCategory.Id, Name = faqCategory.Name, FAQS = _mapper.Map<List<FAQGetDTO>>(faqCategory.FAQS) });
-				return CustomResult(result);
+                var FilteredFAQ = _sieveProcessor.Apply(sieveModel, result.AsQueryable());
+
+                return CustomResult(FilteredFAQ);
 			}
             catch
             {

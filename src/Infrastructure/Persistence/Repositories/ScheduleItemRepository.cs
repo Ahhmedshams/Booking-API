@@ -42,6 +42,11 @@ namespace Infrastructure.Persistence.Repositories
             return entities;
         }
 
+        public async Task<IEnumerable<ScheduleItem>> FindByDayAsync(int scheduleId, DateTime day)
+        {
+            return _context.ScheduleItem.Where(s => s.ScheduleId == scheduleId && s.Day == day);
+        }
+
         public ScheduleItem Delete(int id, DateTime Day, TimeOnly startTime, TimeOnly endTime)
         {
             bool found = IsExist(id, Day, startTime, endTime);
@@ -76,7 +81,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public bool IsExistWithId(int ?id)
         {
-            return _context.Schedule.Any(res => res.ScheduleID == id);
+            return _context.ScheduleItem.Any(res => res.ID == id);
         }
     }
 }

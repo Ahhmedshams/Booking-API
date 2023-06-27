@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System;
 
 namespace WebAPI.Controllers
@@ -22,12 +25,16 @@ namespace WebAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
 
-        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context, IMapper mapper)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context, IMapper mapper, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             this.userManager=userManager;
             this.roleManager=roleManager;
             this.context=context;
             this.mapper=mapper;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
 
@@ -37,7 +44,7 @@ namespace WebAPI.Controllers
 
        //[Authorize(Permissions.Users.Index)]
 
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             var users = await userManager.Users.ToListAsync();
 
@@ -50,8 +57,10 @@ namespace WebAPI.Controllers
 
                 userDto.Roles = (List<string>) userManager.GetRolesAsync(user).Result;
             }
+            var FilteredUsers = _sieveProcessor.Apply(sieveModel, userDTOs.AsQueryable());
 
-            return CustomResult(userDTOs);
+
+            return CustomResult(FilteredUsers);
         }
 
 
