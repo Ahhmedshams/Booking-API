@@ -74,7 +74,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO)
+        public async Task<IActionResult> Add(ResourceSpecialCharacteristicsEditDTO resourceSpecialCharacteristicsDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
@@ -99,7 +99,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id, [FromBody] ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO)
+        public async Task<IActionResult> Edit(int id, [FromBody] ResourceSpecialCharacteristicsEditDTO resourceSpecialCharacteristicsDTO)
         {
             if (ModelState.IsValid)
             {
@@ -108,7 +108,7 @@ namespace WebAPI.Controllers
                 {
                     ResourceSpecialCharacteristics resourceSpecialCharacteristics = _mapper.Map<ResourceSpecialCharacteristics>(resourceSpecialCharacteristicsDTO);
                     var result = await _resourceSpecialCharacteristicsRepository.EditAsync(id, resourceSpecialCharacteristics,rsc=>rsc.ID);
-                    ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO1  = _mapper.Map<ResourceSpecialCharacteristicsDTO>(result);
+                    ResourceSpecialCharacteristicsEditDTO resourceSpecialCharacteristicsDTO1  = _mapper.Map<ResourceSpecialCharacteristicsEditDTO>(result);
                     return CustomResult(resourceSpecialCharacteristicsDTO1);
                 }
             }
