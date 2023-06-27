@@ -5,6 +5,9 @@ using Domain.Entities;
 using Infrastructure.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 using WebAPI.DTO;
 
@@ -17,25 +20,30 @@ namespace WebAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IResourceTypeRepo _resourceTypeRepo;
         private readonly UploadImage _uploadImage;
-
-        public ResourceTypeController(IMapper mapper, IResourceTypeRepo resourceTypeRepo, UploadImage uploadImage)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+        public ResourceTypeController(IMapper mapper, IResourceTypeRepo resourceTypeRepo, UploadImage uploadImage, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions
+)
         {
             _mapper = mapper;
             _resourceTypeRepo = resourceTypeRepo;
             this._uploadImage = uploadImage;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
         [HttpGet]
       //  [Authorize(Permissions.ResourceTypes.Index)]
-        public async Task< IActionResult> GetAll()
+        public async Task< IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync(true,r=>r.Images);
             if (resourceTypes.Count() == 0 ) 
                 return CustomResult("No Resource Type Are Available", HttpStatusCode.NotFound);
             
             List<ResourceTypeDTO> resourceTypesDTO = _mapper.Map<List<ResourceTypeDTO>>(resourceTypes);
+            var FilteredResourceType= _sieveProcessor.Apply(sieveModel, resourceTypesDTO.AsQueryable());
 
-            return CustomResult(resourceTypesDTO);
+            return CustomResult(FilteredResourceType);
         }
 
         [HttpGet("{id:int}")]

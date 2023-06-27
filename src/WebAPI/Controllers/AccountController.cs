@@ -1,6 +1,7 @@
 ﻿using Application.DTO;
 using AutoMapper;
 using CoreApiResponse;
+using Domain.Entities;
 using Domain.Identity;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -8,11 +9,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
+using System.Xml.Linq;
 using WebAPI.DTO;
 
 namespace WebAPI.Controllers
@@ -25,18 +30,21 @@ namespace WebAPI.Controllers
         private readonly IMapper mapper;
         private readonly AccountRepository accountRepo;
         private readonly UploadImage _uploadImage;
-
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
         public AccountController(UserManager<ApplicationUser> _userManager,
-            IMapper _mapper, AccountRepository accountRepo, UploadImage uploadImage)
+            IMapper _mapper, AccountRepository accountRepo, UploadImage uploadImage, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             userManager = _userManager;
             mapper = _mapper;
             this.accountRepo = accountRepo;
             this._uploadImage = uploadImage;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             var users = await userManager.Users.Include(u=>u.Images).ToListAsync();
             List < ApplicationUserDTO> usersDto= new List <ApplicationUserDTO>();
@@ -53,8 +61,10 @@ namespace WebAPI.Controllers
                 };
                 usersDto.Add(userDto);
             }
-             //List<ApplicationUserDTO> userDTOs = mapper.Map<List<ApplicationUserDTO>>(users);
-            return CustomResult(usersDto);
+
+            var FilteredResources = _sieveProcessor.Apply(sieveModel, usersDto.AsQueryable());
+            //List<ApplicationUserDTO> userDTOs = mapper.Map<List<ApplicationUserDTO>>(users);
+            return CustomResult(FilteredResources);
         }
 
 
@@ -235,7 +245,10 @@ namespace WebAPI.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
-                ImageUrls = user.Images
+                ImageUrls = user.Images,
+                Address=user.Address,
+                CreditCardNumber =user.CreditCardNumber,
+                PhoneNumber = user.PhoneNumber
             };
 
             return CustomResult(result);
