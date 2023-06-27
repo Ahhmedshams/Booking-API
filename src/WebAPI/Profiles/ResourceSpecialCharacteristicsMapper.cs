@@ -6,7 +6,14 @@ namespace WebAPI.Profiles
     {
         public ResourceSpecialCharacteristicsMapper()
         {
-            CreateMap<ResourceSpecialCharacteristics, ResourceSpecialCharacteristicsDTO>().ReverseMap();
+            CreateMap<ResourceSpecialCharacteristics, ResourceSpecialCharacteristicsDTO>()
+                .ForMember(RSC=>RSC.Day,opt=>opt.
+                MapFrom(RSCEntity=>RSCEntity.ScheduleItem.Day)).ReverseMap();
+
+            CreateMap<ResourceSpecialCharacteristics, ResourceSpecialCharacteristicsEditDTO>()
+               .ReverseMap();
         }
+
+        
     }
 }

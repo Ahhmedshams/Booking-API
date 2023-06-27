@@ -15,6 +15,6 @@ namespace Application.Common.Interfaces.Repositories
         Schedule AddSchedule(Schedule schedule);
 
         List<AvailableSchedule> GetSchedules(DateTime fromDate, DateTime toDate, SieveModel sieveMode);
-        List<Resource> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime, SieveModel sieveMode, int? regionId = null);
+		Task<List<Resource>> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime, SieveModel sieveMode, int? regionId = null);
     }
 }

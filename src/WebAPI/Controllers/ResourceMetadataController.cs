@@ -83,19 +83,17 @@ namespace WebAPI.Controllers
         }
 
 
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<ResourceMetadata> resource = await _resourceMetadataRepo.GetAllAsync();
-            if (resource.Count() == 0)
-                return CustomResult("No Resource Metadata Are Available ", HttpStatusCode.NotFound);
+            //if (resource.Count() == 0)
+            //    return CustomResult("No Resource Metadata Are Available ", HttpStatusCode.NotFound);
 
             var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(resource);
 
             return CustomResult(resourceDTO);
         }
-
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
@@ -133,7 +131,6 @@ namespace WebAPI.Controllers
                 return CustomResult($"No Resource Metadata Available To Resource Type Id= {id}", HttpStatusCode.NotFound);
 
             var resourceDTO = _mapper.Map<List<ResourceMetaRespDTO>>(resource);
-
             return CustomResult(resourceDTO);
         }
 

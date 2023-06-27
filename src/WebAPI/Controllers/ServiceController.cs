@@ -12,12 +12,12 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ServiceController : BaseController
     {
-        private readonly IServiceRepo serviceRepo;
+		private readonly IServiceRepo serviceRepo;
         private readonly IMapper mapper;
         private readonly UploadImage _uploadImage;
         public ServiceController(IServiceRepo _serviceRepo,IMapper _mapper, UploadImage uploadImage)
         {
-            serviceRepo = _serviceRepo;
+			serviceRepo = _serviceRepo;
             mapper = _mapper;
             _uploadImage = uploadImage;
         }
@@ -28,7 +28,7 @@ namespace WebAPI.Controllers
         {
             var spec = new ServiceSpecification(specParams);
             var services = await serviceRepo.GetAllServicesWithSpec(spec);
-            var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceDTO>>(services);
+            var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceResDTO>>(services);
             return CustomResult(servicesDTO);
         }
 

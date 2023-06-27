@@ -1,12 +1,8 @@
 ﻿using Application.Common.Helpers;
-using Domain.Entities;
 using Infrastructure.Persistence.Specification;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Transactions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -62,7 +58,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<ClientBooking> GetBookingById(int id)
         {
             var clientBooking = await _context.Set<ClientBooking>()
-                                    .Where(b => b.IsDeleted == false & b.Id == id)
+                                    .Where(b => b.IsDeleted == false & b.Id == id).Include(b => b.paymentTransaction)
                                     .FirstOrDefaultAsync();
             return clientBooking;
         }
@@ -300,6 +296,44 @@ namespace Infrastructure.Persistence.Repositories
             }
         }
 
+       
+        //public async Task<IEnumerable<ClientBooking>> GetUserBooking(string id)
+        //{
+        //    return await _context.ClientBookings
+        //          .Where(e => e.UserId == id)
+        //          .Include(e => e.Service)
+        //          .Include(e => e.paymentTransaction)
+        //          .Include(e => e.BookingItems)
+        //          .ThenInclude(e => e.Resource)
+        //          .ThenInclude(e => e.ResourceType)
+        //          .ToListAsync();
+        //}
+
+        public async Task<IEnumerable<ClientBooking>> GetUserBooking(string id)
+        {
+            return await _context.ClientBookings
+                  .Where(e => e.UserId == id)
+                  .Include(e => e.Service)
+                  .ToListAsync();
+        }
+
+
+
+        public Task<ClientBooking> GetUserBooking(string id, int bookingId)
+        {
+            return _context.ClientBookings
+                .Where(e => e.UserId == id && e.Id == bookingId )
+                .Include(e => e.Service)
+                .ThenInclude(e=>e.Images)
+                .Include(e => e.paymentTransaction)
+                .Include(e => e.BookingItems)
+                .ThenInclude(e => e.Resource)
+                .ThenInclude(e => e.Images )
+                .Include(e => e.BookingItems)
+                .ThenInclude(e => e.Resource)
+                .ThenInclude(e => e.ResourceType)
+                .FirstOrDefaultAsync();
+        }
         public async Task CancelBooking(int bookingID)
         { 
                   await _context.Database.ExecuteSqlRawAsync(

@@ -261,12 +261,15 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TransactionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -338,6 +341,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal?>("Rating")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("RegionId")
                         .HasColumnType("int");
@@ -733,7 +739,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
@@ -1002,6 +1008,18 @@ namespace Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("ServiceImage");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserImage", b =>
+                {
+                    b.HasBaseType("Domain.Entities.ImageEntity");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasDiscriminator().HasValue("UserImage");
+                });
+
             modelBuilder.Entity("Domain.Entities.BookingItem", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -1080,7 +1098,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Resource", b =>
                 {
-                    b.HasOne("Domain.Entities.Region", null)
+                    b.HasOne("Domain.Entities.Region", "Region")
                         .WithMany()
                         .HasForeignKey("RegionId");
 
@@ -1089,6 +1107,8 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ResourceTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Region");
 
                     b.Navigation("ResourceType");
                 });
@@ -1150,13 +1170,13 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.ScheduleItem", "scheduleItem")
+                    b.HasOne("Domain.Entities.ScheduleItem", "ScheduleItem")
                         .WithOne("ResourceSpecialCharacteristics")
                         .HasForeignKey("Domain.Entities.ResourceSpecialCharacteristics", "ScheduleID");
 
                     b.Navigation("Resource");
 
-                    b.Navigation("scheduleItem");
+                    b.Navigation("ScheduleItem");
                 });
 
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
@@ -1281,6 +1301,13 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ServiceId");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserImage", b =>
+                {
+                    b.HasOne("Domain.Identity.ApplicationUser", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ApplicationUserId");
+                });
+
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
                 {
                     b.Navigation("BookingItems");
@@ -1325,6 +1352,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Metadata");
+                });
+
+            modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

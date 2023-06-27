@@ -31,7 +31,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> AddReview(ResourceReviewDTO resourceReviewDTO )
         {
             if(!ModelState.IsValid)
-                return CustomResult(ModelState,System.Net.HttpStatusCode.BadRequest);
+                return CustomResult(ModelState,HttpStatusCode.BadRequest);
 
             var User = await accountRepo.IsExistAsync(resourceReviewDTO.UserId);
             var Resource =  resourceRepo.IsExist(resourceReviewDTO.ResourceId);
@@ -46,11 +46,12 @@ namespace WebAPI.Controllers
             {
                var result = await resourceReviewRepo.AddAsync(ResourceReview);
                var resultDTO = mapper.Map<ResourceReviewResDTO>(result);
+               await resourceReviewRepo.SetRating(resourceReviewDTO.ResourceId);
                return CustomResult(resultDTO);
             }
             catch (Exception ex)
             {
-                return CustomResult($"{ex}", System.Net.HttpStatusCode.BadRequest);
+                return CustomResult($"{ex}",HttpStatusCode.BadRequest);
             }
         }
 
@@ -61,11 +62,11 @@ namespace WebAPI.Controllers
             var Resource = resourceRepo.IsExist(id);
 
             if (!Resource)
-                return CustomResult($"No Resource Exist With Id {id}", System.Net.HttpStatusCode.BadRequest);
+                return CustomResult($"No Resource Exist With Id {id}", HttpStatusCode.BadRequest);
 
             var result = await resourceReviewRepo.FindAsync(e=> e.ResourceId == id);
-            if(result.Count() == 0)
-                return CustomResult($"No Review Exist for Resource Id {id}", System.Net.HttpStatusCode.BadRequest);
+            if (result.Count() == 0)
+                return CustomResult($"No Review Exist for Resource Id {id}", HttpStatusCode.BadRequest);
 
 
             var resultDTO = mapper.Map<List<ResourceReviewResDTO>>(result);
@@ -79,12 +80,12 @@ namespace WebAPI.Controllers
             var User = await accountRepo.IsExistAsync(id);
 
             if (!User)
-                return CustomResult($"No User Exist  With Id {id}", System.Net.HttpStatusCode.BadRequest);
+                return CustomResult($"No User Exist  With Id {id}",HttpStatusCode.BadRequest);
 
             var result = await resourceReviewRepo.FindAsync(e => e.UserId == id);
 
             if (result.Count() == 0)
-                return CustomResult($"No Review Exist for User Id {id}", System.Net.HttpStatusCode.BadRequest);
+                return CustomResult($"No Review Exist for User Id {id}", HttpStatusCode.BadRequest);
 
             var resultDTO = mapper.Map<List<ResourceReviewResDTO>>(result);
             return CustomResult(resultDTO);
@@ -95,8 +96,8 @@ namespace WebAPI.Controllers
         {
             var Review = await resourceReviewRepo.GetByIdAsync(id);
 
-            if (Review==null)
-                return CustomResult($"No Review Exist  With Id {id}", System.Net.HttpStatusCode.BadRequest);
+            if (Review == null)
+                return CustomResult($"No Review Exist  With Id {id}", HttpStatusCode.BadRequest);
 
             var resultDTO = mapper.Map<ResourceReviewResDTO>(Review);
             return CustomResult(resultDTO);

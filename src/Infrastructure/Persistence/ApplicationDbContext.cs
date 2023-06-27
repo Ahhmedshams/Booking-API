@@ -30,10 +30,10 @@ namespace Infrastructure.Persistence
         public DbSet<PaymentMethod> PaymentMethods { get; set; }    
         public DbSet<Ticket> Tickets { get; set; }       
         public DbSet<Region> Regions { get; set; }
-        DbSet<Service> Services { get; set; }
-        DbSet<ServiceMetadata> ServiceMetadata { get; set; }
-        DbSet<BookingItem> BookingItems { get; set; }
-        DbSet<ClientBooking> ClientBookings { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<ServiceMetadata> ServiceMetadata { get; set; }
+        public  DbSet<BookingItem> BookingItems { get; set; }
+        public DbSet<ClientBooking> ClientBookings { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
          

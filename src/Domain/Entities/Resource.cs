@@ -23,6 +23,8 @@ namespace Domain.Entities
         public IEnumerable<Schedule> Schedules { get; set; }
         public int? RegionId { set; get; }
         public Region? Region { get; set; }
+        public decimal? Rating { get; set; }
+
         public ICollection<ResourceImage> Images { get; set; }
         public ResourceSpecialCharacteristics? ResourceSpecialCharacteristics { get; set; }
     }

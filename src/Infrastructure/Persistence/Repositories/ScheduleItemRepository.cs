@@ -20,11 +20,31 @@ namespace Infrastructure.Persistence.Repositories
             return entities;
         }
 
+        public async Task<IEnumerable<ScheduleItem>> GetAllScheduleItems()
+        {
+            var scheduleItems = await _context.Set<ScheduleItem>()
+                .Include(si => si.Schedule)
+                    .ThenInclude(s => s.Resource)
+                    .ThenInclude(r => r.Images)
+              /*  .Include(si => si.Schedule)
+                    .ThenInclude(s => s.Resource)
+                    .ThenInclude(r => r.Name)*/
+                 .Where(s => !s.IsDeleted)
+                 .ToListAsync();
+            return scheduleItems;
+
+        }
+
         public async Task<IEnumerable<ScheduleItem>> AddRangeAsync(IEnumerable<ScheduleItem> entities)
         {
             await _context.ScheduleItem.AddRangeAsync(entities);
             await _context.SaveChangesAsync();
             return entities;
+        }
+
+        public async Task<IEnumerable<ScheduleItem>> FindByDayAsync(int scheduleId, DateTime day)
+        {
+            return _context.ScheduleItem.Where(s => s.ScheduleId == scheduleId && s.Day == day);
         }
 
         public ScheduleItem Delete(int id, DateTime Day, TimeOnly startTime, TimeOnly endTime)
@@ -61,7 +81,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public bool IsExistWithId(int ?id)
         {
-            return _context.Schedule.Any(res => res.ScheduleID == id);
+            return _context.ScheduleItem.Any(res => res.ID == id);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Application.Common.Interfaces.Repositories
     {
         Resource EditPrice(int id, decimal price);
         bool IsExist(int id);
+        Resource GetResById(int id);
 
     }
 }

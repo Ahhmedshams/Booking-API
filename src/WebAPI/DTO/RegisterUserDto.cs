@@ -14,10 +14,19 @@ namespace WebAPI.DTO
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
-
+        public ICollection<IFormFile>? UploadedImages { get; set; }
     }
 
+    public class UserRespDTO
+    {
+        public string Id { get; set; }
+        public string UserName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public ICollection<UserImage> ImageUrls { get; set; }
 
+    }
 
 
     public record UserResponce(
@@ -30,7 +39,6 @@ namespace WebAPI.DTO
         string? CreditCardNumber,
         DateTime? LastUpdatedOn,
         string? PhoneNumber
-
         );
 }
 

@@ -46,13 +46,10 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
-            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region);
-            if (resource.Count() == 0)
-                return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
-
+            IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region,e=>e.Images);
+           
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
             IQueryable<ResourceRespDTO>? FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
-
 
             return CustomResult(FilteredSchedules);
         }
@@ -63,8 +60,6 @@ namespace WebAPI.Controllers
 
             // Include Region
             IEnumerable<Resource> resource =  _resourceRepo.Find(e=>e.ResourceTypeId==id);
-            if (resource.Count() == 0)
-                return CustomResult("No Resource Are Available", HttpStatusCode.NotFound);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
             var FilteredSchedules = _sieveProcessor.Apply(sieveModel, resourceDTO.AsQueryable());
@@ -74,7 +69,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            Resource resource = await _resourceRepo.GetByIdAsync(id,e=>e.Region);
+            Resource resource = _resourceRepo.GetResById(id);
             if (resource == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
@@ -143,14 +138,10 @@ namespace WebAPI.Controllers
 
             var res = await _resourceDataRepo.AddRangeAsync(resourceData);
 
-            var resDTO = _mapper.Map<ResourceDataRespDTO>(res);
+            var resDTO = _mapper.Map<List<ResourceDataRespDTO>>(res);
 
             return CustomResult(resDTO);
         }
-
-
-
-
 
         [HttpPut("{id:int}")]
         public IActionResult Edit(int id,[FromBody] Decimal price,int? RegionId)
@@ -164,8 +155,6 @@ namespace WebAPI.Controllers
             return CustomResult(result);
         }
 
-
-
         [HttpDelete("SoftDelete/{id:int}")]
         public async Task<IActionResult> SoftDelete(int id)
         {
@@ -176,8 +165,6 @@ namespace WebAPI.Controllers
 
             return CustomResult(HttpStatusCode.NoContent);
         }
-
-
 
         private async Task<(IActionResult, List<ResourceData>)> CheckResourceData(Resource resource, List<ResourceDataRespIDValueDTO> resourceDTO)
         {
@@ -250,6 +237,7 @@ namespace WebAPI.Controllers
 
             return null;
         }
+       
         private async Task<bool> CheckRegionExists(int RegionId)
         {
             if (RegionId == 0) return false;
