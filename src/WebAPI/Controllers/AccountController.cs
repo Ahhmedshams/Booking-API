@@ -34,7 +34,7 @@ namespace WebAPI.Controllers
 
         [HttpPost("register")]
         /*  [ServiceFilter(typeof(ValidationFilterAttribute))]*/
-        public async Task<IActionResult> Register([FromForm] RegisterUserDto _user)
+        public async Task<IActionResult> Register(RegisterUserDto _user)
         {
             if (ModelState.IsValid)
             {
