@@ -1,9 +1,13 @@
 ﻿
 using AutoMapper;
 using CoreApiResponse;
+using Domain.Entities;
 using Infrastructure.Persistence.Specification.ServiceSpec;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 
 namespace WebAPI.Controllers
@@ -15,21 +19,29 @@ namespace WebAPI.Controllers
 		private readonly IServiceRepo serviceRepo;
         private readonly IMapper mapper;
         private readonly UploadImage _uploadImage;
-        public ServiceController(IServiceRepo _serviceRepo,IMapper _mapper, UploadImage uploadImage)
+
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+        public ServiceController(IServiceRepo _serviceRepo,IMapper _mapper, UploadImage uploadImage, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions
+)
         {
 			serviceRepo = _serviceRepo;
             mapper = _mapper;
             _uploadImage = uploadImage;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
         
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] ServiceSpecParams specParams)
+        public async Task<IActionResult> GetAll([FromQuery] ServiceSpecParams specParams,[FromQuery] SieveModel sieveModel)
         {
             var spec = new ServiceSpecification(specParams);
             var services = await serviceRepo.GetAllServicesWithSpec(spec);
             var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceResDTO>>(services);
-            return CustomResult(servicesDTO);
+            var FilteredService = _sieveProcessor.Apply(sieveModel, servicesDTO.AsQueryable());
+
+            return CustomResult(FilteredService);
         }
 
         [HttpPost]
