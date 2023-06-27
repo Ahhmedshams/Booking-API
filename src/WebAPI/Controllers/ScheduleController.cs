@@ -46,12 +46,13 @@ namespace WebAPI.Controllers
             return CustomResult(FilteredSchedules);
         }
 
-        /*[HttpGet("GetById/{id:int}")]
+        [HttpGet("GetById/{id:int}")]
         public IActionResult GetById(int id)
         {
             Schedule schedule = scheduleRepo.GetById(id);
-
-        }*/
+            if (schedule == null) return CustomResult(HttpStatusCode.BadRequest);
+            return CustomResult(schedule);
+        }
 
         [HttpPost("Add")]
         public IActionResult Add(ScheduleReqDTO schedule)
