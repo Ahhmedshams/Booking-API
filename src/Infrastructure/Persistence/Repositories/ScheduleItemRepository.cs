@@ -76,7 +76,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public bool IsExistWithId(int ?id)
         {
-            return _context.Schedule.Any(res => res.ScheduleID == id);
+            return _context.ScheduleItem.Any(res => res.ID == id);
         }
     }
 }
