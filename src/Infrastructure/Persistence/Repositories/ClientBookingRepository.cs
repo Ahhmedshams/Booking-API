@@ -58,7 +58,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<ClientBooking> GetBookingById(int id)
         {
             var clientBooking = await _context.Set<ClientBooking>()
-                                    .Where(b => b.IsDeleted == false & b.Id == id)
+                                    .Where(b => b.IsDeleted == false & b.Id == id).Include(b => b.paymentTransaction)
                                     .FirstOrDefaultAsync();
             return clientBooking;
         }

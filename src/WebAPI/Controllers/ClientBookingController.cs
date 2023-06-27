@@ -7,6 +7,7 @@ using Application.Common.Interfaces.Services;
 using WebAPI.Utility;
 using Infrastructure.Factories;
 using Domain.Enums;
+using Infrastructure.Persistence.Repositories;
 
 namespace WebAPI.Controllers
 {
@@ -18,15 +19,16 @@ namespace WebAPI.Controllers
         private readonly IMapper mapper;
         private readonly PaymentFactory paymentFactory;
         private readonly IBookingItemRepo bookingItemRepo;
-
+        private readonly IPayemntTransactionRepository paymentTransactionRepository;
 
         public ClientBookingController(IClientBookingRepo _clientBookingRepo,
                                         IMapper _mapper, PaymentFactory paymentFactory, 
-                                        IBookingItemRepo bookingItemRepo)
+                                        IBookingItemRepo bookingItemRepo, IPayemntTransactionRepository paymentTransactionRepository)
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
             this.bookingItemRepo = bookingItemRepo;
+            this.paymentTransactionRepository=paymentTransactionRepository;
             this.paymentFactory = paymentFactory;
             this.paymentFactory = paymentFactory;
             this.bookingItemRepo = bookingItemRepo;
@@ -86,7 +88,7 @@ namespace WebAPI.Controllers
             if (!isValidPaymentType)
                 return CustomResult("Invalid payment method", HttpStatusCode.BadRequest);
 
-            var result = await clientBookingRepo.CreateNewBooking
+            var bookingID = await clientBookingRepo.CreateNewBooking
                 (clientBooking2DTO.UserID,
                 clientBooking2DTO.Date,
                 clientBooking2DTO.ServiceID,
@@ -95,21 +97,20 @@ namespace WebAPI.Controllers
                 clientBooking2DTO.EndTime,
                 clientBooking2DTO.ResourceIDs);
 
-            if (result == -1)
+            if (bookingID == -1)
             {
                 return CustomResult("Invalid data entered", HttpStatusCode.BadRequest);
             }
 
-            var booking = await clientBookingRepo.GetByIdAsync(result);
+            var booking = await clientBookingRepo.GetByIdAsync(bookingID);
 
 
             IPaymentService service = paymentFactory.CreatePaymentService(paymentType);
-            var paymentUrl = await service.MakePayment(bookingItemRepo, booking.TotalCost, result);
+
+            var paymentUrl = await service.MakePayment(paymentTransactionRepository, bookingItemRepo, booking.TotalCost, bookingID);
 
 
             return CustomResult("Payment session created successfully.", new { Result = paymentUrl }, HttpStatusCode.Created);
-
-
         }
 
 
