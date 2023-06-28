@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Sieve.Models;
 using Sieve.Services;
 using System.Net;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -143,6 +145,32 @@ namespace WebAPI.Controllers
                 return CustomResult($"No Schedule Founded With id {id}", HttpStatusCode.NotFound);
 
             return CustomResult(result, HttpStatusCode.OK);
+        }
+
+        [HttpPost("AddSchedualeFile")]
+        public async Task<IActionResult> AddSchedualFile(IFormFile file)
+        {
+
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                var jsonContent = reader.ReadToEnd();
+
+                try
+                {
+                    var data = JsonConvert.DeserializeObject<List<ScheduleJson>>(jsonContent);
+
+                     List<int> failedResources = await scheduleRepo.AddBulk(data);
+                       
+
+
+                    return CustomResult("File uploaded successfully.", new {failedResources});
+                }
+                catch (JsonException)
+                {
+                    return BadRequest("Invalid JSON format.");
+                }
+            }
+            
         }
 
     }
