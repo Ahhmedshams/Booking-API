@@ -19,7 +19,7 @@ namespace Domain.Entities
 
         public string? TransactionId { get; set; }
 
-        public string SessionId { get; set; }
+        public string? SessionId { get; set; }
 
         public PaymentStatus  Status { get; set; }
 

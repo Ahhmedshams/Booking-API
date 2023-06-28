@@ -10,6 +10,10 @@ using Org.BouncyCastle.Asn1.Cmp;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using WebAPI.Profiles;
+using Sieve.Models;
+using Sieve.Services;
+using Microsoft.Extensions.Options;
+using Stripe;
 
 namespace WebAPI.Controllers
 {
@@ -21,22 +25,28 @@ namespace WebAPI.Controllers
         private readonly IResourceRepo _resourceRepo;
         private readonly IScheduleItemRepo _scheduleItemRepo;
         private readonly IResourceSpecialCharacteristicsRepo _resourceSpecialCharacteristicsRepository;
+
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
         //private ResourceSpecialCharacteristicsRepository _resourceSpecialCharacteristicsRepository = new ResourceSpecialCharacteristicsRepository();
         public ResourceSpecialCharacteristicsController(
             IMapper mapper,
             IResourceRepo resourceRepo,
             IScheduleItemRepo scheduleItemRepo,
-            IResourceSpecialCharacteristicsRepo resourceSpecialCharacteristicsRepo
+            IResourceSpecialCharacteristicsRepo resourceSpecialCharacteristicsRepo,
+            ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions
             )
         {
             _mapper = mapper;
             _resourceRepo = resourceRepo;
             _scheduleItemRepo = scheduleItemRepo;
             _resourceSpecialCharacteristicsRepository = resourceSpecialCharacteristicsRepo;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<ResourceSpecialCharacteristics> resourceSpecialCharacteristics =
                 await _resourceSpecialCharacteristicsRepository.GetAllAsync(
@@ -58,8 +68,9 @@ namespace WebAPI.Controllers
             List<ResourceSpecialCharacteristicsDTO> resourceSpecialCharacteristics1 =
                 _mapper.Map<List<ResourceSpecialCharacteristicsDTO>>(resourceSpecialCharacteristics);
 
+            var FilteredRSC = _sieveProcessor.Apply(sieveModel, resourceSpecialCharacteristics1.AsQueryable());
 
-            return CustomResult(resourceSpecialCharacteristics1);
+            return CustomResult(FilteredRSC);
         }
 
         [HttpGet("{id:int}")]
@@ -74,7 +85,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO)
+        public async Task<IActionResult> Add(ResourceSpecialCharacteristicsEditDTO resourceSpecialCharacteristicsDTO)
         {
             if (!ModelState.IsValid)
                 return CustomResult(ModelState, HttpStatusCode.BadRequest);
@@ -99,7 +110,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id, [FromBody] ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO)
+        public async Task<IActionResult> Edit(int id, [FromBody] ResourceSpecialCharacteristicsEditDTO resourceSpecialCharacteristicsDTO)
         {
             if (ModelState.IsValid)
             {
@@ -108,7 +119,7 @@ namespace WebAPI.Controllers
                 {
                     ResourceSpecialCharacteristics resourceSpecialCharacteristics = _mapper.Map<ResourceSpecialCharacteristics>(resourceSpecialCharacteristicsDTO);
                     var result = await _resourceSpecialCharacteristicsRepository.EditAsync(id, resourceSpecialCharacteristics,rsc=>rsc.ID);
-                    ResourceSpecialCharacteristicsDTO resourceSpecialCharacteristicsDTO1  = _mapper.Map<ResourceSpecialCharacteristicsDTO>(result);
+                    ResourceSpecialCharacteristicsEditDTO resourceSpecialCharacteristicsDTO1  = _mapper.Map<ResourceSpecialCharacteristicsEditDTO>(result);
                     return CustomResult(resourceSpecialCharacteristicsDTO1);
                 }
             }

@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
 
         //add (sp add from excel  validatae csv extension)
 
-        [HttpGet("Get All")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<ScheduleItem> items =await scheduleItemRepo.GetAllScheduleItems();
@@ -172,7 +172,7 @@ namespace WebAPI.Controllers
 
         private IActionResult CheckSchedule(int schedId)
         {
-            bool scheduleFound = scheduleItemRepo.IsExistWithId(schedId);
+            bool scheduleFound = scheduleRepo.IsExist(schedId);
             if (!scheduleFound)
                 return CustomResult($"No Schedule Found With id {schedId}", HttpStatusCode.NotFound);
             else

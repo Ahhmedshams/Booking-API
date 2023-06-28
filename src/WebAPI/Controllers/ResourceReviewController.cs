@@ -4,6 +4,9 @@ using CoreApiResponse;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 using WebAPI.DTO;
 
@@ -18,12 +21,16 @@ namespace WebAPI.Controllers
         private readonly IResourceRepo resourceRepo;
         private readonly IResourceReviewRepo resourceReviewRepo;
 
-        public ResourceReviewController(IMapper mapper, IAccountRepository accountRepo, IResourceRepo resourceRepo, IResourceReviewRepo resourceReviewRepo)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+        public ResourceReviewController(IMapper mapper, IAccountRepository accountRepo, IResourceRepo resourceRepo, IResourceReviewRepo resourceReviewRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             this.mapper = mapper;
             this.accountRepo = accountRepo;
             this.resourceRepo = resourceRepo;
             this.resourceReviewRepo = resourceReviewRepo;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
 
