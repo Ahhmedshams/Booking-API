@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Sieve.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.DTO 
 {
@@ -6,6 +7,7 @@ namespace WebAPI.DTO
     {
        // public int Id { get; set; }
         [Required]
+        [Sieve(CanFilter = true, CanSort = true)]
         public string Name { get; set; }
         public bool Shown { get; set; }
         public bool HasSchedual { get; set; }
