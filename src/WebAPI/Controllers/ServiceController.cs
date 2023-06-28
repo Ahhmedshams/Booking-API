@@ -71,7 +71,8 @@ namespace WebAPI.Controllers
 				}
 
 				await serviceRepo.AddAsync(service);
-				return CustomResult(serviceDTO);
+                ServiceResDTO serviceResDTO = mapper.Map<Service, ServiceResDTO>(service);
+				return CustomResult(serviceResDTO);
 			}
 			catch(Exception ex)
             {
