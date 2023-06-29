@@ -1,4 +1,5 @@
-﻿using Domain.Common;
+﻿using Application.Common.Models;
+using Domain.Common;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -34,6 +35,7 @@ namespace Infrastructure.Persistence
         public DbSet<ServiceMetadata> ServiceMetadata { get; set; }
         public  DbSet<BookingItem> BookingItems { get; set; }
         public DbSet<ClientBooking> ClientBookings { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
          
@@ -59,6 +61,7 @@ namespace Infrastructure.Persistence
                     builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
                 }
             }
+
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

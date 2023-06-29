@@ -18,7 +18,6 @@ namespace Application.Common.Interfaces.Repositories
 		Task<List<Resource>> GetAvailableResources(string _day, int _serviceId, string _startTime, string _endTime, SieveModel sieveMode, int? regionId = null);
 
         Task<List<int>> AddBulk(List<ScheduleJson> scheduleJsons);
-        
-    
+        Task<List<AvailableTimes>> GetAvailableTimes(string _day, int _serviceId, int? regionId = null);
     }
 }

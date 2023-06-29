@@ -173,5 +173,18 @@ namespace WebAPI.Controllers
             
         }
 
+        [HttpGet("GetAvailableTimes")]
+        public async Task<IActionResult> GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] int? RegionId)
+        {
+            var availableTimes = await scheduleRepo.GetAvailableTimes(_day, _serviceId, RegionId);
+
+
+            return CustomResult(availableTimes);
+        
+
+        }
+        
+
+
     }
 }

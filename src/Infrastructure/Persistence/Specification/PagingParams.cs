@@ -8,10 +8,10 @@ namespace Infrastructure.Persistence.Specification
 {
     public class PagingParams
     {
-        private const int MaxPageSize = 50;
+        private const int MaxPageSize = 100;
         public int PageIndex { get; set; } = 1;
 
-        private int _pageSize = 5;
+        private int _pageSize = 50;
         public int PageSize
         {
             get => _pageSize;
