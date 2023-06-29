@@ -116,6 +116,43 @@ namespace Infrastructure.Persistence.Repositories
            
         }
 
+        public async Task<List<AvailableTimes>> GetAvailableTimes (string _day, int _serviceId, int? regionId = null)
+        {
+            try
+            {
+                var day = _day;
+                int serviceId = _serviceId;
+
+                var results = await _context.Set<ScheduleItem>()
+                    .FromSqlRaw("EXEC GetAvailableTimes @param1, @param2, @RegionId",
+                        new SqlParameter("@param1", day),
+                        new SqlParameter("@param2", serviceId),
+                        new SqlParameter("@RegionId", regionId)
+                        )
+                      .IgnoreQueryFilters()//.GroupBy(e => new { e.StartTime, e.EndTime })
+                    //  .Select(g => new AvailableTimes() { StartTime = g.Key.StartTime, EndTime = g.Key.EndTime })
+                      .ToListAsync();
+
+                if (results != null)
+                {
+                    var e = results.GroupBy(e => new { e.StartTime, e.EndTime })
+                      .Select(g => new AvailableTimes() { StartTime = g.Key.StartTime, EndTime = g.Key.EndTime }).ToList();
+                    return e;
+                }
+                else
+                {
+                    return new List<AvailableTimes>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<AvailableTimes>();
+            }
+
+
+
+        }
+
         public bool IsExist(int id)
         {
             return _context.Schedule.Any(res => res.ScheduleID == id);
