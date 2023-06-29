@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
             _mapper = mapper;
         }
         [HttpGet("TotalPrice")]
-        public async Task<IActionResult> TopPricesReport(DateTime startDate , DateTime endDate, int serviceId)
+        public async Task<IActionResult> TotalPriceReport(DateTime startDate , DateTime endDate, int serviceId)
         {
             var totalPrice = await _clientBookingRepo.PriceReport(startDate, endDate, serviceId); 
             return CustomResult(new {TotalPrice = totalPrice });

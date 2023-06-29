@@ -9,13 +9,13 @@ namespace Infrastructure.Persistence.Specification
         public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> spec)
         {
             var query = inputQuery;
+			query = query.Where(x => x.IsDeleted == false);
 
-            //Filter
-            if(spec.Criteria.Count() != 0)
+			//Filter
+			if (spec.Criteria.Count() != 0)
             {
                 foreach(var criteria in spec.Criteria)
                 {
-                    query = query.Where(x => x.IsDeleted == false);
                     query = query.Where(criteria);
                 }
             }
