@@ -81,14 +81,18 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("User/{id:Guid}")]
-        public async Task<IActionResult> GetUserReview(string id)
+        public async Task<IActionResult> GetUserReview(string id , int? bookingId)
         {
             var User = await accountRepo.IsExistAsync(id);
 
             if (!User)
                 return CustomResult($"No User Exist  With Id {id}",HttpStatusCode.BadRequest);
+            IEnumerable<ResourceReview> result;
+            if (bookingId == null)
+                   result = await resourceReviewRepo.FindAsync(e => e.UserId == id);
+            else
+                result = await resourceReviewRepo.FindAsync(e => e.UserId == id && e.BookingId == bookingId);
 
-            var result = await resourceReviewRepo.FindAsync(e => e.UserId == id);
 
             if (result.Count() == 0)
                 return CustomResult($"No Review Exist for User Id {id}", HttpStatusCode.BadRequest);

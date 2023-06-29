@@ -47,7 +47,6 @@ namespace WebAPI.Utility
                 Location = clientBooking.Location,
                 Status = clientBooking.Status,
                 ServiceName = clientBooking.Service.Name,
-                ServiceDescription = clientBooking.Service.Description,
                 UserId = clientBooking.UserId,
                 BookingItems = clientBooking.BookingItems.ToBookingItemWIthDetails(),
                 ServiceImages = clientBooking.Service.Images,
