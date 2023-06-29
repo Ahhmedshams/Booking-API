@@ -210,7 +210,7 @@ namespace Infrastructure.Persistence.Repositories
             var regionIdParameter = new SqlParameter("@region", regionID);
 
             await _context.Database.ExecuteSqlRawAsync(
-                "EXEC GetHiddenCost2 @serviceID, @day, @startTime, @endTime, @region, @resultId OUT, @resultPrice OUT",
+                "EXEC GetTransitionfees @serviceID, @day, @startTime, @endTime, @region, @resultId OUT, @resultPrice OUT",
                 serviceIdParameter,
                 dayParameter,
                 startTimeParameter,
