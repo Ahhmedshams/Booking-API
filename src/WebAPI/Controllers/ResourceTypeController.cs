@@ -36,7 +36,7 @@ namespace WebAPI.Controllers
       //  [Authorize(Permissions.ResourceTypes.Index)]
         public async Task< IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
-            IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync(true,r=>r.Images);
+            IEnumerable<ResourceType> resourceTypes = await _resourceTypeRepo.GetAllAsync(true);
             if (resourceTypes.Count() == 0 ) 
                 return CustomResult("No Resource Type Are Available", HttpStatusCode.NotFound);
             
@@ -49,7 +49,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            ResourceType resourceType = await _resourceTypeRepo.GetByIdAsync(id, r => r.Images);
+            ResourceType resourceType = await _resourceTypeRepo.GetByIdAsync(id);
             if (resourceType == null)
                 return CustomResult($"No Resource Type Are Available With id {id}", HttpStatusCode.NotFound);
 
@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
                 return CustomResult("This Name already Exist", HttpStatusCode.BadRequest);
 
             ResourceType resourceType = _mapper.Map<ResourceType>(resTypeDto);
-
+/*
             if (resTypeDto.UploadedImages != null && resTypeDto.UploadedImages.Any())
             {
                 var entityType = "ResourceTypeImage";
@@ -81,7 +81,7 @@ namespace WebAPI.Controllers
                     var resourceTypeImages = images.OfType<ResourceTypeImage>().ToList();
                     resourceType.Images = resourceTypeImages;
                 }
-            }
+            }*/
             //esourceType resourceType = new() { Name = Name };
             await _resourceTypeRepo.AddAsync(resourceType);
 

@@ -11,6 +11,6 @@ namespace Domain.Entities
         public bool Shown { get; set; }
         public bool HasSchedual { get; set; }
         public IEnumerable<ResourceMetadata> Metadata { get; set; }
-        public ICollection<ResourceTypeImage> Images { get; set; }
-    }
+/*        public ICollection<ResourceTypeImage> Images { get; set; }
+*/    }
 }

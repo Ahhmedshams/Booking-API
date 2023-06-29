@@ -21,7 +21,7 @@ namespace Infrastructure.Persistence.Configurations
 
               builder.HasDiscriminator<string>("Discriminator")
                .HasValue<ServiceImage>(nameof(ServiceImage))
-               .HasValue<ResourceTypeImage>(nameof(ResourceTypeImage))
+               //.HasValue<ResourceTypeImage>(nameof(ResourceTypeImage))
                .HasValue<ResourceImage>(nameof(ResourceImage));
 
         }

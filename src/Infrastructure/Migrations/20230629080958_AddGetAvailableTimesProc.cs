@@ -380,8 +380,6 @@ create TABLE #TempResourceTypeID (
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("DROP PROC GetAvailableTimes");
-
-
         }
     }
 }

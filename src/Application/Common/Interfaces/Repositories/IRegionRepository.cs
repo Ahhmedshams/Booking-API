@@ -15,6 +15,7 @@ namespace Application.Common.Interfaces.Repositories
     public interface IRegionRepository : IAsyncRepository<Region>
     {
 
-       
+        Task SoftDeleting(int id);
+
     }
 }
