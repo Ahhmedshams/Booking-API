@@ -53,7 +53,6 @@ namespace WebAPI.Controllers
             {
                var result = await resourceReviewRepo.AddAsync(ResourceReview);
                var resultDTO = mapper.Map<ResourceReviewResDTO>(result);
-               await resourceReviewRepo.SetRating(resourceReviewDTO.ResourceId);
                return CustomResult(resultDTO);
             }
             catch (Exception ex)

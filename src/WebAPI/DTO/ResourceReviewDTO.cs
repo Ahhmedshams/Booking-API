@@ -11,6 +11,7 @@ namespace WebAPI.DTO
 
         [Range(1, 5,ErrorMessage ="Rate should be between 1 - 5.")]
         public int Rating { get; set; }
+        public int BookingId { get; set; }
         public string Description { get; set; }
 
     }

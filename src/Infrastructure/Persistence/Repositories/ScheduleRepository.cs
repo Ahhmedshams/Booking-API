@@ -120,5 +120,47 @@ namespace Infrastructure.Persistence.Repositories
         {
             return _context.Schedule.Any(res => res.ScheduleID == id);
         }
+
+        public async Task<List<int>> AddBulk(List<ScheduleJson> scheduleJsons)
+        {
+            List<int> falidResouces = new List<int>();
+            foreach(var item in scheduleJsons)
+            {
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        
+                      var result =  await _context.Schedule.AddAsync(item.schedule);
+                        await _context.SaveChangesAsync();
+
+                        if (result == null)
+                        {
+                            falidResouces.Add(item.schedule.ResourceId);
+                            transaction.Rollback();
+                        }
+                        foreach(var sci in item.scheduleItems)
+                        {
+                            sci.ScheduleId = item.schedule.ScheduleID;
+                        }
+
+                       await _context.ScheduleItem.AddRangeAsync(item.scheduleItems);
+
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        falidResouces.Add(item.schedule.ResourceId);
+                        transaction.Rollback();
+                        
+                    }
+                }
+            }
+            return falidResouces;
+
+
+        }
     }
 }

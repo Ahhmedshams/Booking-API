@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,8 +29,16 @@ namespace Infrastructure.Persistence.Configurations
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasOne(e => e.ClientBooking)
+                .WithMany()
+                .HasForeignKey(e => e.BookingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             builder.Property(e => e.Rating)
-                .HasPrecision(1, 5);
+            .HasPrecision(1, 5);
+
+            builder
+              .ToTable(tb => tb.HasTrigger("trg_ResourceRating"));
         }
     }
 }

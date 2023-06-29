@@ -340,6 +340,13 @@ namespace Infrastructure.Persistence.Repositories
                          "EXEC CancelPendingBooking @param1",
                          new SqlParameter("@param1", bookingID));
         }
+
+        public async Task CompleteBooking(int bookingID)
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                   "EXEC FreeResourcesOfBooking @param1, @param2",
+                   new SqlParameter("@param1", bookingID), new SqlParameter("@param2", BookingStatus.Completed.ToString()));
+        }
     }
 
 }
