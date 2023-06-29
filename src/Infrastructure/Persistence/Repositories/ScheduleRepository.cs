@@ -189,7 +189,41 @@ namespace Infrastructure.Persistence.Repositories
                 return (0, 0);
             }
         }
+        public async Task<(int, decimal)> GetTransitionfees(int serviceId, string _day, string _startTime, string _endTime, int regionID)
+        {
+            var resultIdParameter = new SqlParameter("@resultId", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
 
+            var resultPriceParameter = new SqlParameter("@resultPrice", SqlDbType.Decimal)
+            {
+                Precision = 18,
+                Scale = 2,
+                Direction = ParameterDirection.Output
+            };
+
+            var serviceIdParameter = new SqlParameter("@serviceID", serviceId);
+            var dayParameter = new SqlParameter("@day", _day);
+            var startTimeParameter = new SqlParameter("@startTime", _startTime);
+            var endTimeParameter = new SqlParameter("@endTime", _endTime);
+            var regionIdParameter = new SqlParameter("@region", regionID);
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC GetHiddenCost2 @serviceID, @day, @startTime, @endTime, @region, @resultId OUT, @resultPrice OUT",
+                serviceIdParameter,
+                dayParameter,
+                startTimeParameter,
+                endTimeParameter,
+                regionIdParameter,
+                resultIdParameter,
+                resultPriceParameter);
+
+            var resultId = (int)resultIdParameter.Value;
+            var resultPrice = (decimal)resultPriceParameter.Value;
+
+            return (resultId, resultPrice);
+        }
         public bool IsExist(int id)
         {
             return _context.Schedule.Any(res => res.ScheduleID == id);
@@ -236,5 +270,7 @@ namespace Infrastructure.Persistence.Repositories
 
 
         }
+
+
     }
 }

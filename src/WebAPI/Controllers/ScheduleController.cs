@@ -200,6 +200,23 @@ namespace WebAPI.Controllers
                 return CustomResult();
             }
         }
+        [HttpGet("GetTransitionfees")]
+        public async Task<IActionResult> GetTransitionfees(int serviceId, string _day, string _startTime, string _endTime, int regionID)
+        {
+            try
+            {
+                var hiddenCostResult = await scheduleRepo.GetTransitionfees(serviceId, _day, _startTime, _endTime, regionID);
+
+                // Handle the hiddenCostResult as needed (e.g., return it as JSON)
+                return Ok(hiddenCostResult);
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur during the execution
+                return StatusCode(500, "An error occurred: " + ex.Message);
+            }
+        }
+
 
 
     }
