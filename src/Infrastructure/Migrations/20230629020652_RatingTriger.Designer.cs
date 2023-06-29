@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230625222245_addProcRating")]
-    partial class addProcRating
+    [Migration("20230629020652_RatingTriger")]
+    partial class RatingTriger
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -264,12 +264,14 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
+                    b.Property<string>("SessionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TransactionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -709,6 +711,39 @@ namespace Infrastructure.Migrations
                     b.ToTable("ServiceMetadata");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Ticket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("AdminRecivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("ContactDoneAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RecivedAdminId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TicketDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Tickets");
+                });
+
             modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -975,6 +1010,18 @@ namespace Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("ServiceImage");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserImage", b =>
+                {
+                    b.HasBaseType("Domain.Entities.ImageEntity");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasDiscriminator().HasValue("UserImage");
+                });
+
             modelBuilder.Entity("Domain.Entities.BookingItem", b =>
                 {
                     b.HasOne("Domain.Entities.ClientBooking", "ClientBooking")
@@ -1175,6 +1222,15 @@ namespace Infrastructure.Migrations
                     b.Navigation("Service");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Ticket", b =>
+                {
+                    b.HasOne("Domain.Identity.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1247,6 +1303,13 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ServiceId");
                 });
 
+            modelBuilder.Entity("Domain.Entities.UserImage", b =>
+                {
+                    b.HasOne("Domain.Identity.ApplicationUser", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ApplicationUserId");
+                });
+
             modelBuilder.Entity("Domain.Entities.ClientBooking", b =>
                 {
                     b.Navigation("BookingItems");
@@ -1291,6 +1354,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Metadata");
+                });
+
+            modelBuilder.Entity("Domain.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

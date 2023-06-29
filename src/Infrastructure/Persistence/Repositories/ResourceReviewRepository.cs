@@ -28,17 +28,6 @@ namespace Infrastructure.Persistence.Repositories
 
         }
 
-        public async Task SetRating(int id)
-        {
-            var resourceID = id;
-            var sql = $"EXEC SetRating @resourceID";
-            var parameter = new SqlParameter("@resourceID", resourceID);
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parameter);
-
-
-            await _context.SaveChangesAsync();
-        }
 
     }
 }
