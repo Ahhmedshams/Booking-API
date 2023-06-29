@@ -30,9 +30,9 @@ public class UploadImage
                     case "ServiceImage":
                         image = new ServiceImage { Uri = uri };
                         break;
-                    case "ResourceTypeImage":
+                    /*case "ResourceTypeImage":
                         image = new ResourceTypeImage { Uri = uri };
-                        break;
+                        break;*/
                     case "ResourceImage":
                         image = new ResourceImage { Uri = uri };
                         break;
