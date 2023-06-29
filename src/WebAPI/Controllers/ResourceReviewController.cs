@@ -4,6 +4,9 @@ using CoreApiResponse;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Sieve.Models;
+using Sieve.Services;
 using System.Net;
 using WebAPI.DTO;
 
@@ -18,12 +21,16 @@ namespace WebAPI.Controllers
         private readonly IResourceRepo resourceRepo;
         private readonly IResourceReviewRepo resourceReviewRepo;
 
-        public ResourceReviewController(IMapper mapper, IAccountRepository accountRepo, IResourceRepo resourceRepo, IResourceReviewRepo resourceReviewRepo)
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
+        public ResourceReviewController(IMapper mapper, IAccountRepository accountRepo, IResourceRepo resourceRepo, IResourceReviewRepo resourceReviewRepo, ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             this.mapper = mapper;
             this.accountRepo = accountRepo;
             this.resourceRepo = resourceRepo;
             this.resourceReviewRepo = resourceReviewRepo;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
 
@@ -46,7 +53,6 @@ namespace WebAPI.Controllers
             {
                var result = await resourceReviewRepo.AddAsync(ResourceReview);
                var resultDTO = mapper.Map<ResourceReviewResDTO>(result);
-               await resourceReviewRepo.SetRating(resourceReviewDTO.ResourceId);
                return CustomResult(resultDTO);
             }
             catch (Exception ex)
@@ -75,14 +81,18 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("User/{id:Guid}")]
-        public async Task<IActionResult> GetUserReview(string id)
+        public async Task<IActionResult> GetUserReview(string id , int? bookingId)
         {
             var User = await accountRepo.IsExistAsync(id);
 
             if (!User)
                 return CustomResult($"No User Exist  With Id {id}",HttpStatusCode.BadRequest);
+            IEnumerable<ResourceReview> result;
+            if (bookingId == null)
+                   result = await resourceReviewRepo.FindAsync(e => e.UserId == id);
+            else
+                result = await resourceReviewRepo.FindAsync(e => e.UserId == id && e.BookingId == bookingId);
 
-            var result = await resourceReviewRepo.FindAsync(e => e.UserId == id);
 
             if (result.Count() == 0)
                 return CustomResult($"No Review Exist for User Id {id}", HttpStatusCode.BadRequest);

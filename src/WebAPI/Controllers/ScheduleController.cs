@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Sieve.Models;
 using Sieve.Services;
 using System.Net;
+using WebAPI.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -46,12 +48,13 @@ namespace WebAPI.Controllers
             return CustomResult(FilteredSchedules);
         }
 
-        /*[HttpGet("GetById/{id:int}")]
+        [HttpGet("GetById/{id:int}")]
         public IActionResult GetById(int id)
         {
             Schedule schedule = scheduleRepo.GetById(id);
-
-        }*/
+            if (schedule == null) return CustomResult(HttpStatusCode.BadRequest);
+            return CustomResult(schedule);
+        }
 
         [HttpPost("Add")]
         public IActionResult Add(ScheduleReqDTO schedule)
@@ -143,6 +146,48 @@ namespace WebAPI.Controllers
 
             return CustomResult(result, HttpStatusCode.OK);
         }
+
+        [HttpPost("AddSchedualeFile")]
+        public async Task<IActionResult> AddSchedualFile(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                return CustomResult("file is empty", HttpStatusCode.BadRequest);
+
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                var jsonContent = reader.ReadToEnd();
+
+                try
+                {
+                    var data = JsonConvert.DeserializeObject<List<ScheduleJson>>(jsonContent);
+
+                     List<int> failedResources = await scheduleRepo.AddBulk(data);
+                       
+
+
+                    return CustomResult("File uploaded successfully.", new {failedResources});
+                }
+                catch (JsonException)
+                {
+                    return BadRequest("Invalid JSON format.");
+                }
+            }
+            
+        }
+
+        [HttpGet("GetAvailableTimes")]
+        public async Task<IActionResult> GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] int? RegionId)
+        {
+            var availableTimes = await scheduleRepo.GetAvailableTimes(_day, _serviceId, RegionId);
+
+
+            return CustomResult(availableTimes);
+        
+
+        }
+        
+
 
     }
 }

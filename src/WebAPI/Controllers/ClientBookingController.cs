@@ -8,6 +8,10 @@ using WebAPI.Utility;
 using Infrastructure.Factories;
 using Domain.Enums;
 using Infrastructure.Persistence.Repositories;
+using Sieve.Models;
+using Sieve.Services;
+using Microsoft.Extensions.Options;
+using Domain.Entities;
 
 namespace WebAPI.Controllers
 {
@@ -20,10 +24,12 @@ namespace WebAPI.Controllers
         private readonly PaymentFactory paymentFactory;
         private readonly IBookingItemRepo bookingItemRepo;
         private readonly IPayemntTransactionRepository paymentTransactionRepository;
-
+        private readonly ISieveProcessor _sieveProcessor;
+        private readonly SieveOptions _sieveOptions;
         public ClientBookingController(IClientBookingRepo _clientBookingRepo,
                                         IMapper _mapper, PaymentFactory paymentFactory, 
-                                        IBookingItemRepo bookingItemRepo, IPayemntTransactionRepository paymentTransactionRepository)
+                                        IBookingItemRepo bookingItemRepo, IPayemntTransactionRepository paymentTransactionRepository
+                                        , ISieveProcessor sieveProcessor, IOptions<SieveOptions> sieveOptions)
         {
             clientBookingRepo = _clientBookingRepo;
             mapper = _mapper;
@@ -32,17 +38,20 @@ namespace WebAPI.Controllers
             this.paymentFactory = paymentFactory;
             this.paymentFactory = paymentFactory;
             this.bookingItemRepo = bookingItemRepo;
+            _sieveProcessor = sieveProcessor;
+            _sieveOptions = sieveOptions?.Value;
         }
 
        
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] ClientBookingSpecParam specParams)
+        public async Task<IActionResult> GetAll([FromQuery] ClientBookingSpecParam specParams, [FromQuery] SieveModel sieveModel)
         {
             var spec = new ClientBookingSpecification(specParams);
             var clientBooks = await clientBookingRepo.GetAllBookingsWithSpec(spec);
 
             var clientBooksDTO = mapper.Map<IEnumerable<ClientBooking>, IEnumerable<ClientBookingDTO>>(clientBooks);
-            return CustomResult(clientBooksDTO);
+            var FilteredBooking = _sieveProcessor.Apply(sieveModel, clientBooksDTO.AsQueryable());
+            return CustomResult(FilteredBooking);
         }
 
 

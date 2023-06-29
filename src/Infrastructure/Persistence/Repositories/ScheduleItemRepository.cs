@@ -75,13 +75,13 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<ScheduleItem> FindAsync(int scheduleId, DateTime day, TimeOnly startTime, TimeOnly endTime)
         {
-            return await _context.ScheduleItem.FirstOrDefaultAsync(s => s.ScheduleId==scheduleId &&s.Day == day && s.StartTime == startTime && s.EndTime == endTime);
+            return await _context.ScheduleItem.FirstOrDefaultAsync(s => s.ScheduleId==scheduleId &&s.Day.Date == day.Date && s.StartTime == startTime && s.EndTime == endTime);
         }
 
 
         public bool IsExistWithId(int ?id)
         {
-            return _context.ScheduleItem.Any(res => res.ID == id);
+            return _context.Schedule.Any(res => res.ScheduleID == id);
         }
     }
 }

@@ -32,10 +32,10 @@ namespace Infrastructure.BackgroundTasks
                     {
                         if (booking.Date == DateTime.Now.Date && booking.EndTime <= DateTime.Now.TimeOfDay)
                         {
-                            booking.Status = BookingStatus.Completed;
+                           // booking.Status = BookingStatus.Completed;
                             // TODO: Free all resources related with booking after change status to COMPLETED. 
-                            // await clientBookingRepo.CancelBooking(booking.Id);
-                            await clientBookingRepo.EditAsync(booking.Id, booking, e => e.Id);
+                            await clientBookingRepo.CompleteBooking(booking.Id);
+                           // await clientBookingRepo.EditAsync(booking.Id, booking, e => e.Id);
                         }
                     }
 

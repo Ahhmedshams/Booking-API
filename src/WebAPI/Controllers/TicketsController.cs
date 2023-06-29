@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
             var userId = claimsIdentity.FindFirst("id")?.Value;
             var ticket = await _context.Tickets.FindAsync(id);
            
-            if (ticket == null)
+            if (ticket == null)   
                 return NotFound("Ticket Not Found");
             //var ticket = _Mapper.Map<Ticket>(ticketCheck);
             if(ticket.RecivedAdminId == null && ticket.AdminRecivedAt == null)
@@ -81,10 +81,18 @@ namespace WebAPI.Controllers
             return Ok(ticket);
         }
 
+        [HttpGet("AllTickets")]
+        public async Task<IActionResult> GetAllTickets()
+        {
+            var tickets =  _context.Tickets.ToList();
+            if (tickets == null)
+                return NotFound("Ticket Not Found");
+            return Ok(tickets);
+        }
         [HttpGet("NewTickets")]
         public async Task<IActionResult> GetNewTickets()
         {
-            var tickets =  _context.Tickets.Where(x => x.RecivedAdminId == null && x.AdminRecivedAt == null).ToList();
+            var tickets = _context.Tickets.Where(x => x.RecivedAdminId == null && x.AdminRecivedAt == null).ToList();
             if (tickets == null)
                 return NotFound("Ticket Not Found");
             return Ok(tickets);
