@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Sieve.Models;
+using System.Data;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Infrastructure.Persistence.Repositories
@@ -151,6 +152,42 @@ namespace Infrastructure.Persistence.Repositories
 
 
 
+        }
+        public async Task<(int, decimal)> GetHiddenCostWithNoSchedule(int serviceId)
+        {
+            try
+            {
+                var serviceIdParameter = new SqlParameter("@serviceId", serviceId);
+                var resultIdParameter = new SqlParameter
+                {
+                    ParameterName = "@resultId",
+                    SqlDbType = SqlDbType.Int,
+                    Direction = ParameterDirection.Output
+                };
+                var resultPriceParameter = new SqlParameter
+                {
+                    ParameterName = "@resultPrice",
+                    SqlDbType = SqlDbType.Decimal,
+                    Precision = 18,
+                    Scale = 2,
+                    Direction = ParameterDirection.Output
+                };
+
+                await _context.Database.ExecuteSqlRawAsync("EXEC GetHiddenCost @serviceId, @resultId OUTPUT, @resultPrice OUTPUT",
+                    serviceIdParameter,
+                    resultIdParameter,
+                    resultPriceParameter);
+
+                var resultId = (int)resultIdParameter.Value;
+                var resultPrice = (decimal)resultPriceParameter.Value;
+
+                return (resultId, resultPrice);
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions
+                return (0, 0);
+            }
         }
 
         public bool IsExist(int id)
