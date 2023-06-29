@@ -15,9 +15,16 @@ namespace Infrastructure.Persistence.Repositories
     {
         public RegionRepository(ApplicationDbContext context) : base(context)
         {
+
+        }
+        public async Task SoftDeleting(int id)
+        {
+            var region = await GetByIdAsync(id);
+            region.IsDeleted = true;
+            await _context.SaveChangesAsync();
         }
 
-    
+
 
 
 
