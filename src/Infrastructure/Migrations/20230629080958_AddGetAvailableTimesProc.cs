@@ -246,7 +246,7 @@ create TABLE #TempResourceTypeID (
 									AND [Shown]=1
 									AND [HasSchedual]=1
 									AND @date BETWEEN S.[FromDate] AND S.[ToDate]
-									GROUP BY SI.[StartTime], SI.[EndTime]
+								--	GROUP BY SI.[StartTime], SI.[EndTime]
 								END
 							END --9
 				END  --8
