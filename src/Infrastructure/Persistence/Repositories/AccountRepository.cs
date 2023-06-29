@@ -46,10 +46,10 @@ namespace Infrastructure.Persistence.Repositories
                     bodybuilder.HtmlBody =
                     "</head>\r\n<body>\r\n  " +
                     "<div class=\"container\">\r\n    " +
-                    "<p>Click the Button below to Confirm your Email</p>\r\n" +
+                    "<p>Click the link below to Confirm your Email</p>\r\n" +
                     $"<a " +
                     $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
-                    $" href={config["Server:Client"]}/auth/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}" +
+                    $" href=\"{config["Server:Client"]}/auth/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}\" Confirm Email </a>" +
                     "<p>Best regards,</p>\r" +
                     "<p>Sona</p>\r\n  " +
                     "</div>\r\n</body>\r\n</html>";
