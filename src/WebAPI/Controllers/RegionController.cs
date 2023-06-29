@@ -58,12 +58,19 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deletedRegion = await _regionRepo.DeleteAsync(id);
-            if (deletedRegion == null)
+            var regionToDelete = await _regionRepo.GetByIdAsync(id);
+            if(regionToDelete == null)
+            {
                 return CustomResult($"Region with ID {id} not found.", HttpStatusCode.NotFound);
 
-            var regionDto = _mapper.Map<RegionGetDTO>(deletedRegion);
-            return CustomResult(regionDto);
+            }
+             await _regionRepo.SoftDeleting(id);
+            //var deletedRegion = await _regionRepo.DeleteAsync(id);
+
+            //if (deletedRegion == null)
+            //    return CustomResult($"Region with ID {id} not found.", HttpStatusCode.NotFound);
+            //var regionDto = _mapper.Map<RegionGetDTO>(deletedRegion);
+            return CustomResult("Delete Successed", HttpStatusCode.OK);
         }
 
         [HttpPut("{id}")]
