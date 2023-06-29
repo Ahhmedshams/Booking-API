@@ -177,7 +177,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAvailableTimes")]
-        public async Task<IActionResult> GetAvailableResources([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] int? RegionId)
+        public async Task<IActionResult> GetAvailableTimes([FromQuery] string _day, [FromQuery] int _serviceId, [FromQuery] int? RegionId)
         {
             var availableTimes = await scheduleRepo.GetAvailableTimes(_day, _serviceId, RegionId);
 
@@ -186,7 +186,20 @@ namespace WebAPI.Controllers
         
 
         }
-        
+        [HttpGet("GetHiddenCostWithNoSchedule")]
+        public async Task<IActionResult> GetHiddenCostWithNoSchedule([FromQuery] int serviceId)
+        {
+            var (resultId, resultPrice) = await scheduleRepo.GetHiddenCostWithNoSchedule(serviceId);
+
+            if (resultId != 0 && resultPrice != 0)
+            {
+                return CustomResult(new { ResultId = resultId, ResultPrice = resultPrice });
+            }
+            else
+            {
+                return CustomResult();
+            }
+        }
 
 
     }

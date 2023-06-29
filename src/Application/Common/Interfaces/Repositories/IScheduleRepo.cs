@@ -19,5 +19,7 @@ namespace Application.Common.Interfaces.Repositories
 
         Task<List<int>> AddBulk(List<ScheduleJson> scheduleJsons);
         Task<List<AvailableTimes>> GetAvailableTimes(string _day, int _serviceId, int? regionId = null);
+
+        Task<(int, decimal)> GetHiddenCostWithNoSchedule(int serviceId);
     }
 }
