@@ -34,14 +34,13 @@ namespace WebAPI.Controllers
 
         
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] ServiceSpecParams specParams,[FromQuery] SieveModel sieveModel)
+        public async Task<IActionResult> GetAll([FromQuery] ServiceSpecParams specParams)
         {
             var spec = new ServiceSpecification(specParams);
             var services = await serviceRepo.GetAllServicesWithSpec(spec);
             var servicesDTO = mapper.Map<IEnumerable<Service>, IEnumerable<ServiceResDTO>>(services);
-            var FilteredService = _sieveProcessor.Apply(sieveModel, servicesDTO.AsQueryable());
 
-            return CustomResult(FilteredService);
+            return CustomResult(servicesDTO);
         }
 
         [HttpPost]
