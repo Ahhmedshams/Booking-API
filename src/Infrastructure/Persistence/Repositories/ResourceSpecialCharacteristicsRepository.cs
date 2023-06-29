@@ -21,8 +21,13 @@ namespace Infrastructure.Persistence.Repositories
         public async Task DeleteSoft(int id)
         {
             var RSC = await GetByIdAsync(id);
-            RSC.IsDeleted = true;
-            await _context.SaveChangesAsync();
+
+            if (RSC != null)
+            {
+                _context.ResourceSpecialCharacteristics.Remove(RSC);
+                await _context.SaveChangesAsync();
+            }
         }
+
     }
 }

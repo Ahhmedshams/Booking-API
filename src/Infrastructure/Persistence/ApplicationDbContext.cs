@@ -35,6 +35,7 @@ namespace Infrastructure.Persistence
         public DbSet<ServiceMetadata> ServiceMetadata { get; set; }
         public  DbSet<BookingItem> BookingItems { get; set; }
         public DbSet<ClientBooking> ClientBookings { get; set; }
+        public DbSet<ResourceSpecialCharacteristics> ResourceSpecialCharacteristics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
