@@ -151,6 +151,9 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> AddSchedualFile(IFormFile file)
         {
 
+            if (file == null || file.Length == 0)
+                return CustomResult("file is empty", HttpStatusCode.BadRequest);
+
             using (var reader = new StreamReader(file.OpenReadStream()))
             {
                 var jsonContent = reader.ReadToEnd();
