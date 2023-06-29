@@ -211,7 +211,6 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                // Handle any exceptions that occur during the execution
                 return CustomResult();
             }
         }
