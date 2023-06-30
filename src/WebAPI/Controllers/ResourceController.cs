@@ -43,30 +43,30 @@ namespace WebAPI.Controllers
             _regionRepo = regionRepo;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
-        //{
-        //    IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true,e=>e.Region,e=>e.Images);
-
-        //    List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
-        //    IQueryable<ResourceRespDTO>? FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
-
-        //    return CustomResult(FilteredSchedules);
-        //}
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
         {
             IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true, e => e.Region, e => e.Images);
 
             List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
-            IQueryable<ResourceRespDTO>? FilteredSchedulesWithoutPaging = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable(), applyPagination: false);
-            int totalItemCount = FilteredSchedulesWithoutPaging.Count();
-            var FilteredSchedulesWithPaging = _sieveProcessor.Apply(sieveModel, FilteredSchedulesWithoutPaging, applyFiltering: false, applySorting: false); // Only applies pagination
-            int pageSize = sieveModel.PageSize ?? 10; 
-            int totalPages = (int)Math.Ceiling((double)totalItemCount / pageSize);
-            Request.HttpContext.Response.Headers.Add("Total-Page-Count", totalPages.ToString());
-            return CustomResult($"totalPages={totalPages}", FilteredSchedulesWithPaging);
+            IQueryable<ResourceRespDTO>? FilteredSchedules = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable());
+
+            return CustomResult(resourceDTO);
         }
+        //[HttpGet]
+        //public async Task<IActionResult> GetAll([FromQuery] SieveModel sieveModel)
+        //{
+        //    IEnumerable<Resource> resource = await _resourceRepo.GetAllAsync(true, e => e.Region, e => e.Images);
+
+        //    List<ResourceRespDTO> resourceDTO = _mapper.Map<List<ResourceRespDTO>>(resource);
+        //    IQueryable<ResourceRespDTO>? FilteredSchedulesWithoutPaging = _sieveProcessor.Apply<ResourceRespDTO>(sieveModel, resourceDTO.AsQueryable(), applyPagination: false);
+        //    int totalItemCount = FilteredSchedulesWithoutPaging.Count();
+        //    var FilteredSchedulesWithPaging = _sieveProcessor.Apply(sieveModel, FilteredSchedulesWithoutPaging, applyFiltering: false, applySorting: false); // Only applies pagination
+        //    int pageSize = sieveModel.PageSize ?? 50; 
+        //    int totalPages = (int)Math.Ceiling((double)totalItemCount / pageSize);
+        //    Request.HttpContext.Response.Headers.Add("Total-Page-Count", totalPages.ToString());
+        //    return CustomResult($"totalPages={totalPages}", FilteredSchedulesWithPaging);
+        //}
 
         [HttpGet("ResourceType/{id:int}")]
         public async Task<IActionResult> GetAllByResourceType(int id, [FromQuery] SieveModel sieveModel)
