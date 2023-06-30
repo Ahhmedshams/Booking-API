@@ -44,15 +44,17 @@ namespace Infrastructure.Persistence.Repositories
 
                     var bodybuilder = new BodyBuilder();
                     bodybuilder.HtmlBody =
-                    "</head>\r\n<body>\r\n  " +
-                    "<div class=\"container\">\r\n    " +
-                    "<p>Click the link below to Confirm your Email</p>\r\n" +
-                    $"<a " +
-                    $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
-                    $" href=\"{config["Server:Client"]}/auth/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}\" Confirm Email </a>" +
-                    "<p>Best regards,</p>\r" +
-                    "<p>Sona</p>\r\n  " +
-                    "</div>\r\n</body>\r\n</html>";
+                    "</head>\r\n<body>\r\n" +
+                    "  <div style=\"max-width: 600px; padding: 20px;\">" +
+                    "    <p>Click the link below to Confirm your Email:</p>\r\n" +
+                    $"    <a href=\"{config["Server:Client"]}/auth/ConfirmEmail?userId={userFromDb.Id}&token={ValidEncodingConfirmToken}\"" +
+                    "      style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none;\">Confirm Email</a>\r\n" +
+                    "    <p>Best regards,</p>\r\n" +
+                    "    <p>Sona</p>\r\n" +
+                    "  </div>\r\n" +
+                    "</body>\r\n" +
+                    "</html>";
+
                     var mailData = new MailData
                     {
                         EmailTo = userFromDb.Email,
@@ -162,19 +164,21 @@ namespace Infrastructure.Persistence.Repositories
 
                     var bodybuilder = new BodyBuilder();
                     bodybuilder.HtmlBody =
-                    "</head>\r\n<body>\r\n  " +
-                    "<div class=\"container\">\r\n    " +
-                    $"<p>Dear {user.UserName},</p>\r\n    " +
-                    "<p>We received a request to reset your password. Please use the following token to reset your password:</p>\r\n    " +
-                    $"<p>{ResetToken}</p>" +
-                    "<p>Click the link below to reset your password</p>\r\n" +
-                    $"<a " +
-                    $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
-                    $" href={config["Server:Client"]}/auth/resetPassword>Reset Password</a>\r\n    " +
-                    "<p>If you did not request a password reset, please ignore this email.</p>\r\n    " +
-                    "<p>Best regards,</p>\r" +
-                    "<p>Sona</p>\r\n  " +
-                    "</div>\r\n</body>\r\n</html>";
+                    "</head>\r\n<body>\r\n" +
+                    "  <div style=\"max-width: 600px; padding: 20px;\">" +
+                    $"    <p>Dear {user.UserName},</p>\r\n" +
+                    "    <p>We received a request to reset your password. Please use the following token to reset your password:</p>\r\n" +
+                    $"    <p>{ResetToken}</p>\r\n" +
+                    "    <p>Click the link below to reset your password:</p>\r\n" +
+                    $"    <a href=\"{config["Server:Client"]}/auth/resetPassword\"" +
+                    "      style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none;\">Reset Password</a>\r\n" +
+                    "    <p>If you did not request a password reset, please ignore this email.</p>\r\n" +
+                    "    <p>Best regards,</p>\r\n" +
+                    "    <p>Sona</p>\r\n" +
+                    "  </div>\r\n" +
+                    "</body>\r\n" +
+                    "</html>";
+
 
                     message.Body = bodybuilder.ToMessageBody();
 
