@@ -170,7 +170,7 @@ namespace Infrastructure.Persistence.Repositories
                     "<p>Click the link below to reset your password</p>\r\n" +
                     $"<a " +
                     $"style=\"display: inline-block; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; white-space: nowrap; vertical-align: middle; border: 1px solid #007bff; border-radius: .25rem; background-color: #007bff; color: #fff; text-decoration: none; text-decoration-style: none; text-decoration-color: none;\"" +
-                    $" href={config["Server:Client"]}/resetPassword>Reset Password</a>\r\n    " +
+                    $" href={config["Server:Client"]}/auth/resetPassword>Reset Password</a>\r\n    " +
                     "<p>If you did not request a password reset, please ignore this email.</p>\r\n    " +
                     "<p>Best regards,</p>\r" +
                     "<p>Sona</p>\r\n  " +
