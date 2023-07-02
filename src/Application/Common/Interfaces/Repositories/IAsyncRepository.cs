@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Domain.Common;
+using System.Linq.Expressions;
 
 namespace Application.Common.Interfaces.Repositories
 {
@@ -10,6 +11,14 @@ namespace Application.Common.Interfaces.Repositories
         Task<T> DeleteAsync<IDType>(IDType id);
         Task<T> EditAsync<IDType>(IDType id, T entity, Expression<Func<T, IDType>> keySelector);
         Task<T?> GetByIdAsync<IDType1, IDType2>(IDType1 id1, IDType2 id2, params Expression<Func<T, object>>[] includes);
-        Task<T> SoftDeleteAsync<IDType>(IDType id);
+        Task<bool> SoftDeleteAsync(int id);
+        ISoftDeletable SoftDelete(ISoftDeletable Entity);
+        IEnumerable<ISoftDeletable> SoftDelete(IEnumerable<ISoftDeletable> Entities);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        Task<int> SaveChangesAsync();
     }
 }
+
+
+
+

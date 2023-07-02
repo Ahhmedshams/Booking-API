@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Domain.Common;
 using Microsoft.EntityFrameworkCore;
+using Sieve.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class CRUDRepositoryAsync<T> : IAsyncRepository<T> where T : class , ISoftDeletable
+    public class CRUDRepositoryAsync<T> : IAsyncRepository<T> where T : class ,ISoftDeletable
     {
         protected readonly ApplicationDbContext _context;
 
@@ -30,9 +31,12 @@ namespace Infrastructure.Persistence.Repositories
             }
             if (withNoTracking == true) 
                 query.AsNoTracking();
+            query = query.Where(x => !x.IsDeleted);
 
             return await query.ToListAsync();
         }
+
+
 
         public async Task<T> AddAsync(T entity)
         {
@@ -64,7 +68,7 @@ namespace Infrastructure.Persistence.Repositories
 
 
 
-        public async Task<T?> GetByIdAsync<IDType>(IDType id , params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdAsync<IDType>(IDType id, params Expression<Func<T, object>>[] includes)
         {
             var query = _context.Set<T>().AsQueryable();
             if (includes.Length > 0)
@@ -91,22 +95,44 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.Set<T>().FindAsync(id1, id2);
         }
 
-        public async Task<T> SoftDeleteAsync<IDType>(IDType id)
+
+
+
+        public virtual async Task<bool> SoftDeleteAsync(int id)
         {
             var foundEntity = _context.Set<T>().Find(id);
             if (foundEntity == null)
-                return null;
+                return false;
             else
                 foundEntity.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return foundEntity;
+            return true;
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        public ISoftDeletable SoftDelete(ISoftDeletable Entity)
+        {
+            Entity.IsDeleted = true;
+            return Entity;
+        }
+
+        public IEnumerable<ISoftDeletable> SoftDelete(IEnumerable<ISoftDeletable> Entities)
+        {
+            foreach (var Entity in Entities)
+                Entity.IsDeleted = true;
+
+            return Entities;
         }
 
 
-
-
-
-
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
     }
 }
