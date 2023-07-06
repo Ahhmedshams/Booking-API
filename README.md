@@ -9,10 +9,8 @@
     <a href="#">
         <img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Paypal" style="max-width:100%;">
     </a>
-
-<a href="#">
-        <img src="https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=Stripe&logoColor=white
-" alt="Stripe" style="max-width:100%;">
+    <a href="#">
+        <img src="https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=Stripe&logoColor=white" alt="Stripe" style="max-width:100%;">
     </a>
 
 <a href="#">
