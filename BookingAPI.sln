@@ -5,8 +5,6 @@ VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A826B295-AD51-442F-89AB-D84305E3EA1B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DCE0353C-FF29-46B0-9820-C9306D548D7C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "src\Application\Application.csproj", "{F0CCFFB0-CBF1-417F-91F4-59C47D6B86B3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "src\Domain\Domain.csproj", "{82026E33-0EF9-41B8-873F-A8D08DE5F988}"
@@ -14,6 +12,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{C63F8190-5A4A-46F7-845C-55AE9DB5590C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "src\WebAPI\WebAPI.csproj", "{8AC45AC2-79E3-4086-9832-D03EB04CEE6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booking-API.Tests", "Booking-API.Tests\Booking-API.Tests.csproj", "{CF9C9E6A-6CF3-4213-AE88-94EEC8836E6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +37,10 @@ Global
 		{8AC45AC2-79E3-4086-9832-D03EB04CEE6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AC45AC2-79E3-4086-9832-D03EB04CEE6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AC45AC2-79E3-4086-9832-D03EB04CEE6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF9C9E6A-6CF3-4213-AE88-94EEC8836E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF9C9E6A-6CF3-4213-AE88-94EEC8836E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF9C9E6A-6CF3-4213-AE88-94EEC8836E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF9C9E6A-6CF3-4213-AE88-94EEC8836E6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
