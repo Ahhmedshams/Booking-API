@@ -50,6 +50,6 @@ submit a request to purchase the service
 1. Fork this Repository
 2. change the current directory to project path ex: ```cd Booking-Api ```
 3. At appSettings file set your SQL Server Connection string.
-3. run ```  update-database```
-4. If you want to make stripe or PayPal payment work, make sure add your keys at your AppSettings file.
+3. run ```  update-database``` 
+4. If you want to make stripe or PayPal payment work, make sure add your keys at your AppSettings file. 
 
